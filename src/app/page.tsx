@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { KiboAvatar } from "@/components/kibo/KiboAvatar";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -9,6 +9,26 @@ import { CHAPTERS, Chapter } from "@/data/chapters";
 export default function HomePage() {
   const [selectedChapter, setSelectedChapter] = useState<Chapter | null>(null);
   const [activeHintLevel, setActiveHintLevel] = useState<number>(1);
+
+  // Keyboard Accessibility: Tutup modal dengan tombol Escape & kunci scroll latar
+  useEffect(() => {
+    if (!selectedChapter) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setSelectedChapter(null);
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = originalOverflow;
+    };
+  }, [selectedChapter]);
 
   const hintExamples = [
     {
@@ -624,6 +644,7 @@ export default function HomePage() {
             <div
               role="dialog"
               aria-modal="true"
+              aria-labelledby="modal-chapter-title"
               style={{
                 position: "fixed",
                 inset: 0,
@@ -684,7 +705,7 @@ export default function HomePage() {
                 </div>
 
                 <div>
-                  <h3 style={{ fontSize: "1.6rem", fontWeight: 800, marginBottom: "8px" }}>
+                  <h3 id="modal-chapter-title" style={{ fontSize: "1.6rem", fontWeight: 800, marginBottom: "8px" }}>
                     {selectedChapter.title}
                   </h3>
                   <div style={{ color: "var(--cyan-core)", fontWeight: 600, fontSize: "0.95rem", marginBottom: "12px" }}>

@@ -30,8 +30,11 @@ export default function RootLayout({
   return (
     <html lang="id">
       <body className={plusJakartaSans.className}>
+        <a href="#main-content" className="skip-link">
+          Lewati ke Konten Utama
+        </a>
         <Navbar />
-        <main style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+        <main id="main-content" style={{ flex: 1, display: "flex", flexDirection: "column" }}>
           {children}
         </main>
         <Footer />
