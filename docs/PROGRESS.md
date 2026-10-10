@@ -28,15 +28,15 @@ Priority:
 
 ## Phase 1 — Core Navigation
 
-- [ ] P0 Home / Landing
+- [x] P0 Home / Landing
 - [ ] P0 Adventure / World Map
 - [ ] P0 Progress page
 - [ ] P0 How-to-play page
-- [ ] P0 Responsive navigation
+- [x] P0 Responsive navigation
 
 ## Phase 2 — Kibo
 
-- [ ] P0 Implement Kibo master visual
+- [x] P0 Implement Kibo master visual
 - [ ] P0 Implement Kibo idle state
 - [ ] P0 Implement Kibo happy state
 - [ ] P0 Implement Kibo thinking state
