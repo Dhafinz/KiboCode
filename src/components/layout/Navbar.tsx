@@ -116,7 +116,7 @@ export function Navbar() {
             Cara Belajar
           </Link>
           <Link
-            href="/#kurikulum"
+            href="/adventure"
             style={{
               fontSize: "0.95rem",
               fontWeight: 500,
@@ -124,7 +124,7 @@ export function Navbar() {
               transition: "color 150ms ease",
             }}
           >
-            Peta Bab
+            Peta Petualangan
           </Link>
           <Link
             href="/#kibo-mentor"
@@ -141,7 +141,7 @@ export function Navbar() {
 
         {/* Desktop CTA Action */}
         <div style={{ display: "none", alignItems: "center", gap: "12px" }} className="desktop-cta">
-          <Link href="/#kurikulum">
+          <Link href="/adventure">
             <Button variant="cyan" size="sm" style={{ fontWeight: 700, borderRadius: "9999px" }}>
               Mulai Petualangan 🚀
             </Button>
@@ -211,7 +211,7 @@ export function Navbar() {
             Cara Belajar
           </Link>
           <Link
-            href="/#kurikulum"
+            href="/adventure"
             onClick={closeMobileMenu}
             style={{
               fontSize: "1.05rem",
@@ -220,7 +220,7 @@ export function Navbar() {
               padding: "8px 0",
             }}
           >
-            Peta Bab (15 Misi)
+            Peta Petualangan (5 Wilayah)
           </Link>
           <Link
             href="/#kibo-mentor"
@@ -235,7 +235,7 @@ export function Navbar() {
             AI Mentor Kibo
           </Link>
           <div style={{ paddingTop: "8px" }}>
-            <Link href="/#kurikulum" onClick={closeMobileMenu}>
+            <Link href="/adventure" onClick={closeMobileMenu}>
               <Button variant="cyan" size="md" style={{ width: "100%", borderRadius: "12px" }}>
                 Mulai Petualangan 🚀
               </Button>

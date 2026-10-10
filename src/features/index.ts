@@ -1,15 +1,17 @@
 /**
  * Features Domain Organization
  *
- * Future modules to be implemented in accordance with Phase roadmap:
- * - blocks: Block engine types, parser, runner (Phase 3)
- * - challenges: Challenge runners and state machines (Phase 4)
- * - progress: Local & cloud progress persistence sync (Phase 5)
- * - ai: AI Kibo mentor client and hint progression (Phase 6)
+ * Current implemented modules:
+ * - blocks: Block engine types, deterministic simulation runner (Prompt 04)
+ * - progress: Local storage progress persistence and star tracking (Prompt 04)
  */
 
+export * from "./blocks/types";
+export * from "./blocks/engine";
+export * from "./progress/storage";
+
 export const FEATURE_FLAGS = {
-  blockEngine: false,
-  aiMentor: false,
+  blockEngine: true,
+  aiMentor: false, // Predefined progressive hints are active; live LLM deferred
   progressTracking: true,
 };

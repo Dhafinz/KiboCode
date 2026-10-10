@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import { KiboAvatar } from "@/components/kibo/KiboAvatar";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -179,7 +180,7 @@ export default function HomePage() {
                   paddingTop: "8px",
                 }}
               >
-                <a href="#kurikulum">
+                <Link href="/adventure">
                   <Button
                     variant="cyan"
                     size="lg"
@@ -193,7 +194,7 @@ export default function HomePage() {
                   >
                     Mulai Petualangan 🚀
                   </Button>
-                </a>
+                </Link>
                 <a href="#cara-belajar">
                   <Button
                     variant="secondary"
@@ -729,14 +730,47 @@ export default function HomePage() {
                 >
                   <KiboAvatar size={54} variant="happy" showGlow={false} isCircle={true} />
                   <div style={{ fontSize: "0.875rem", color: "#ffffff", lineHeight: 1.5 }}>
-                    <strong>Status Pengembangan:</strong> Engine drag-and-drop dan 3 level interaktif bab ini sedang disiapkan pada fase berikutnya. Kamu akan segera bisa memainkannya!
+                    {selectedChapter.id === "lumina-town" ? (
+                      <>
+                        <strong>Wilayah Aktif!</strong> Misi 01 (Lampu Pertama) sudah siap dimainkan. Bantu Kibo menyusun instruksi untuk menyalakan kembali lampu kota!
+                      </>
+                    ) : (
+                      <>
+                        <strong>Status Pengembangan:</strong> Wilayah ini akan terbuka setelah misi di Lumina Town diselesaikan. Ayo selesaikan tantangan pertama!
+                      </>
+                    )}
                   </div>
                 </div>
 
-                <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
-                  <Button variant="primary" size="md" onClick={() => setSelectedChapter(null)} style={{ minHeight: "44px", padding: "10px 24px" }}>
-                    Mengerti, Siap Belajar! 👍
+                <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px", flexWrap: "wrap" }}>
+                  <Button
+                    variant="outline"
+                    size="md"
+                    onClick={() => setSelectedChapter(null)}
+                    style={{ minHeight: "44px", padding: "10px 20px" }}
+                  >
+                    Tutup
                   </Button>
+                  {selectedChapter.id === "lumina-town" ? (
+                    <Link href="/challenge/ch-01">
+                      <Button
+                        variant="cyan"
+                        size="md"
+                        style={{ minHeight: "44px", padding: "10px 24px", fontWeight: 800 }}
+                      >
+                        Mainkan Misi 01 Sekarang 🚀
+                      </Button>
+                    </Link>
+                  ) : (
+                    <Button
+                      variant="primary"
+                      size="md"
+                      onClick={() => setSelectedChapter(null)}
+                      style={{ minHeight: "44px", padding: "10px 24px" }}
+                    >
+                      Mengerti, Siap Belajar! 👍
+                    </Button>
+                  )}
                 </div>
               </div>
             </div>
@@ -1019,7 +1053,7 @@ export default function HomePage() {
             </div>
 
             <div style={{ display: "flex", gap: "16px", flexWrap: "wrap", justifyContent: "center" }}>
-              <a href="#kurikulum">
+              <Link href="/adventure">
                 <Button
                   variant="cyan"
                   size="lg"
@@ -1033,7 +1067,7 @@ export default function HomePage() {
                 >
                   Jelajahi Peta 5 Bab Sekarang 🚀
                 </Button>
-              </a>
+              </Link>
               <a href="#hero">
                 <Button
                   variant="outline"
