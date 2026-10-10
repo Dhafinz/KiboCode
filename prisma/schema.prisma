@@ -1,0 +1,24 @@
+// Prisma schema for KiboCode
+// Development database: SQLite (docs/TECHNICAL.md & docs/DECISIONS.md)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Foundation schema for player progress tracking
+// Detailed challenge records and concepts will be expanded in Phase 5
+model PlayerProgress {
+  id               String   @id @default(uuid())
+  playerId         String   @unique @default("local_player")
+  currentChapterId String   @default("lumina-town")
+  currentChallenge String   @default("ch-01")
+  totalStars       Int      @default(0)
+  worldRestoredPct Float    @default(0.0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
