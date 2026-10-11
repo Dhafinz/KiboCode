@@ -13,13 +13,21 @@ interface PageProps {
   params: Promise<{ challengeId: string }>;
 }
 
-export default async function ChallengePage({ params }: PageProps) {
+async function ChallengeContent({
+  params,
+}: {
+  params: Promise<{ challengeId: string }>;
+}) {
   const { challengeId } = await params;
 
   if (!CHALLENGES[challengeId]) {
     notFound();
   }
 
+  return <ChallengeClient key={challengeId} challengeId={challengeId} />;
+}
+
+export default function ChallengePage({ params }: PageProps) {
   return (
     <Suspense
       fallback={
@@ -38,7 +46,7 @@ export default async function ChallengePage({ params }: PageProps) {
         </div>
       }
     >
-      <ChallengeClient challengeId={challengeId} />
+      <ChallengeContent params={params} />
     </Suspense>
   );
 }

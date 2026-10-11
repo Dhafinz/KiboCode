@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from "react";
 import { ChapterId } from "@/types";
-import { CHALLENGES } from "@/data/challenges";
+import { CHALLENGES, ChallengeDetail } from "@/data/challenges";
 
 export interface ChallengeProgressRecord {
   challengeId: string;
@@ -19,7 +19,7 @@ export interface PlayerProgressData {
 }
 
 const STORAGE_KEY = "kibocode_player_progress_v1";
-const TOTAL_CHALLENGES_IN_WORLD = 15;
+const TOTAL_CHALLENGES_IN_WORLD = 25;
 
 const DEFAULT_PROGRESS: PlayerProgressData = {
   playerId: "local_player",
@@ -68,7 +68,7 @@ function notifyListeners() {
  */
 export function loadProgress(): PlayerProgressData {
   if (typeof window === "undefined") {
-    return DEFAULT_PROGRESS;
+    return inMemoryCache;
   }
 
   try {
@@ -97,10 +97,6 @@ export function saveChallengeResult(
   challengeId: string,
   stars: number
 ): PlayerProgressData {
-  if (typeof window === "undefined") {
-    return DEFAULT_PROGRESS;
-  }
-
   try {
     if (!CHALLENGES[challengeId]) {
       console.warn(`ID tantangan "${challengeId}" tidak valid. Catatan progres diabaikan.`);
@@ -108,6 +104,12 @@ export function saveChallengeResult(
     }
 
     const current = loadProgress();
+
+    if (!isChallengeUnlocked(challengeId, current)) {
+      console.warn(`Tantangan "${challengeId}" masih terkunci. Catatan progres diabaikan.`);
+      return current;
+    }
+
     const existingRecord = current.completedChallenges[challengeId];
 
     // Simpan bintang tertinggi (tidak pernah mengurangi bintang jika sudah 3)
@@ -143,13 +145,20 @@ export function saveChallengeResult(
       updatedAt: new Date().toISOString(),
     };
 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedData));
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedData));
+      } catch (err) {
+        console.error("Gagal menyimpan progres ke localStorage:", err);
+      }
+    }
+
     inMemoryCache = updatedData;
     isCacheLoaded = true;
     notifyListeners();
     return updatedData;
   } catch (err) {
-    console.error("Gagal menyimpan progres ke localStorage:", err);
+    console.error("Gagal menyimpan progres:", err);
     return DEFAULT_PROGRESS;
   }
 }
@@ -160,6 +169,50 @@ export function saveChallengeResult(
 export function isChallengeCompleted(challengeId: string): boolean {
   const progress = loadProgress();
   return Boolean(progress.completedChallenges[challengeId]);
+}
+
+/**
+ * Helper to get the prerequisite challenge that must be completed first
+ */
+export function getPrerequisiteChallenge(
+  challengeId: string
+): ChallengeDetail | undefined {
+  const challenge = CHALLENGES[challengeId];
+  if (!challenge || challenge.order <= 1) {
+    return undefined;
+  }
+
+  const prevOrder = challenge.order - 1;
+  return Object.values(CHALLENGES).find(
+    (c) => c.chapterId === challenge.chapterId && c.order === prevOrder
+  );
+}
+
+/**
+ * Checks if a challenge is unlocked based on player progress.
+ * Rule:
+ * - Challenge 01 (order 1 in chapter 1) is unlocked by default.
+ * - Challenge with order > 1 is unlocked IF the previous challenge in the chapter is completed.
+ */
+export function isChallengeUnlocked(
+  challengeId: string,
+  progressData?: PlayerProgressData
+): boolean {
+  const challenge = CHALLENGES[challengeId];
+  if (!challenge) return false;
+
+  // Tantangan pertama dari Lumina Town selalu terbuka
+  if (challenge.order === 1) {
+    return true;
+  }
+
+  const current = progressData ?? loadProgress();
+  const prereq = getPrerequisiteChallenge(challengeId);
+
+  if (!prereq) return true;
+
+  // Terbuka jika tantangan prasyarat sudah berhasil diselesaikan
+  return Boolean(current.completedChallenges[prereq.id]);
 }
 
 /**
@@ -174,14 +227,15 @@ export function getChallengeStars(challengeId: string): number {
  * Helper to clear local progress (useful for testing or reset)
  */
 export function clearProgress(): void {
-  if (typeof window === "undefined") return;
-  try {
-    localStorage.removeItem(STORAGE_KEY);
-    inMemoryCache = DEFAULT_PROGRESS;
-    notifyListeners();
-  } catch (err) {
-    console.warn("Gagal mereset localStorage:", err);
+  inMemoryCache = DEFAULT_PROGRESS;
+  if (typeof window !== "undefined") {
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch (err) {
+      console.warn("Gagal mereset localStorage:", err);
+    }
   }
+  notifyListeners();
 }
 
 function getProgressSnapshot(): PlayerProgressData {

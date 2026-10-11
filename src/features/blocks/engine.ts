@@ -46,6 +46,26 @@ export function runSimulation(
     }
 
     if (block === "MOVE") {
+      // Periksa apakah Kibo sedang berdiri di petak gerbang yang masih tertutup
+      const gateAtCurrentPos = normConfig.targets.find(
+        (t) => t.position === currentPos && t.type === "gate"
+      );
+      if (gateAtCurrentPos && !activatedTargetIds.has(gateAtCurrentPos.id)) {
+        simulationHalted = true;
+        failureReason = `Duar! ${gateAtCurrentPos.label || "Gerbang Pintar"} masih tertutup! Kibo tidak bisa lewat. Gunakan perintah kondisi [Jika Tertutup: Buka Gerbang] terlebih dahulu ya.`;
+        steps.push({
+          stepIndex: i,
+          blockType: block,
+          kiboPosition: currentPos,
+          lampActive: activatedTargetIds.size > 0,
+          activeTargetIds: Array.from(activatedTargetIds),
+          status: "failure",
+          message: failureReason,
+          kiboMood: "confused",
+        });
+        break;
+      }
+
       const nextPos = currentPos + 1;
       if (nextPos > maxTilePosition) {
         // Melangkah melampaui batas arena petak
@@ -77,11 +97,74 @@ export function runSimulation(
           kiboMood: "idle",
         });
       }
+    } else if (block === "IF_GATE") {
+      const gateAtPos = normConfig.targets.find(
+        (t) => t.position === currentPos && t.type === "gate"
+      );
+
+      if (gateAtPos) {
+        activatedTargetIds.add(gateAtPos.id);
+        const gateMsg =
+          gateAtPos.activationMessage ||
+          "Kondisi diperiksa: Gerbang Pintar tertutup! Sensor merespons dan gerbang kini terbuka!";
+        steps.push({
+          stepIndex: i,
+          blockType: block,
+          kiboPosition: currentPos,
+          lampActive: activatedTargetIds.size > 0,
+          activeTargetIds: Array.from(activatedTargetIds),
+          status: "success",
+          message: gateMsg,
+          kiboMood: "happy",
+        });
+      } else {
+        simulationHalted = true;
+        failureReason =
+          "Kibo memeriksa sekitar, tapi di petak ini tidak ada Gerbang Pintar untuk dibuka!";
+        steps.push({
+          stepIndex: i,
+          blockType: block,
+          kiboPosition: currentPos,
+          lampActive: activatedTargetIds.size > 0,
+          activeTargetIds: Array.from(activatedTargetIds),
+          status: "failure",
+          message: failureReason,
+          kiboMood: "confused",
+        });
+        break;
+      }
     } else if (block === "ACTIVATE") {
       const targetAtPos = normConfig.targets.find((t) => t.position === currentPos);
 
       if (targetAtPos) {
+        // Cek ketergantungan urutan: apakah prasyarat target sudah aktif?
+        if (targetAtPos.dependsOn && !activatedTargetIds.has(targetAtPos.dependsOn)) {
+          simulationHalted = true;
+          failureReason =
+            targetAtPos.prerequisiteMessage ||
+            `Perangkat ${targetAtPos.label || "ini"} belum bisa diaktifkan karena sumber dayanya belum dinyalakan terlebih dahulu! Aktifkan perangkat sebelumnya ya.`;
+          steps.push({
+            stepIndex: i,
+            blockType: block,
+            kiboPosition: currentPos,
+            lampActive: activatedTargetIds.size > 0,
+            activeTargetIds: Array.from(activatedTargetIds),
+            status: "failure",
+            message: failureReason,
+            kiboMood: "confused",
+          });
+          break;
+        }
+
         activatedTargetIds.add(targetAtPos.id);
+        const activationMsg =
+          targetAtPos.activationMessage ||
+          (targetAtPos.type === "generator"
+            ? "Generator Daya diaktifkan! Arus daya digital mengalir!"
+            : targetAtPos.type === "crystal"
+            ? "Kristal Cahaya Agung bersinar megah! Seluruh Lumina Town kembali benderang!"
+            : "Saklar disentuh! Lampu jalan Lumina Town kembali bersinar terang!");
+
         steps.push({
           stepIndex: i,
           blockType: block,
@@ -89,14 +172,14 @@ export function runSimulation(
           lampActive: true,
           activeTargetIds: Array.from(activatedTargetIds),
           status: "success",
-          message: "Saklar disentuh! Lampu jalan Lumina Town kembali bersinar terang!",
+          message: activationMsg,
           kiboMood: "happy",
         });
       } else {
         // Belum sampai di petak target saklar
         simulationHalted = true;
         failureReason =
-          "Kibo belum sampai di depan tiang lampu! Di petak ini tidak ada saklar yang bisa dinyalakan.";
+          "Kibo belum sampai di depan saklar atau tiang lampu! Di petak ini tidak ada saklar yang bisa dinyalakan.";
         steps.push({
           stepIndex: i,
           blockType: block,
@@ -123,15 +206,27 @@ export function runSimulation(
     const isOptimal = blocks.length <= normConfig.optimalBlocks;
     const stars = isOptimal ? 3 : 2;
 
+    let successMsg = isOptimal
+      ? "Luar biasa! Urutan instruksimu tepat dan efisien. Lampu kota kembali menyala!"
+      : "Bagus sekali! Lampu kota menyala, tapi kamu bisa mencoba membuatnya lebih ringkas untuk 3 bintang penuh!";
+
+    if (normConfig.id === "ch-04") {
+      successMsg = isOptimal
+        ? "Luar biasa! Gerbang Pintar berhasil dibuka dengan logika IF-THEN yang tepat, dan Menara Cahaya kembali bersinar!"
+        : "Bagus sekali! Menara Cahaya berhasil dinyalakan, coba buat susunan blok lebih ringkas untuk 3 bintang penuh!";
+    } else if (normConfig.id === "ch-05") {
+      successMsg = isOptimal
+        ? "Luar biasa! Lumina Town telah pulih seutuhnya! Seluruh lampu, generator, dan Kristal Cahaya Agung bersinar megah! ✨"
+        : "Bagus sekali! Seluruh Lumina Town berhasil dipulihkan, tapi kamu bisa mencoba membuatnya lebih ringkas untuk 3 bintang penuh!";
+    }
+
     return {
       success: true,
       finalPosition: currentPos,
       lampActive: true,
       activeTargetIds: Array.from(activatedTargetIds),
       steps,
-      feedbackMessage: isOptimal
-        ? "Luar biasa! Urutan instruksimu tepat dan efisien. Lampu kota kembali menyala!"
-        : "Bagus sekali! Lampu kota menyala, tapi kamu bisa mencoba membuatnya lebih ringkas untuk 3 bintang penuh!",
+      feedbackMessage: successMsg,
       kiboMood: "celebrate",
       starsEarned: stars,
     };
@@ -145,7 +240,11 @@ export function runSimulation(
     const unactivatedTarget = requiredTargets.find((t) => !activatedTargetIds.has(t.id));
     if (unactivatedTarget && currentPos === unactivatedTarget.position) {
       finalFeedback =
-        "Kibo sudah berdiri tepat di depan tiang lampu, tapi lampunya belum menyala! Jangan lupa beri instruksi Nyalakan Lampu ya.";
+        `Kibo sudah berdiri tepat di depan ${unactivatedTarget.label || "tiang lampu"}, tapi saklarnya belum dinyalakan! Tambahkan instruksi Nyalakan Lampu ya.`;
+      finalMood = "thinking";
+    } else if (activatedTargetIds.size > 0 && unactivatedTarget) {
+      finalFeedback =
+        `Sebagian lampu sudah menyala, tapi ${unactivatedTarget.label || "lampu lainnya"} masih padam! Periksa kembali apakah Kibo sudah menyalakan setiap lampu di jalurnya.`;
       finalMood = "thinking";
     } else {
       finalFeedback =

@@ -47,7 +47,7 @@ Priority:
 ## Phase 3 — Block Coding Engine
 
 - [x] P0 Block data model (Verified: `BlockType`, `BlockItem`, `SimulationStep`, `ChallengeTarget`)
-- [x] P0 Block library (Verified: Minimal child-friendly set `MOVE` and `ACTIVATE` for Ch 01)
+- [x] P0 Block library (Verified: Child-friendly set MOVE, ACTIVATE, and conditional block IF_GATE for Smart Gate puzzle)
 - [ ] P0 Drag/drop (Deferred to later iteration; click-to-add implemented)
 - [ ] P0 Snap behavior (Deferred to visual puzzle iteration)
 - [ ] P0 Nested blocks (Deferred to Condition/Loop chapters)
@@ -60,30 +60,40 @@ Priority:
 
 ## Phase 4 — Challenges
 
-### Lumina Town
+### Lumina Town (Sequence — 5 Challenges Complete)
 - [x] P0 Challenge 01 (Verified: "First Light" fully playable with 2D Lumina Town scene, isometric neon platforms, StreetLamp lighting states, and animated Kibo path glide at `/challenge/ch-01`)
-- [ ] P0 Challenge 02
-- [ ] P0 Challenge 03
+- [x] P0 Challenge 02 (Verified: "Light the Street" multi-target sequence with 4 platforms, 2 street lamps at tile 2 & 4, progressive hints, optimal 5 blocks, and prerequisite unlock gate at `/challenge/ch-02`)
+- [x] P0 Challenge 03 (Verified: "Night Walk" advanced sequence with 5 platforms, checkpoint lamp & central illuminator, progressive hints, optimal 6 blocks, and prerequisite unlock gate at `/challenge/ch-03`)
+- [x] P0 Challenge 04 (Verified: "Gerbang Pintar (Smart Gate)" introducing simple conditional concept IF–THEN via obstacle gate and atomic condition block IF_GATE ["Jika Tertutup: Buka Gerbang"]. Kibo must inspect gate condition at platform 3 and open it before passing to activate Light Tower at platform 4. Repetition with Challenge 02 eliminated; distinct optimal solution [MOVE, MOVE, IF_GATE, MOVE, ACTIVATE] at `/challenge/ch-04`)
+- [x] P0 Challenge 05 (Verified: "Festival of Lights" grand finale sequence for Lumina Town with RelayStation, GardenLantern, LightCrystal spire, multi-stage precondition chain, full Lumina Town restoration, optimal 8 blocks at `/challenge/ch-05`. Visual coordinate bug fixed via unified grid column math `((kiboPos + 0.5) / totalTiles) * 100%`, verified via automated browser playthrough)
 
-### Gate Valley
-- [ ] P0 Challenge 04
-- [ ] P0 Challenge 05
+### Gate Valley (Condition — Locked until Lumina Town complete)
 - [ ] P0 Challenge 06
-
-### Sprout Garden
 - [ ] P0 Challenge 07
 - [ ] P0 Challenge 08
 - [ ] P0 Challenge 09
-
-### Memory Station
 - [ ] P0 Challenge 10
+
+### Sprout Garden (Loop)
 - [ ] P0 Challenge 11
 - [ ] P0 Challenge 12
-
-### Kibo Core
 - [ ] P0 Challenge 13
 - [ ] P0 Challenge 14
 - [ ] P0 Challenge 15
+
+### Memory Station (Variable)
+- [ ] P0 Challenge 16
+- [ ] P0 Challenge 17
+- [ ] P0 Challenge 18
+- [ ] P0 Challenge 19
+- [ ] P0 Challenge 20
+
+### Kibo Core (Problem Solving)
+- [ ] P0 Challenge 21
+- [ ] P0 Challenge 22
+- [ ] P0 Challenge 23
+- [ ] P0 Challenge 24
+- [ ] P0 Challenge 25
 
 ## Phase 5 — Progress
 

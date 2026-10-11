@@ -7,16 +7,24 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { CHAPTERS } from "@/data/chapters";
 import { CHALLENGES } from "@/data/challenges";
-import { usePlayerProgress } from "@/features/progress/storage";
+import {
+  usePlayerProgress,
+  isChallengeUnlocked,
+  getPrerequisiteChallenge,
+} from "@/features/progress/storage";
 
 export default function AdventurePage() {
   const progress = usePlayerProgress();
-
-  const ch01Record = progress.completedChallenges["ch-01"];
-  const isCh01Completed = Boolean(ch01Record);
-  const ch01Stars = ch01Record?.stars ?? 0;
   const totalStars = progress.totalStars;
   const worldRestoredPct = progress.worldRestoredPct;
+  const isAnyCompleted = Object.keys(progress.completedChallenges).length > 0;
+  const isLuminaTownRestored = Boolean(
+    progress.completedChallenges["ch-01"] &&
+    progress.completedChallenges["ch-02"] &&
+    progress.completedChallenges["ch-03"] &&
+    progress.completedChallenges["ch-04"] &&
+    progress.completedChallenges["ch-05"]
+  );
 
   return (
     <div
@@ -171,7 +179,7 @@ export default function AdventurePage() {
             >
               <KiboAvatar
                 size={160}
-                variant={isCh01Completed ? "celebrate" : "idle"}
+                variant={isLuminaTownRestored ? "celebrate" : isAnyCompleted ? "happy" : "idle"}
                 showGlow={true}
                 isCircle={true}
               />
@@ -189,7 +197,11 @@ export default function AdventurePage() {
                   boxShadow: "0 4px 12px rgba(0, 0, 0, 0.4)",
                 }}
               >
-                {isCh01Completed ? "Kibo: Lumina Town Menyala! ✨" : "Kibo: Siap Memulai Misi! 🚀"}
+                {isLuminaTownRestored
+                  ? "Kibo: Lumina Town Pulih Sepenuhnya! ✨"
+                  : isAnyCompleted
+                  ? "Kibo: Petualangan Berlanjut! 💡"
+                  : "Kibo: Siap Memulai Misi! 🚀"}
               </div>
             </div>
           </div>
@@ -322,101 +334,199 @@ export default function AdventurePage() {
                     {ch.description}
                   </p>
 
-                  {/* Playable Challenge Card for Lumina Town */}
+                  {/* Playable Challenge Cards for Lumina Town */}
                   {isFirstArea ? (
-                    <div
-                      style={{
-                        backgroundColor: "rgba(10, 15, 29, 0.8)",
-                        border: "1px solid rgba(0, 242, 254, 0.25)",
-                        borderRadius: "16px",
-                        padding: "20px",
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: "16px",
-                      }}
-                    >
-                      <div
-                        style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                          flexWrap: "wrap",
-                          gap: "12px",
-                        }}
-                      >
-                        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                          <span style={{ fontSize: "1.4rem" }}>💡</span>
-                          <div>
-                            <div style={{ fontWeight: 800, color: "#ffffff", fontSize: "1.05rem" }}>
-                              {CHALLENGES["ch-01"].title}
+                    <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                      {Object.values(CHALLENGES)
+                        .filter((chal) => chal.chapterId === ch.id)
+                        .sort((a, b) => a.order - b.order)
+                        .map((chal) => {
+                          const record = progress.completedChallenges[chal.id];
+                          const isCompleted = Boolean(record);
+                          const stars = record?.stars ?? 0;
+                          const isUnlocked = isChallengeUnlocked(chal.id, progress);
+                          const prereq = getPrerequisiteChallenge(chal.id);
+
+                          return (
+                            <div
+                              key={chal.id}
+                              style={{
+                                backgroundColor: isUnlocked
+                                  ? "rgba(10, 15, 29, 0.85)"
+                                  : "rgba(10, 15, 29, 0.5)",
+                                border: isCompleted
+                                  ? "1.5px solid rgba(16, 185, 129, 0.4)"
+                                  : isUnlocked
+                                  ? "1.5px solid rgba(0, 242, 254, 0.35)"
+                                  : "1px dashed rgba(255, 255, 255, 0.15)",
+                                borderRadius: "16px",
+                                padding: "20px",
+                                display: "flex",
+                                flexDirection: "column",
+                                gap: "14px",
+                                opacity: isUnlocked ? 1 : 0.75,
+                                transition: "all 200ms ease",
+                              }}
+                            >
+                              <div
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "space-between",
+                                  alignItems: "center",
+                                  flexWrap: "wrap",
+                                  gap: "12px",
+                                }}
+                              >
+                                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                                  <span style={{ fontSize: "1.4rem" }}>
+                                    {chal.id === "ch-01"
+                                      ? "💡"
+                                      : chal.id === "ch-02"
+                                      ? "🏮"
+                                      : chal.id === "ch-03"
+                                      ? "🌟"
+                                      : chal.id === "ch-04"
+                                      ? "🚪"
+                                      : "🔮"}
+                                  </span>
+                                  <div>
+                                    <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                                      <span style={{ fontWeight: 800, color: "#ffffff", fontSize: "1.05rem" }}>
+                                        Misi 0{chal.order}: {chal.title}
+                                      </span>
+                                      {isCompleted && (
+                                        <Badge variant="green" size="sm">
+                                          Selesai ✓
+                                        </Badge>
+                                      )}
+                                      {!isCompleted && isUnlocked && (
+                                        <Badge variant="cyan" size="sm">
+                                          Tersedia
+                                        </Badge>
+                                      )}
+                                      {!isUnlocked && (
+                                        <Badge variant="neutral" size="sm">
+                                          🔒 Terkunci
+                                        </Badge>
+                                      )}
+                                    </div>
+                                    <div
+                                      style={{
+                                        fontSize: "0.85rem",
+                                        color: isUnlocked ? "var(--cyan-core)" : "var(--text-dim)",
+                                        marginTop: "2px",
+                                      }}
+                                    >
+                                      Fokus: {chal.conceptLabel} • {chal.gridTiles} Petak Jalur
+                                    </div>
+                                  </div>
+                                </div>
+
+                                {/* Star Rating Badge */}
+                                <div
+                                  style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: "6px",
+                                    padding: "6px 12px",
+                                    borderRadius: "10px",
+                                    backgroundColor: isCompleted
+                                      ? "rgba(245, 158, 11, 0.2)"
+                                      : isUnlocked
+                                      ? "rgba(0, 242, 254, 0.1)"
+                                      : "rgba(255, 255, 255, 0.04)",
+                                    border: isCompleted
+                                      ? "1px solid rgba(245, 158, 11, 0.4)"
+                                      : isUnlocked
+                                      ? "1px solid rgba(0, 242, 254, 0.25)"
+                                      : "1px solid rgba(255, 255, 255, 0.08)",
+                                  }}
+                                >
+                                  <span style={{ fontSize: "1rem" }}>
+                                    {isCompleted ? "⭐".repeat(stars) : isUnlocked ? "⏳" : "🔒"}
+                                  </span>
+                                  <span
+                                    style={{
+                                      fontSize: "0.85rem",
+                                      fontWeight: 700,
+                                      color: isCompleted
+                                        ? "var(--warm-yellow)"
+                                        : isUnlocked
+                                        ? "var(--cyan-core)"
+                                        : "var(--text-dim)",
+                                    }}
+                                  >
+                                    {isCompleted
+                                      ? `${stars}/3 Bintang`
+                                      : isUnlocked
+                                      ? "Belum Selesai"
+                                      : "Terkunci"}
+                                  </span>
+                                </div>
+                              </div>
+
+                              <p style={{ fontSize: "0.9rem", color: "var(--text-muted)", lineHeight: 1.5 }}>
+                                {chal.story}
+                              </p>
+
+                              <div
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "space-between",
+                                  alignItems: "center",
+                                  flexWrap: "wrap",
+                                  gap: "12px",
+                                  paddingTop: "12px",
+                                  borderTop: "1px solid rgba(255, 255, 255, 0.08)",
+                                }}
+                              >
+                                <div style={{ fontSize: "0.85rem", color: "var(--text-dim)" }}>
+                                  {!isUnlocked && prereq ? (
+                                    <span>
+                                      🔒 Selesaikan <strong>{prereq.title.split("(")[0].trim()}</strong> terlebih dahulu
+                                    </span>
+                                  ) : (
+                                    <span>Target: {chal.optimalBlocks} blok optimal</span>
+                                  )}
+                                </div>
+
+                                {isUnlocked ? (
+                                  <Link href={`/challenge/${chal.id}`}>
+                                    <Button
+                                      variant={isCompleted ? "secondary" : "cyan"}
+                                      size="md"
+                                      id={`btn-play-${chal.id}`}
+                                      style={{
+                                        borderRadius: "12px",
+                                        fontWeight: 800,
+                                        padding: "8px 20px",
+                                        boxShadow: isCompleted ? undefined : "0 4px 16px rgba(0, 242, 254, 0.3)",
+                                      }}
+                                    >
+                                      {isCompleted ? "Main Lagi ↺" : "Mainkan Misi ▶"}
+                                    </Button>
+                                  </Link>
+                                ) : (
+                                  <Button
+                                    variant="secondary"
+                                    size="md"
+                                    disabled
+                                    id={`btn-locked-${chal.id}`}
+                                    style={{
+                                      borderRadius: "12px",
+                                      fontWeight: 700,
+                                      padding: "8px 20px",
+                                      opacity: 0.5,
+                                      cursor: "not-allowed",
+                                    }}
+                                  >
+                                    🔒 Terkunci
+                                  </Button>
+                                )}
+                              </div>
                             </div>
-                            <div style={{ fontSize: "0.85rem", color: "var(--cyan-core)" }}>
-                              Fokus: Urutan Langkah (Sequence) • 3 Petak Jalur
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Star Rating Badge */}
-                        <div
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "6px",
-                            padding: "6px 12px",
-                            borderRadius: "10px",
-                            backgroundColor: isCh01Completed
-                              ? "rgba(245, 158, 11, 0.2)"
-                              : "rgba(255, 255, 255, 0.06)",
-                            border: isCh01Completed
-                              ? "1px solid rgba(245, 158, 11, 0.4)"
-                              : "1px solid rgba(255, 255, 255, 0.1)",
-                          }}
-                        >
-                          <span style={{ fontSize: "1rem" }}>
-                            {isCh01Completed ? "⭐".repeat(ch01Stars) : "⏳"}
-                          </span>
-                          <span
-                            style={{
-                              fontSize: "0.85rem",
-                              fontWeight: 700,
-                              color: isCh01Completed ? "var(--warm-yellow)" : "var(--text-dim)",
-                            }}
-                          >
-                            {isCh01Completed ? `Selesai (${ch01Stars}/3 Bintang)` : "Belum Selesai"}
-                          </span>
-                        </div>
-                      </div>
-
-                      <p style={{ fontSize: "0.9rem", color: "var(--text-muted)", lineHeight: 1.5 }}>
-                        {CHALLENGES["ch-01"].story}
-                      </p>
-
-                      <div
-                        style={{
-                          display: "flex",
-                          justifyContent: "flex-end",
-                          alignItems: "center",
-                          gap: "12px",
-                          paddingTop: "8px",
-                          borderTop: "1px solid rgba(255, 255, 255, 0.08)",
-                        }}
-                      >
-                        <Link href="/challenge/ch-01">
-                          <Button
-                            variant="cyan"
-                            size="md"
-                            id="btn-play-ch-01"
-                            style={{
-                              borderRadius: "12px",
-                              fontWeight: 800,
-                              padding: "10px 24px",
-                              boxShadow: "0 4px 16px rgba(0, 242, 254, 0.3)",
-                            }}
-                          >
-                            {isCh01Completed ? "Main Lagi ↺" : "Mainkan Misi ▶"}
-                          </Button>
-                        </Link>
-                      </div>
+                          );
+                        })}
                     </div>
                   ) : (
                     /* Locked Area Notice */
@@ -433,7 +543,11 @@ export default function AdventurePage() {
                     >
                       <span style={{ fontSize: "1.2rem" }}>🔒</span>
                       <span style={{ fontSize: "0.875rem", color: "var(--text-dim)" }}>
-                        Wilayah ini terkunci. Selesaikan tantangan di wilayah sebelumnya untuk membuka gerbang bab ini.
+                        {idx === 1
+                          ? isLuminaTownRestored
+                            ? "Gerbang Gate Valley telah siap dibuka! Wilayah ini akan hadir pada tahap petualangan berikutnya."
+                            : "Wilayah ini terkunci. Selesaikan seluruh 5 misi di Lumina Town untuk membuka gerbang bab ini."
+                          : "Wilayah ini terkunci. Selesaikan tantangan di wilayah sebelumnya untuk membuka gerbang bab ini."}
                       </span>
                     </div>
                   )}

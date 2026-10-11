@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "npx tsx tests/lumina-town.test.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.4.1",

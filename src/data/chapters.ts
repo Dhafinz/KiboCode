@@ -18,7 +18,7 @@ export const CHAPTERS: Chapter[] = [
     concept: "sequence",
     conceptLabel: "Sequence (Urutan Langkah)",
     description: "Perbaiki sistem lampu kota yang kehilangan instruksi langkah demi langkah.",
-    totalChallenges: 3,
+    totalChallenges: 5,
   },
   {
     id: "gate-valley",
@@ -27,7 +27,7 @@ export const CHAPTERS: Chapter[] = [
     concept: "condition",
     conceptLabel: "Condition (Kondisi IF/ELSE)",
     description: "Bantu gerbang lembah mengenali kapan harus membuka dan menutup.",
-    totalChallenges: 3,
+    totalChallenges: 5,
   },
   {
     id: "sprout-garden",
@@ -36,7 +36,7 @@ export const CHAPTERS: Chapter[] = [
     concept: "loop",
     conceptLabel: "Loop (Pengulangan)",
     description: "Pulihkan sistem pengairan otomatis dengan pengulangan aksi efisien.",
-    totalChallenges: 3,
+    totalChallenges: 5,
   },
   {
     id: "memory-station",
@@ -45,7 +45,7 @@ export const CHAPTERS: Chapter[] = [
     concept: "variable",
     conceptLabel: "Variable (Variabel & Nilai)",
     description: "Simpan dan gunakan kembali nilai data yang dibutuhkan dunia digital.",
-    totalChallenges: 3,
+    totalChallenges: 5,
   },
   {
     id: "kibo-core",
@@ -54,6 +54,6 @@ export const CHAPTERS: Chapter[] = [
     concept: "problem-solving",
     conceptLabel: "Problem Solving (Kombinasi Logika)",
     description: "Pusat Kibo World, gabungkan seluruh konsep untuk reaktivasi Kibo Core.",
-    totalChallenges: 3,
+    totalChallenges: 5,
   },
 ];

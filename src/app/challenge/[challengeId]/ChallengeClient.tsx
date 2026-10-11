@@ -6,6 +6,9 @@ import { KiboAvatar, KiboVariant } from "@/components/kibo/KiboAvatar";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { StreetLamp } from "@/components/gameplay/StreetLamp";
+import { PowerGenerator } from "@/components/gameplay/PowerGenerator";
+import { LightCrystal } from "@/components/gameplay/LightCrystal";
+import { SmartGate } from "@/components/gameplay/SmartGate";
 import { DigitalPlatform } from "@/components/gameplay/DigitalPlatform";
 import {
   CHALLENGES,
@@ -18,6 +21,8 @@ import { runSimulation } from "@/features/blocks/engine";
 import {
   saveChallengeResult,
   usePlayerProgress,
+  isChallengeUnlocked,
+  getPrerequisiteChallenge,
 } from "@/features/progress/storage";
 
 let blockSequenceId = 0;
@@ -115,7 +120,7 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
     setBlocks((prev) => prev.filter((b) => b.id !== id));
   };
 
-  // Reset stage position without clearing blocks
+  // Reset seluruh kondisi permainan dan susunan blok ke kondisi awal
   const handleResetStage = () => {
     if (runTimerRef.current) {
       clearInterval(runTimerRef.current);
@@ -123,13 +128,14 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
     }
     setIsRunning(false);
     setActiveStepIndex(null);
+    setBlocks([]); // Menghapus seluruh blok yang telah disusun pemain
     setKiboPos(challenge.startPosition);
     setLampOn(false);
     setActiveTargetIds([]);
     setKiboMood("idle");
     setFeedback({
       type: "info",
-      message: "Posisi Kibo dan lampu telah direset. Tekan 'Jalankan Kode' untuk mencoba lagi.",
+      message: "Susunan blok dan arena telah direset ke kondisi awal. Ayo susun perintah baru untuk Kibo!",
     });
   };
 
@@ -142,6 +148,7 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
     setLampOn(false);
     setActiveTargetIds([]);
     setActiveStepIndex(null);
+    setKiboMood("idle");
 
     const blockTypes = blocks.map((b) => b.type);
     const result = runSimulation(blockTypes, challenge);
@@ -225,19 +232,128 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
     }
   };
 
-  // Posisi horizontal Kibo dalam persentase jalur (smooth transition)
+  // Posisi horizontal Kibo dalam persentase jalur (100% selaras dengan pusat petak)
   const getKiboHorizontalPosition = () => {
     const totalTiles = challenge.gridTiles;
-    const minPosPct = 18;
-    const maxPosPct = 82;
     if (totalTiles <= 1) return "50%";
-    const span = maxPosPct - minPosPct;
-    const step = span / (totalTiles - 1);
     if (kiboPos >= totalTiles) {
-      return `${maxPosPct + 10}%`; // overstep melampaui batas arena
+      return `${((totalTiles + 0.2) / totalTiles) * 100}%`; // overstep melampaui batas arena
     }
-    return `${minPosPct + kiboPos * step}%`;
+    return `${((kiboPos + 0.5) / totalTiles) * 100}%`;
   };
+
+  const isUnlocked = isChallengeUnlocked(challenge.id, progress);
+  const prereqChallenge = getPrerequisiteChallenge(challenge.id);
+  const nextChallenge = Object.values(CHALLENGES).find(
+    (c) => c.chapterId === challenge.chapterId && c.order === challenge.order + 1
+  );
+
+  if (!isUnlocked) {
+    return (
+      <div
+        style={{
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          padding: "24px 0 60px 0",
+        }}
+      >
+        <div className="container" style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <Link
+              href="/adventure"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "8px",
+                color: "var(--cyan-core)",
+                fontSize: "0.95rem",
+                fontWeight: 700,
+                padding: "8px 16px",
+                borderRadius: "12px",
+                backgroundColor: "rgba(0, 242, 254, 0.1)",
+                border: "1px solid rgba(0, 242, 254, 0.25)",
+                transition: "all 150ms ease",
+              }}
+            >
+              ← Kembali ke Peta Petualangan
+            </Link>
+          </div>
+
+          <div
+            className="glass-card"
+            style={{
+              padding: "clamp(32px, 5vw, 48px)",
+              borderRadius: "24px",
+              border: "1.5px solid rgba(245, 158, 11, 0.4)",
+              backgroundColor: "rgba(10, 15, 29, 0.95)",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              textAlign: "center",
+              gap: "24px",
+              boxShadow: "0 16px 40px rgba(0, 0, 0, 0.6), 0 0 30px rgba(245, 158, 11, 0.15)",
+              maxWidth: "600px",
+              margin: "32px auto 0 auto",
+            }}
+          >
+            <KiboAvatar size={130} variant="thinking" showGlow={true} isCircle={true} />
+
+            <div style={{ display: "flex", flexDirection: "column", gap: "10px", alignItems: "center" }}>
+              <Badge variant="yellow" size="md">
+                🔒 Misi Masih Terkunci
+              </Badge>
+              <h1 style={{ fontSize: "clamp(1.5rem, 3.5vw, 2rem)", fontWeight: 800, color: "#ffffff" }}>
+                {challenge.title}
+              </h1>
+              <p style={{ color: "var(--text-muted)", fontSize: "1rem", lineHeight: 1.6, maxWidth: "500px" }}>
+                Wah, Kibo belum bisa membuka gerbang misi ini! Kamu perlu menyelesaikan misi sebelumnya terlebih dahulu agar Kibo mengumpulkan energi yang cukup.
+              </p>
+            </div>
+
+            {prereqChallenge && (
+              <div
+                style={{
+                  width: "100%",
+                  padding: "16px 20px",
+                  borderRadius: "16px",
+                  backgroundColor: "rgba(255, 255, 255, 0.04)",
+                  border: "1px solid rgba(255, 255, 255, 0.1)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  flexWrap: "wrap",
+                  gap: "12px",
+                }}
+              >
+                <div style={{ textAlign: "left" }}>
+                  <div style={{ fontSize: "0.8rem", color: "var(--text-dim)", fontWeight: 700 }}>
+                    PRASYARAT MISI:
+                  </div>
+                  <div style={{ fontWeight: 800, color: "#ffffff", fontSize: "1rem" }}>
+                    {prereqChallenge.title}
+                  </div>
+                </div>
+                <Link href={`/challenge/${prereqChallenge.id}`}>
+                  <Button variant="cyan" size="sm" style={{ borderRadius: "10px", fontWeight: 700 }}>
+                    Mainkan Misi Prasyarat ▶
+                  </Button>
+                </Link>
+              </div>
+            )}
+
+            <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", justifyContent: "center" }}>
+              <Link href="/adventure">
+                <Button variant="outline" size="md" style={{ borderRadius: "12px" }}>
+                  🗺️ Buka Peta Dunia
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -394,7 +510,9 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
             }}
           >
             <span>🏮</span>
-            <span>Lumina Town — Gerbang Utama</span>
+            <span>
+              Lumina Town — Misi 0{challenge.order}: {challenge.title.split("(")[0].trim()}
+            </span>
           </div>
 
           {/* AREA JALUR & 3 PLATFORM DIGITAL (ISOMETRIC) */}
@@ -414,8 +532,8 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
               style={{
                 position: "absolute",
                 bottom: "55px",
-                left: "18%",
-                right: "18%",
+                left: `${(0.5 / challenge.gridTiles) * 100}%`,
+                right: `${(0.5 / challenge.gridTiles) * 100}%`,
                 height: "4px",
                 background:
                   "linear-gradient(90deg, #00f2fe 0%, #38bdf8 50%, #00f2fe 100%)",
@@ -481,13 +599,12 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
             {/* Hexagonal Isometric Platforms (Dinamis sesuai data tantangan) */}
             <div
               style={{
-                display: "flex",
-                justifyContent: "space-between",
+                display: "grid",
+                gridTemplateColumns: `repeat(${challenge.gridTiles}, minmax(0, 1fr))`,
                 alignItems: "flex-end",
                 width: "100%",
                 position: "relative",
                 zIndex: 2,
-                gap: "8px",
               }}
             >
               {Array.from({ length: challenge.gridTiles }).map((_, idx) => {
@@ -509,17 +626,39 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                 }
 
                 return (
-                  <DigitalPlatform
+                  <div
                     key={idx}
-                    index={idx + 1}
-                    label={label}
-                    isActive={isCurrentKibo || isTargetActive}
-                    hasChevron={!isStart && !isTarget}
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "flex-end",
+                      width: "100%",
+                    }}
                   >
-                    {isTarget && targetAtTile?.type === "lamp" && (
-                      <StreetLamp isOn={isTargetActive} />
-                    )}
-                  </DigitalPlatform>
+                    <DigitalPlatform
+                      index={idx + 1}
+                      label={label}
+                      isActive={isCurrentKibo || isTargetActive}
+                      hasChevron={!isStart && !isTarget}
+                    >
+                      {isTarget && (
+                        <>
+                          {targetAtTile?.type === "lamp" && (
+                            <StreetLamp isOn={isTargetActive} />
+                          )}
+                          {targetAtTile?.type === "generator" && (
+                            <PowerGenerator isOn={isTargetActive} />
+                          )}
+                          {targetAtTile?.type === "crystal" && (
+                            <LightCrystal isOn={isTargetActive} />
+                          )}
+                          {targetAtTile?.type === "gate" && (
+                            <SmartGate isOpen={isTargetActive} />
+                          )}
+                        </>
+                      )}
+                    </DigitalPlatform>
+                  </div>
                 );
               })}
             </div>
@@ -617,6 +756,8 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                   blocks.map((item, index) => {
                     const isCurrentStep = activeStepIndex === index;
                     const isMove = item.type === "MOVE";
+                    const isGate = item.type === "IF_GATE";
+                    const blockCfg = AVAILABLE_BLOCK_CONFIGS[item.type];
 
                     return (
                       <div
@@ -651,7 +792,7 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                           {index + 1}
                         </div>
 
-                        {/* Pill Berwarna Sesuai Referensi (Biru untuk MOVE, Ungu untuk ACTIVATE) */}
+                        {/* Pill Berwarna Sesuai Jenis Blok */}
                         <div
                           style={{
                             flex: 1,
@@ -660,11 +801,15 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                             justifyContent: "space-between",
                             padding: "10px 16px",
                             borderRadius: "14px",
-                            background: isMove
+                            background: isGate
+                              ? "linear-gradient(135deg, #d97706 0%, #b45309 100%)"
+                              : isMove
                               ? "linear-gradient(135deg, #0284c7 0%, #0369a1 100%)"
                               : "linear-gradient(135deg, #9333ea 0%, #7e22ce 100%)",
                             border: isCurrentStep
                               ? "2px solid #ffffff"
+                              : isGate
+                              ? "1px solid rgba(245, 158, 11, 0.4)"
                               : isMove
                               ? "1px solid rgba(56, 189, 248, 0.4)"
                               : "1px solid rgba(192, 132, 252, 0.4)",
@@ -677,10 +822,10 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                         >
                           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                             <span style={{ fontSize: "1.15rem" }}>
-                              {isMove ? "⬆" : "🔆"}
+                              {blockCfg?.icon || (isMove ? "⬆" : "🔆")}
                             </span>
                             <span style={{ fontWeight: 800, fontSize: "0.95rem", color: "#ffffff" }}>
-                              {AVAILABLE_BLOCK_CONFIGS[item.type].label}
+                              {blockCfg?.label || item.type}
                             </span>
                           </div>
 
@@ -756,59 +901,60 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                     </div>
                   </div>
 
-                  {/* Tombol Cepat Pilihan Blok */}
+                  {/* Tombol Cepat Pilihan Blok (Dinamis sesuai availableBlocks) */}
                   <div style={{ display: "flex", flexDirection: "column", gap: "8px", width: "100%" }}>
-                    <button
-                      type="button"
-                      id="block-add-move"
-                      disabled={isRunning || blocks.length >= challenge.maxBlocks}
-                      onClick={() => handleAddBlock("MOVE")}
-                      style={{
-                        padding: "10px 14px",
-                        borderRadius: "12px",
-                        background: "linear-gradient(135deg, #0284c7 0%, #0369a1 100%)",
-                        border: "1px solid rgba(56, 189, 248, 0.4)",
-                        color: "#ffffff",
-                        fontWeight: 700,
-                        fontSize: "0.875rem",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        gap: "8px",
-                        cursor: isRunning || blocks.length >= challenge.maxBlocks ? "not-allowed" : "pointer",
-                        opacity: isRunning || blocks.length >= challenge.maxBlocks ? 0.6 : 1,
-                        transition: "transform 150ms ease, box-shadow 150ms ease",
-                      }}
-                    >
-                      <span>+ ⬆</span>
-                      <span>Maju 1 Langkah</span>
-                    </button>
+                    {challenge.availableBlocks.map((bType) => {
+                      const cfg = AVAILABLE_BLOCK_CONFIGS[bType];
+                      const isMove = bType === "MOVE";
+                      const isGate = bType === "IF_GATE";
+                      const btnId =
+                        bType === "MOVE"
+                          ? "block-add-move"
+                          : bType === "ACTIVATE"
+                          ? "block-add-activate"
+                          : `block-add-${bType.toLowerCase().replace(/_/g, "-")}`;
 
-                    <button
-                      type="button"
-                      id="block-add-activate"
-                      disabled={isRunning || blocks.length >= challenge.maxBlocks}
-                      onClick={() => handleAddBlock("ACTIVATE")}
-                      style={{
-                        padding: "10px 14px",
-                        borderRadius: "12px",
-                        background: "linear-gradient(135deg, #9333ea 0%, #7e22ce 100%)",
-                        border: "1px solid rgba(192, 132, 252, 0.4)",
-                        color: "#ffffff",
-                        fontWeight: 700,
-                        fontSize: "0.875rem",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        gap: "8px",
-                        cursor: isRunning || blocks.length >= challenge.maxBlocks ? "not-allowed" : "pointer",
-                        opacity: isRunning || blocks.length >= challenge.maxBlocks ? 0.6 : 1,
-                        transition: "transform 150ms ease, box-shadow 150ms ease",
-                      }}
-                    >
-                      <span>+ 🔆</span>
-                      <span>Nyalakan Lampu</span>
-                    </button>
+                      return (
+                        <button
+                          key={bType}
+                          type="button"
+                          id={btnId}
+                          disabled={isRunning || blocks.length >= challenge.maxBlocks}
+                          onClick={() => handleAddBlock(bType)}
+                          style={{
+                            padding: "10px 14px",
+                            borderRadius: "12px",
+                            background: isGate
+                              ? "linear-gradient(135deg, #d97706 0%, #b45309 100%)"
+                              : isMove
+                              ? "linear-gradient(135deg, #0284c7 0%, #0369a1 100%)"
+                              : "linear-gradient(135deg, #9333ea 0%, #7e22ce 100%)",
+                            border: isGate
+                              ? "1px solid rgba(245, 158, 11, 0.4)"
+                              : isMove
+                              ? "1px solid rgba(56, 189, 248, 0.4)"
+                              : "1px solid rgba(192, 132, 252, 0.4)",
+                            color: "#ffffff",
+                            fontWeight: 700,
+                            fontSize: "0.875rem",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            gap: "8px",
+                            cursor:
+                              isRunning || blocks.length >= challenge.maxBlocks
+                                ? "not-allowed"
+                                : "pointer",
+                            opacity:
+                              isRunning || blocks.length >= challenge.maxBlocks ? 0.6 : 1,
+                            transition: "transform 150ms ease, box-shadow 150ms ease",
+                          }}
+                        >
+                          <span>+ {cfg?.icon || "▶"}</span>
+                          <span>{cfg?.label || bType}</span>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
@@ -1050,10 +1196,14 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                   marginBottom: "8px",
                 }}
               >
-                Misi Selesai! Hebat! 🎉
+                {challenge.id === "ch-05"
+                  ? "Lumina Town Pulih Sepenuhnya! 🌟"
+                  : "Misi Selesai! Hebat! 🎉"}
               </h2>
               <p style={{ color: "var(--text-muted)", fontSize: "0.95rem", lineHeight: 1.6 }}>
-                Kamu berhasil membantu Kibo menyalakan lampu jalan pertama di Lumina Town dengan urutan instruksi yang tepat!
+                {challenge.id === "ch-05"
+                  ? "Luar biasa! Kamu berhasil menuntaskan seluruh 5 misi di Lumina Town! Seluruh lentera, generator, dan Kristal Cahaya Agung kini bersinar benderang."
+                  : `Kamu berhasil menyelesaikan misi "${challenge.title}" dengan urutan instruksi yang tepat!`}
               </p>
             </div>
 
@@ -1081,16 +1231,34 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                 justifyContent: "center",
               }}
             >
-              <Link href="/adventure" style={{ flex: 1, minWidth: "160px" }}>
+              {nextChallenge && (
+                <Link href={`/challenge/${nextChallenge.id}`} style={{ flex: 1, minWidth: "180px" }}>
+                  <Button
+                    variant="cyan"
+                    size="lg"
+                    id="btn-victory-next-challenge"
+                    style={{
+                      width: "100%",
+                      borderRadius: "14px",
+                      fontWeight: 800,
+                      boxShadow: "0 4px 16px rgba(0, 242, 254, 0.4)",
+                    }}
+                  >
+                    Misi Berikutnya: {nextChallenge.title.split("(")[0].trim()} ▶
+                  </Button>
+                </Link>
+              )}
+
+              <Link href="/adventure" style={{ flex: 1, minWidth: "140px" }}>
                 <Button
-                  variant="cyan"
+                  variant={nextChallenge ? "outline" : "cyan"}
                   size="lg"
                   id="btn-victory-back-map"
                   style={{
                     width: "100%",
                     borderRadius: "14px",
-                    fontWeight: 800,
-                    boxShadow: "0 4px 16px rgba(0, 242, 254, 0.4)",
+                    fontWeight: 700,
+                    boxShadow: nextChallenge ? undefined : "0 4px 16px rgba(0, 242, 254, 0.4)",
                   }}
                 >
                   Kembali ke Peta 🗺️

@@ -46,7 +46,7 @@ export function DigitalPlatform({
       <div
         style={{
           position: "relative",
-          width: "140px",
+          width: "min(140px, 100%)",
           height: "56px",
           marginTop: "-10px",
           transition: "transform 250ms ease, filter 250ms ease",
