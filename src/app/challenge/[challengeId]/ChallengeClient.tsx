@@ -11,6 +11,7 @@ import {
   CHALLENGES,
   BlockType,
   AVAILABLE_BLOCK_CONFIGS,
+  normalizeChallenge,
 } from "@/data/challenges";
 import { BlockItem } from "@/features/blocks/types";
 import { runSimulation } from "@/features/blocks/engine";
@@ -30,18 +31,17 @@ interface ChallengeClientProps {
 }
 
 export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
-  const challenge = CHALLENGES[challengeId] ?? CHALLENGES["ch-01"];
+  const challenge = normalizeChallenge(CHALLENGES[challengeId] ?? CHALLENGES["ch-01"]);
   const progress = usePlayerProgress();
   const savedStars = progress.completedChallenges[challenge.id]?.stars ?? 0;
 
   // Workspace state: ordered blocks
-  const [blocks, setBlocks] = useState<BlockItem[]>([
-    // Nilai awal ramah untuk anak: kosong atau siap disusun
-  ]);
+  const [blocks, setBlocks] = useState<BlockItem[]>([]);
 
   // Simulation visual state
   const [kiboPos, setKiboPos] = useState<number>(challenge.startPosition);
   const [lampOn, setLampOn] = useState<boolean>(false);
+  const [activeTargetIds, setActiveTargetIds] = useState<string[]>([]);
   const [kiboMood, setKiboMood] = useState<KiboVariant>("idle");
   const [isRunning, setIsRunning] = useState<boolean>(false);
   const [activeStepIndex, setActiveStepIndex] = useState<number | null>(null);
@@ -125,6 +125,7 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
     setActiveStepIndex(null);
     setKiboPos(challenge.startPosition);
     setLampOn(false);
+    setActiveTargetIds([]);
     setKiboMood("idle");
     setFeedback({
       type: "info",
@@ -139,6 +140,7 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
     // Reset visual stage before running
     setKiboPos(challenge.startPosition);
     setLampOn(false);
+    setActiveTargetIds([]);
     setActiveStepIndex(null);
 
     const blockTypes = blocks.map((b) => b.type);
@@ -168,6 +170,7 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
         setActiveStepIndex(step.stepIndex);
         setKiboPos(step.kiboPosition);
         setLampOn(step.lampActive);
+        setActiveTargetIds(step.activeTargetIds ?? (step.lampActive ? [challenge.targets[0]?.id || "lamp-1"] : []));
         setKiboMood(step.kiboMood);
         setFeedback({
           type: step.status === "failure" ? "error" : "info",
@@ -191,6 +194,8 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
             message: result.feedbackMessage,
           });
           setStarsAwarded(result.starsEarned);
+          setActiveTargetIds(result.activeTargetIds);
+          setLampOn(result.lampActive);
           // Simpan progres ke local storage
           saveChallengeResult(challenge.id, result.starsEarned);
           setShowVictoryModal(true);
@@ -222,11 +227,16 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
 
   // Posisi horizontal Kibo dalam persentase jalur (smooth transition)
   const getKiboHorizontalPosition = () => {
-    if (kiboPos === 0) return "18%";
-    if (kiboPos === 1) return "50%";
-    if (kiboPos === 2) return "82%";
-    // Overstep jika melebihi platform 3
-    return "94%";
+    const totalTiles = challenge.gridTiles;
+    const minPosPct = 18;
+    const maxPosPct = 82;
+    if (totalTiles <= 1) return "50%";
+    const span = maxPosPct - minPosPct;
+    const step = span / (totalTiles - 1);
+    if (kiboPos >= totalTiles) {
+      return `${maxPosPct + 10}%`; // overstep melampaui batas arena
+    }
+    return `${minPosPct + kiboPos * step}%`;
   };
 
   return (
@@ -415,34 +425,26 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
               }}
             >
               {/* Chevron Pulse Indicators on Conduit */}
-              <div
-                style={{
-                  position: "absolute",
-                  left: "25%",
-                  top: "50%",
-                  transform: "translate(-50%, -50%)",
-                  color: "var(--cyan-core)",
-                  fontSize: "14px",
-                  fontWeight: 900,
-                  textShadow: "0 0 8px var(--cyan-core)",
-                }}
-              >
-                ››
-              </div>
-              <div
-                style={{
-                  position: "absolute",
-                  left: "75%",
-                  top: "50%",
-                  transform: "translate(-50%, -50%)",
-                  color: "var(--cyan-core)",
-                  fontSize: "14px",
-                  fontWeight: 900,
-                  textShadow: "0 0 8px var(--cyan-core)",
-                }}
-              >
-                ››
-              </div>
+              {Array.from({ length: Math.max(1, challenge.gridTiles - 1) }).map((_, i) => {
+                const chevronLeft = ((i + 0.5) / (challenge.gridTiles - 1)) * 100;
+                return (
+                  <div
+                    key={i}
+                    style={{
+                      position: "absolute",
+                      left: `${chevronLeft}%`,
+                      top: "50%",
+                      transform: "translate(-50%, -50%)",
+                      color: "var(--cyan-core)",
+                      fontSize: "14px",
+                      fontWeight: 900,
+                      textShadow: "0 0 8px var(--cyan-core)",
+                    }}
+                  >
+                    ››
+                  </div>
+                );
+              })}
             </div>
 
             {/* TRACK CHARACTER KIBO: Berpindah Halus Antar Platform */}
@@ -476,7 +478,7 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
               </div>
             </div>
 
-            {/* 3 Hexagonal Isometric Platforms */}
+            {/* Hexagonal Isometric Platforms (Dinamis sesuai data tantangan) */}
             <div
               style={{
                 display: "flex",
@@ -485,31 +487,41 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                 width: "100%",
                 position: "relative",
                 zIndex: 2,
+                gap: "8px",
               }}
             >
-              {/* Platform 1: Titik Awal */}
-              <DigitalPlatform
-                index={1}
-                label="TITIK AWAL"
-                isActive={kiboPos === 0}
-              />
+              {Array.from({ length: challenge.gridTiles }).map((_, idx) => {
+                const isStart = idx === challenge.startPosition;
+                const targetAtTile = challenge.targets.find((t) => t.position === idx);
+                const isTarget = Boolean(targetAtTile);
+                const isTargetActive = targetAtTile
+                  ? activeTargetIds.includes(targetAtTile.id) || (lampOn && challenge.targets.length === 1)
+                  : false;
+                const isCurrentKibo = kiboPos === idx;
 
-              {/* Platform 2: Jalur Digital (dengan tanda panah chevron neon) */}
-              <DigitalPlatform
-                index={2}
-                label="JALUR DIGITAL"
-                isActive={kiboPos === 1}
-                hasChevron={true}
-              />
+                let label = `PETAK ${idx + 1}`;
+                if (isStart) {
+                  label = "TITIK AWAL";
+                } else if (isTarget) {
+                  label = targetAtTile?.label || "TIANG LAMPU";
+                } else {
+                  label = "JALUR DIGITAL";
+                }
 
-              {/* Platform 3: Tiang Lampu */}
-              <DigitalPlatform
-                index={3}
-                label="TIANG LAMPU"
-                isActive={kiboPos === 2 || lampOn}
-              >
-                <StreetLamp isOn={lampOn} />
-              </DigitalPlatform>
+                return (
+                  <DigitalPlatform
+                    key={idx}
+                    index={idx + 1}
+                    label={label}
+                    isActive={isCurrentKibo || isTargetActive}
+                    hasChevron={!isStart && !isTarget}
+                  >
+                    {isTarget && targetAtTile?.type === "lamp" && (
+                      <StreetLamp isOn={isTargetActive} />
+                    )}
+                  </DigitalPlatform>
+                );
+              })}
             </div>
           </div>
         </div>

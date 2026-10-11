@@ -46,15 +46,16 @@ Priority:
 
 ## Phase 3 — Block Coding Engine
 
-- [x] P0 Block data model (Verified: `BlockType`, `BlockItem`, `SimulationStep`)
+- [x] P0 Block data model (Verified: `BlockType`, `BlockItem`, `SimulationStep`, `ChallengeTarget`)
 - [x] P0 Block library (Verified: Minimal child-friendly set `MOVE` and `ACTIVATE` for Ch 01)
 - [ ] P0 Drag/drop (Deferred to later iteration; click-to-add implemented)
 - [ ] P0 Snap behavior (Deferred to visual puzzle iteration)
 - [ ] P0 Nested blocks (Deferred to Condition/Loop chapters)
 - [x] P0 Remove/reset blocks (Verified: single remove ✕, clear all 🗑️, reset stage ↺)
-- [x] P0 Program execution (Verified: pure deterministic engine `runSimulation`)
-- [x] P0 Execution visualization (Verified: timed step-by-step playback with step highlighting)
-- [x] P0 Success/failure validation (Verified: checks goal, premature activate, oversteps)
+- [x] P0 Program execution (Verified: pure deterministic engine `runSimulation` parameterized for arbitrary gridTiles and targets without hardcoding)
+- [x] P0 Execution visualization (Verified: dynamic linear interpolation track, laser conduit chevrons, and StreetLamp lighting states)
+- [x] P0 Success/failure validation (Verified: dynamic targets matching, premature activation check, overstep check, and dynamic optimalBlocks star rating)
+- [x] P0 Route & Progress validation (Verified: Server-side `notFound()` for invalid challenge IDs, fake progress record prevention in `storage.ts`)
 - [ ] P1 Undo/redo if feasible
 
 ## Phase 4 — Challenges

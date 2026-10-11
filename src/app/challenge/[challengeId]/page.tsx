@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { notFound } from "next/navigation";
 import ChallengeClient from "./ChallengeClient";
 import { CHALLENGES } from "@/data/challenges";
 
@@ -14,6 +15,10 @@ interface PageProps {
 
 export default async function ChallengePage({ params }: PageProps) {
   const { challengeId } = await params;
+
+  if (!CHALLENGES[challengeId]) {
+    notFound();
+  }
 
   return (
     <Suspense

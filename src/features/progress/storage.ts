@@ -1,5 +1,6 @@
 import { useSyncExternalStore } from "react";
 import { ChapterId } from "@/types";
+import { CHALLENGES } from "@/data/challenges";
 
 export interface ChallengeProgressRecord {
   challengeId: string;
@@ -101,6 +102,11 @@ export function saveChallengeResult(
   }
 
   try {
+    if (!CHALLENGES[challengeId]) {
+      console.warn(`ID tantangan "${challengeId}" tidak valid. Catatan progres diabaikan.`);
+      return loadProgress();
+    }
+
     const current = loadProgress();
     const existingRecord = current.completedChallenges[challengeId];
 

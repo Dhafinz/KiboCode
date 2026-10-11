@@ -1,25 +1,29 @@
-import { ChallengeDetail } from "@/data/challenges";
+import { ChallengeDetail, normalizeChallenge } from "@/data/challenges";
 import { BlockType } from "@/data/challenges";
 import { SimulationResult, SimulationStep } from "./types";
 
 /**
  * Pure Deterministic Block Simulation Engine
  *
- * Sesuai panduan Prompt 04 & docs/TECHNICAL.md:
+ * Sesuai panduan Prompt 05 & docs/TECHNICAL.md:
  * - Tidak menggunakan eval() atau eksekusi kode dinamis sembarang.
  * - Mengevaluasi urutan instruksi secara deterministik langkah demi langkah.
- * - Memisahkan validasi logika dari komponen tampilan antarmuka.
+ * - Berbasis parameter konfigurasi tantangan dinamis (petak, target, blok optimal).
  */
 export function runSimulation(
   blocks: BlockType[],
   challenge: ChallengeDetail
 ): SimulationResult {
+  const normConfig = normalizeChallenge(challenge);
+  const maxTilePosition = normConfig.gridTiles - 1;
+
   // Validasi urutan kosong
   if (blocks.length === 0) {
     return {
       success: false,
-      finalPosition: challenge.startPosition,
+      finalPosition: normConfig.startPosition,
       lampActive: false,
+      activeTargetIds: [],
       steps: [],
       feedbackMessage:
         "Belum ada instruksi yang dipasang. Klik atau seret blok perintah untuk membantu Kibo melangkah!",
@@ -28,8 +32,8 @@ export function runSimulation(
     };
   }
 
-  let currentPos = challenge.startPosition;
-  let isLampOn = false;
+  let currentPos = normConfig.startPosition;
+  const activatedTargetIds = new Set<string>();
   const steps: SimulationStep[] = [];
   let simulationHalted = false;
   let failureReason = "";
@@ -43,17 +47,18 @@ export function runSimulation(
 
     if (block === "MOVE") {
       const nextPos = currentPos + 1;
-      if (nextPos > challenge.lampPosition) {
-        // Melangkah melampaui tiang lampu
+      if (nextPos > maxTilePosition) {
+        // Melangkah melampaui batas arena petak
         currentPos = nextPos;
         simulationHalted = true;
         failureReason =
-          "Kibo melangkah terlalu jauh melebihi tiang lampu! Periksa kembali jumlah langkah yang diperlukan.";
+          "Kibo melangkah terlalu jauh melebihi jalur digital! Periksa kembali jumlah langkah yang diperlukan.";
         steps.push({
           stepIndex: i,
           blockType: block,
           kiboPosition: currentPos,
-          lampActive: isLampOn,
+          lampActive: activatedTargetIds.size > 0,
+          activeTargetIds: Array.from(activatedTargetIds),
           status: "failure",
           message: failureReason,
           kiboMood: "confused",
@@ -65,26 +70,30 @@ export function runSimulation(
           stepIndex: i,
           blockType: block,
           kiboPosition: currentPos,
-          lampActive: isLampOn,
+          lampActive: activatedTargetIds.size > 0,
+          activeTargetIds: Array.from(activatedTargetIds),
           status: "success",
           message: `Kibo maju 1 langkah ke petak ${currentPos + 1}.`,
           kiboMood: "idle",
         });
       }
     } else if (block === "ACTIVATE") {
-      if (currentPos === challenge.lampPosition) {
-        isLampOn = true;
+      const targetAtPos = normConfig.targets.find((t) => t.position === currentPos);
+
+      if (targetAtPos) {
+        activatedTargetIds.add(targetAtPos.id);
         steps.push({
           stepIndex: i,
           blockType: block,
           kiboPosition: currentPos,
           lampActive: true,
+          activeTargetIds: Array.from(activatedTargetIds),
           status: "success",
           message: "Saklar disentuh! Lampu jalan Lumina Town kembali bersinar terang!",
           kiboMood: "happy",
         });
       } else {
-        // Belum sampai di depan tiang lampu
+        // Belum sampai di petak target saklar
         simulationHalted = true;
         failureReason =
           "Kibo belum sampai di depan tiang lampu! Di petak ini tidak ada saklar yang bisa dinyalakan.";
@@ -92,7 +101,8 @@ export function runSimulation(
           stepIndex: i,
           blockType: block,
           kiboPosition: currentPos,
-          lampActive: false,
+          lampActive: activatedTargetIds.size > 0,
+          activeTargetIds: Array.from(activatedTargetIds),
           status: "failure",
           message: failureReason,
           kiboMood: "confused",
@@ -102,17 +112,22 @@ export function runSimulation(
     }
   }
 
+  const requiredTargets = normConfig.targets.filter((t) => t.required);
+  const allRequiredTargetsActive =
+    requiredTargets.length > 0 &&
+    requiredTargets.every((t) => activatedTargetIds.has(t.id));
+
   // Evaluasi kondisi keberhasilan akhir
-  if (isLampOn && currentPos === challenge.lampPosition && !simulationHalted) {
-    // Keberhasilan: hitung bintang
-    // Optimal sequence untuk Challenge 01 adalah tepat 3 blok (MOVE -> MOVE -> ACTIVATE)
-    const isOptimal = blocks.length === 3;
+  if (allRequiredTargetsActive && !simulationHalted) {
+    // Keberhasilan: hitung bintang berdasarkan konfigurasi optimal tantangan
+    const isOptimal = blocks.length <= normConfig.optimalBlocks;
     const stars = isOptimal ? 3 : 2;
 
     return {
       success: true,
       finalPosition: currentPos,
       lampActive: true,
+      activeTargetIds: Array.from(activatedTargetIds),
       steps,
       feedbackMessage: isOptimal
         ? "Luar biasa! Urutan instruksimu tepat dan efisien. Lampu kota kembali menyala!"
@@ -122,12 +137,13 @@ export function runSimulation(
     };
   }
 
-  // Kegagalan: Kibo berhenti sebelum lampu menyala
+  // Kegagalan: Kibo berhenti sebelum seluruh target menyala
   let finalFeedback = failureReason;
   let finalMood: "confused" | "thinking" = "confused";
 
   if (!finalFeedback) {
-    if (currentPos === challenge.lampPosition && !isLampOn) {
+    const unactivatedTarget = requiredTargets.find((t) => !activatedTargetIds.has(t.id));
+    if (unactivatedTarget && currentPos === unactivatedTarget.position) {
       finalFeedback =
         "Kibo sudah berdiri tepat di depan tiang lampu, tapi lampunya belum menyala! Jangan lupa beri instruksi Nyalakan Lampu ya.";
       finalMood = "thinking";
@@ -141,7 +157,8 @@ export function runSimulation(
   return {
     success: false,
     finalPosition: currentPos,
-    lampActive: isLampOn,
+    lampActive: activatedTargetIds.size > 0,
+    activeTargetIds: Array.from(activatedTargetIds),
     steps,
     feedbackMessage: finalFeedback,
     kiboMood: finalMood,

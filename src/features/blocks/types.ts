@@ -13,6 +13,7 @@ export interface SimulationStep {
   blockType: BlockType;
   kiboPosition: number;
   lampActive: boolean;
+  activeTargetIds?: string[];
   status: "success" | "failure";
   message: string;
   kiboMood: KiboVariant;
@@ -22,6 +23,7 @@ export interface SimulationResult {
   success: boolean;
   finalPosition: number;
   lampActive: boolean;
+  activeTargetIds: string[];
   steps: SimulationStep[];
   feedbackMessage: string;
   kiboMood: KiboVariant;

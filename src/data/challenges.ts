@@ -30,6 +30,14 @@ export const AVAILABLE_BLOCK_CONFIGS: Record<BlockType, BlockConfig> = {
   },
 };
 
+export interface ChallengeTarget {
+  id: string;
+  type: "lamp";
+  position: number;
+  label?: string;
+  required: boolean;
+}
+
 export interface ChallengeDetail {
   id: string;
   chapterId: ChapterId;
@@ -41,10 +49,12 @@ export interface ChallengeDetail {
   goal: string;
   availableBlocks: BlockType[];
   maxBlocks: number;
+  optimalBlocks: number; // Jumlah blok ideal untuk 3 bintang
   // Layout dunia simulasi
-  gridTiles: number; // Jumlah petak jalur (3 petak: 0, 1, 2)
-  startPosition: number; // 0
-  lampPosition: number; // 2
+  gridTiles: number; // Jumlah petak jalur (misal 3, 4, 5...)
+  startPosition: number; // Posisi awal Kibo
+  lampPosition: number; // Posisi tiang lampu utama (kompatibilitas)
+  targets: ChallengeTarget[]; // Daftar target objektif pada petak
   // Petunjuk bertahap (Progressive Hints sesuai docs/AI_RULES.md)
   hints: {
     level: 1 | 2 | 3 | 4;
@@ -66,9 +76,19 @@ export const CHALLENGES: Record<string, ChallengeDetail> = {
     goal: "Susun instruksi agar Kibo berjalan ke depan tiang lampu (2 langkah) lalu aktifkan lampu.",
     availableBlocks: ["MOVE", "ACTIVATE"],
     maxBlocks: 6,
+    optimalBlocks: 3,
     gridTiles: 3,
     startPosition: 0,
     lampPosition: 2,
+    targets: [
+      {
+        id: "lamp-1",
+        type: "lamp",
+        position: 2,
+        label: "TIANG LAMPU",
+        required: true,
+      },
+    ],
     hints: [
       {
         level: 1,
@@ -94,6 +114,32 @@ export const CHALLENGES: Record<string, ChallengeDetail> = {
   },
 };
 
+export function normalizeChallenge(challenge: ChallengeDetail): ChallengeDetail {
+  const lampPos = challenge.lampPosition ?? (challenge.gridTiles - 1);
+  const targets =
+    challenge.targets && challenge.targets.length > 0
+      ? challenge.targets
+      : [
+          {
+            id: `target-${lampPos}`,
+            type: "lamp" as const,
+            position: lampPos,
+            label: "TIANG LAMPU",
+            required: true,
+          },
+        ];
+
+  return {
+    ...challenge,
+    optimalBlocks: challenge.optimalBlocks ?? 3,
+    startPosition: challenge.startPosition ?? 0,
+    lampPosition: lampPos,
+    targets,
+  };
+}
+
 export function getChallengeById(id: string): ChallengeDetail | undefined {
-  return CHALLENGES[id];
+  const challenge = CHALLENGES[id];
+  if (!challenge) return undefined;
+  return normalizeChallenge(challenge);
 }
