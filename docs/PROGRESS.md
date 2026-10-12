@@ -54,7 +54,7 @@ Priority:
 - [x] P0 Remove/reset blocks (Verified: single remove ✕, clear all 🗑️, reset stage ↺)
 - [x] P0 Program execution (Verified: pure deterministic engine `runSimulation` parameterized for arbitrary gridTiles and targets without hardcoding)
 - [x] P0 Execution visualization (Verified: dynamic linear interpolation track, laser conduit chevrons, and StreetLamp lighting states)
-- [x] P0 Success/failure validation (Verified: dynamic targets matching, premature activation check, overstep check, and dynamic optimalBlocks star rating)
+- [x] P0 Success/failure validation (Verified: dynamic targets matching, chapter-aware & target-specific feedback without Lumina Town lamp hardcoding, premature activation check, overstep check, and dynamic optimalBlocks star rating)
 - [x] P0 Route & Progress validation (Verified: Server-side `notFound()` for invalid challenge IDs, fake progress record prevention in `storage.ts`)
 - [ ] P1 Undo/redo if feasible
 
@@ -67,19 +67,17 @@ Priority:
 - [x] P0 Challenge 04 (Verified: "Gerbang Pintar (Smart Gate)" introducing simple conditional concept IF–THEN via obstacle gate and atomic condition block IF_GATE ["Jika Tertutup: Buka Gerbang"]. Kibo must inspect gate condition at platform 3 and open it before passing to activate Light Tower at platform 4. Repetition with Challenge 02 eliminated; distinct optimal solution [MOVE, MOVE, IF_GATE, MOVE, ACTIVATE] at `/challenge/ch-04`)
 - [x] P0 Challenge 05 (Verified: "Festival of Lights" grand finale sequence for Lumina Town with RelayStation, GardenLantern, LightCrystal spire, multi-stage precondition chain, full Lumina Town restoration, optimal 8 blocks at `/challenge/ch-05`. Visual coordinate bug fixed via unified grid column math `((kiboPos + 0.5) / totalTiles) * 100%`, verified via automated browser playthrough)
 
-### Gate Valley (Condition — Locked until Lumina Town complete)
-- [ ] P0 Challenge 06
-- [ ] P0 Challenge 07
-- [ ] P0 Challenge 08
-- [ ] P0 Challenge 09
-- [ ] P0 Challenge 10
+### Gate Valley (Condition — 3 Initial Challenges Complete)
+- [x] P0 Challenge 06 (Verified: "Guardian Gate" single condition IF_GATE obstacle with 4 platforms, Guardian Gate at tile 2, Valley Totem crystal at tile 4, optimal 5 blocks at `/challenge/ch-06`)
+- [x] P0 Challenge 07 (Verified: "Energy Bridge" condition discrimination IF_BRIDGE obstacle with 5 platforms, EnergyBridge plasma rift at tile 3, Valley Power generator at tile 5, optimal 6 blocks at `/challenge/ch-07`)
+- [x] P0 Challenge 08 (Verified: "Valley Crossroads" multi-condition sequential logic with 6 platforms, Guardian Gate at tile 2, Energy Bridge at tile 4, Master Crystal at tile 6, optimal 8 blocks at `/challenge/ch-08`)
+- [ ] P1 Challenge 09 (Deferred: Advanced condition extension)
+- [ ] P1 Challenge 10 (Deferred: Advanced condition extension)
 
-### Sprout Garden (Loop)
-- [ ] P0 Challenge 11
-- [ ] P0 Challenge 12
-- [ ] P0 Challenge 13
-- [ ] P0 Challenge 14
-- [ ] P0 Challenge 15
+### Sprout Garden (Loop — 3 Challenges Complete)
+- [x] P0 Challenge 09 (Verified: "Tunas Pertama (First Sprout)" simple loop concept with 4 platforms, 3 sprouts at tiles 2, 3, 4, optimal 4 blocks: `REPEAT_3 -> MOVE -> WATER -> END_LOOP` at `/challenge/ch-09`)
+- [x] P0 Challenge 10 (Verified: "Kebun Berbaris (Garden Rows)" sequence + loop combination with 6 platforms, entry path, 3 flower rows at tiles 3, 4, 5, irrigation pump at tile 6, optimal 7 blocks: `MOVE -> REPEAT_3 -> MOVE -> WATER -> END_LOOP -> MOVE -> ACTIVATE` at `/challenge/ch-10`)
+- [x] P0 Challenge 11 (Verified: "Festival Bunga (Flower Festival)" compound multi-step loop pattern with 6 platforms, 4 festival flowers across 2 twin garden beds at tiles 2, 3, 4, 5, Grand Fountain finale at tile 6, optimal 8 blocks: `REPEAT_2 -> MOVE -> WATER -> MOVE -> WATER -> END_LOOP -> MOVE -> ACTIVATE` at `/challenge/ch-11`)
 
 ### Memory Station (Variable)
 - [ ] P0 Challenge 16

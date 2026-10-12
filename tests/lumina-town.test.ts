@@ -144,6 +144,25 @@ console.log("\n3. Pengujian Edukatif: Validasi Ketergantungan Prasyarat Urutan:"
   console.log("  ✓ Ch-05 Precondition Gate: Berhasil menolak aktivasi kristal sebelum lentera");
 }
 
+// Ch-01: Berhenti di depan Tiang Lampu tanpa ACTIVATE (MOVE, MOVE)
+{
+  const ch01 = normalizeChallenge(CHALLENGES["ch-01"]);
+  const res = runSimulation(["MOVE", "MOVE"], ch01);
+  assert.equal(res.success, false, "Kibo belum menyalakan lampu harus belum selesai");
+  assert.ok(
+    res.feedbackMessage.includes("TIANG LAMPU") &&
+      res.feedbackMessage.includes("saklarnya belum dinyalakan") &&
+      res.feedbackMessage.includes("Nyalakan Lampu"),
+    "Feedback Lumina Town harus menginformasikan saklar belum dinyalakan"
+  );
+  assert.equal(
+    res.feedbackMessage.toLowerCase().includes("siram"),
+    false,
+    "Feedback Lumina Town tidak boleh tercampur instruksi siram tanaman"
+  );
+  console.log("  ✓ Ch-01 Feedback Otentik: Tetap menampilkan 'saklarnya belum dinyalakan' dan tidak tercampur pesan tanaman.");
+}
+
 // 4. Pengujian Evaluasi Bintang (2 Bintang jika tidak optimal)
 console.log("\n4. Pengujian Evaluasi Bintang Non-Optimal:");
 {

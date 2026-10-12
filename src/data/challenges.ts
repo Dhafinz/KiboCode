@@ -1,6 +1,14 @@
 import { ChapterId, ConceptType } from "@/types";
 
-export type BlockType = "MOVE" | "ACTIVATE" | "IF_GATE";
+export type BlockType =
+  | "MOVE"
+  | "ACTIVATE"
+  | "IF_GATE"
+  | "IF_BRIDGE"
+  | "WATER"
+  | "REPEAT_2"
+  | "REPEAT_3"
+  | "END_LOOP";
 
 export interface BlockConfig {
   type: BlockType;
@@ -22,11 +30,11 @@ export const AVAILABLE_BLOCK_CONFIGS: Record<BlockType, BlockConfig> = {
   },
   ACTIVATE: {
     type: "ACTIVATE",
-    label: "Nyalakan Lampu",
+    label: "Nyalakan Lampu / Aktifkan",
     keyword: "ACTIVATE",
     icon: "💡",
     color: "#00f2fe",
-    description: "Mengaktifkan saklar sistem untuk menghidupkan lampu jalan.",
+    description: "Mengaktifkan saklar sistem, tiang lampu, atau pompa pengairan.",
   },
   IF_GATE: {
     type: "IF_GATE",
@@ -36,9 +44,57 @@ export const AVAILABLE_BLOCK_CONFIGS: Record<BlockType, BlockConfig> = {
     color: "#f59e0b",
     description: "Jika Kibo di depan gerbang tertutup, buka gerbang agar bisa lewat.",
   },
+  IF_BRIDGE: {
+    type: "IF_BRIDGE",
+    label: "Jika Terputus: Hubungkan Jembatan",
+    keyword: "IF_BRIDGE",
+    icon: "🌉",
+    color: "#0ea5e9",
+    description: "Jika Kibo di depan jembatan energi yang terputus, hubungkan jembatan agar aman diseberangi.",
+  },
+  WATER: {
+    type: "WATER",
+    label: "Siram Tanaman",
+    keyword: "WATER",
+    icon: "💧",
+    color: "#06b6d4",
+    description: "Menyiram tunas atau bunga digital agar mekar dan tumbuh segar.",
+  },
+  REPEAT_2: {
+    type: "REPEAT_2",
+    label: "Ulangi 2 Kali",
+    keyword: "REPEAT_2",
+    icon: "🔁",
+    color: "#10b981",
+    description: "Mengulang blok instruksi di dalamnya sebanyak 2 kali.",
+  },
+  REPEAT_3: {
+    type: "REPEAT_3",
+    label: "Ulangi 3 Kali",
+    keyword: "REPEAT_3",
+    icon: "🔄",
+    color: "#059669",
+    description: "Mengulang blok instruksi di dalamnya sebanyak 3 kali.",
+  },
+  END_LOOP: {
+    type: "END_LOOP",
+    label: "Akhir Pengulangan",
+    keyword: "END_LOOP",
+    icon: "⏹️",
+    color: "#047857",
+    description: "Menandai batas akhir dari blok pengulangan (loop).",
+  },
 };
 
-export type TargetType = "lamp" | "generator" | "crystal" | "gate";
+export type TargetType =
+  | "lamp"
+  | "generator"
+  | "crystal"
+  | "gate"
+  | "bridge"
+  | "sprout"
+  | "flower"
+  | "fountain";
 
 export interface ChallengeTarget {
   id: string;
@@ -66,7 +122,7 @@ export interface ChallengeDetail {
   // Layout dunia simulasi
   gridTiles: number; // Jumlah petak jalur (misal 3, 4, 5...)
   startPosition: number; // Posisi awal Kibo
-  lampPosition: number; // Posisi tiang lampu utama (kompatibilitas)
+  lampPosition?: number; // Posisi tiang lampu utama (kompatibilitas)
   targets: ChallengeTarget[]; // Daftar target objektif pada petak
   // Petunjuk bertahap (Progressive Hints sesuai docs/AI_RULES.md)
   hints: {
@@ -365,6 +421,417 @@ export const CHALLENGES: Record<string, ChallengeDetail> = {
         level: 4,
         title: "Level 4: Solusi Terpandu (Guided Solution)",
         text: "Urutan lengkap 8 blok: MOVE → ACTIVATE → MOVE → MOVE → ACTIVATE → MOVE → MOVE → ACTIVATE. Ayo selesaikan dan pulihkan Lumina Town!",
+      },
+    ],
+  },
+  "ch-06": {
+    id: "ch-06",
+    chapterId: "gate-valley",
+    order: 1,
+    title: "Gerbang Penjaga (Guardian Gate)",
+    concept: "condition",
+    conceptLabel: "Kondisi Tunggal (Single IF)",
+    story:
+      "Kibo tiba di pintu masuk Gate Valley! Sebuah Gerbang Penjaga kuno mengunci jalan masuk lembah karena glitch sistem. Kibo harus memeriksa kondisi gerbang, membukanya dengan perintah IF_GATE, lalu melangkah ke Totem Lembah untuk menyalakannya!",
+    goal: "Pandu Kibo maju ke Petak 2 di depan Gerbang Penjaga, buka gerbang dengan perintah IF_GATE, lalu lanjutkan langkah ke Petak 4 untuk mengaktifkan Totem Lembah.",
+    availableBlocks: ["MOVE", "IF_GATE", "ACTIVATE"],
+    maxBlocks: 8,
+    optimalBlocks: 5,
+    gridTiles: 4,
+    startPosition: 0,
+    lampPosition: 3,
+    targets: [
+      {
+        id: "guardian-gate",
+        type: "gate",
+        position: 1,
+        label: "GERBANG PENJAGA",
+        required: true,
+        activationMessage:
+          "Kondisi diperiksa: Gerbang Penjaga tertutup! Sensor merespons dan gerbang kini terbuka! Selamat datang di Gate Valley!",
+      },
+      {
+        id: "valley-totem",
+        type: "crystal",
+        position: 3,
+        label: "TOTEM LEMBAH",
+        required: true,
+        activationMessage:
+          "Totem Kristal Lembah bersinar terang! Gerbang pertama Gate Valley berhasil dipulihkan!",
+      },
+    ],
+    hints: [
+      {
+        level: 1,
+        title: "Level 1: Berpikir (Thinking)",
+        text: "Gerbang Penjaga berada tepat di Petak 2. Mengapa Kibo tidak bisa langsung melangkah ke Petak 3 tanpa membuka gerbang terlebih dahulu?",
+      },
+      {
+        level: 2,
+        title: "Level 2: Arah (Direction)",
+        text: "Maju 1 langkah ke Petak 2 tepat di depan gerbang. Setelah gerbang terbuka, Kibo perlu melangkah 2 kali lagi menuju Totem Lembah di Petak 4.",
+      },
+      {
+        level: 3,
+        title: "Level 3: Konsep (Concept)",
+        text: "Konsep IF-THEN: Gunakan blok 'Jika Tertutup: Buka Gerbang' saat Kibo berdiri di depan gerbang sebelum melanjutkan perjalanan.",
+      },
+      {
+        level: 4,
+        title: "Level 4: Solusi Terpandu (Guided Solution)",
+        text: "Urutan lengkap 5 blok: MOVE → IF_GATE → MOVE → MOVE → ACTIVATE. Ayo pasang kelima blok ini lalu jalankan program!",
+      },
+    ],
+  },
+  "ch-07": {
+    id: "ch-07",
+    chapterId: "gate-valley",
+    order: 2,
+    title: "Jembatan Energi (Energy Bridge)",
+    concept: "condition",
+    conceptLabel: "Pilihan Kondisi (Condition Action)",
+    story:
+      "Sebuah jurang plasma digital membelah jalanan Gate Valley! Di Petak 3, Jembatan Energi tampak terputus dan berbahaya untuk dilangkahi. Kibo harus mengenali rintangan jembatan dan memilih perintah kondisi yang tepat untuk menghubungkan aliran energi jembatan sebelum menyeberang ke Stasiun Daya!",
+    goal: "Pandu Kibo ke Petak 3 di depan jembatan energi yang terputus, hubungkan jembatan dengan IF_BRIDGE, lalu seberangi celah menuju Petak 5 untuk menyalakan Stasiun Daya Lembah.",
+    availableBlocks: ["MOVE", "IF_GATE", "IF_BRIDGE", "ACTIVATE"],
+    maxBlocks: 10,
+    optimalBlocks: 6,
+    gridTiles: 5,
+    startPosition: 0,
+    lampPosition: 4,
+    targets: [
+      {
+        id: "energy-bridge",
+        type: "bridge",
+        position: 2,
+        label: "JEMBATAN ENERGI",
+        required: true,
+        activationMessage:
+          "Kondisi diperiksa: Jembatan energi terputus! Aliran daya plasma terhubung dan jembatan kini kokoh diseberangi! ⚡",
+      },
+      {
+        id: "valley-power",
+        type: "generator",
+        position: 4,
+        label: "STASIUN DAYA",
+        required: true,
+        activationMessage:
+          "Stasiun Daya Lembah diaktifkan! Gelombang energi mengalir ke seluruh Gate Valley!",
+      },
+    ],
+    hints: [
+      {
+        level: 1,
+        title: "Level 1: Berpikir (Thinking)",
+        text: "Perhatikan rintangan di Petak 3. Ini adalah Jembatan Energi yang terputus, bukan Gerbang! Blok kondisi mana yang cocok?",
+      },
+      {
+        level: 2,
+        title: "Level 2: Arah (Direction)",
+        text: "Kibo harus melangkah 2 kali dengan MOVE ke Petak 3 di depan celah jembatan, lalu menghubungkan jembatan sebelum melangkah 2 kali lagi ke Petak 5.",
+      },
+      {
+        level: 3,
+        title: "Level 3: Konsep (Concept)",
+        text: "Memilih Kondisi yang Tepat: Gunakan blok 'Jika Terputus: Hubungkan Jembatan' (IF_BRIDGE). Jangan keliru menggunakan blok gerbang ya!",
+      },
+      {
+        level: 4,
+        title: "Level 4: Solusi Terpandu (Guided Solution)",
+        text: "Urutan lengkap 6 blok: MOVE → MOVE → IF_BRIDGE → MOVE → MOVE → ACTIVATE. Ayo pasang dan sambungkan jembatan energi!",
+      },
+    ],
+  },
+  "ch-08": {
+    id: "ch-08",
+    chapterId: "gate-valley",
+    order: 3,
+    title: "Persimpangan Lembah (Valley Crossroads)",
+    concept: "condition",
+    conceptLabel: "Logika Multi-Kondisi (Multi-Condition Logic)",
+    story:
+      "Tantangan puncak di Gate Valley! Di Jalur Persimpangan Lembah, Kibo menghadapi dua rintangan berbeda secara berurutan: Gerbang Penjaga di Petak 2 dan Jembatan Energi di Petak 4. Kibo harus menerapkan logika kondisi yang sesuai pada setiap situasi agar dapat mencapai dan menyalakan Kristal Agung Lembah di Petak 6!",
+    goal: "Atasi kedua rintangan secara adaptif: buka Gerbang Penjaga di Petak 2 dengan IF_GATE, hubungkan Jembatan Energi di Petak 4 dengan IF_BRIDGE, lalu aktifkan Kristal Agung Lembah di Petak 6.",
+    availableBlocks: ["MOVE", "IF_GATE", "IF_BRIDGE", "ACTIVATE"],
+    maxBlocks: 12,
+    optimalBlocks: 8,
+    gridTiles: 6,
+    startPosition: 0,
+    lampPosition: 5,
+    targets: [
+      {
+        id: "crossroad-gate",
+        type: "gate",
+        position: 1,
+        label: "GERBANG PENJAGA",
+        required: true,
+        activationMessage:
+          "Gerbang Penjaga dibuka! Jalur persimpangan lembah mulai terbuka!",
+      },
+      {
+        id: "crossroad-bridge",
+        type: "bridge",
+        position: 3,
+        label: "JEMBATAN ENERGI",
+        required: true,
+        activationMessage:
+          "Jembatan Energi terhubung! Lintasan menuju pelataran kristal aman diseberangi!",
+      },
+      {
+        id: "master-crystal",
+        type: "crystal",
+        position: 5,
+        label: "KRISTAL AGUNG",
+        required: true,
+        activationMessage:
+          "Kristal Agung Gate Valley bersinar ungu benderang! Seluruh Gate Valley telah pulih seutuhnya! 🌟",
+      },
+    ],
+    hints: [
+      {
+        level: 1,
+        title: "Level 1: Berpikir (Thinking)",
+        text: "Ada dua rintangan di jalur ini: Gerbang Penjaga di Petak 2 dan Jembatan Energi di Petak 4. Kibo harus menggunakan blok kondisi yang tepat untuk masing-masing rintangan.",
+      },
+      {
+        level: 2,
+        title: "Level 2: Arah (Direction)",
+        text: "Maju ke Petak 2 dan buka gerbang. Maju 2 kali ke Petak 4 dan hubungkan jembatan. Lalu maju 2 kali lagi ke Petak 6 untuk menyalakan kristal agung.",
+      },
+      {
+        level: 3,
+        title: "Level 3: Konsep (Concept)",
+        text: "Penerapan Multi-Kondisi: Gunakan IF_GATE saat di depan gerbang, dan gunakan IF_BRIDGE saat di depan jembatan. Lalu gunakan ACTIVATE di depan kristal.",
+      },
+      {
+        level: 4,
+        title: "Level 4: Solusi Terpandu (Guided Solution)",
+        text: "Urutan lengkap 8 blok: MOVE → IF_GATE → MOVE → MOVE → IF_BRIDGE → MOVE → MOVE → ACTIVATE. Ayo pasang dan pulihkan Gate Valley!",
+      },
+    ],
+  },
+  "ch-09": {
+    id: "ch-09",
+    chapterId: "sprout-garden",
+    order: 1,
+    title: "Tunas Pertama (First Sprout)",
+    concept: "loop",
+    conceptLabel: "Loop (Pengulangan Sederhana)",
+    story:
+      "Selamat datang di Sprout Garden! Saluran air otomatis terputus dan tunas-tunas digital di kebun mulai layu. Bantu Kibo menyiram 3 tunas berturut-turut menggunakan blok pengulangan (loop) agar tidak perlu menyusun langkah yang sama berulang kali!",
+    goal: "Gunakan blok Loop untuk mengulang gerakan maju dan menyiram 3 tunas secara efisien.",
+    gridTiles: 4,
+    startPosition: 0,
+    lampPosition: 3,
+    optimalBlocks: 4,
+    maxBlocks: 8,
+    availableBlocks: ["MOVE", "WATER", "REPEAT_3", "END_LOOP"],
+    targets: [
+      {
+        id: "sprout-1",
+        type: "sprout",
+        position: 1,
+        label: "TUNAS HIJAU 1",
+        required: true,
+        activationMessage: "Tunas pertama disiram dan mulai bersemi segar! 🌱",
+      },
+      {
+        id: "sprout-2",
+        type: "sprout",
+        position: 2,
+        label: "TUNAS HIJAU 2",
+        required: true,
+        activationMessage: "Tunas kedua disiram dan daun mudanya mekar! 🌿",
+      },
+      {
+        id: "sprout-3",
+        type: "sprout",
+        position: 3,
+        label: "TUNAS HIJAU 3",
+        required: true,
+        activationMessage:
+          "Tunas ketiga disiram dan mekar indah! Ketiga tunas di petak kebun telah pulih! 🌸",
+      },
+    ],
+    hints: [
+      {
+        level: 1,
+        title: "Level 1: Berpikir (Thinking)",
+        text: "Perhatikan polanya: ada 3 tunas di Petak 2, 3, dan 4 yang perlu disiram secara berurutan. Jangan tulis perintah secara manual berulang-ulang jika bisa diulang!",
+      },
+      {
+        level: 2,
+        title: "Level 2: Arah (Direction)",
+        text: "Untuk setiap tunas, polanya adalah Maju 1 Langkah lalu Siram Tanaman. Pola [Maju → Siram] ini perlu diulang sebanyak 3 kali.",
+      },
+      {
+        level: 3,
+        title: "Level 3: Konsep (Concept)",
+        text: "Konsep Pengulangan (Loop): Pasang blok Ulangi 3 Kali, masukkan Maju dan Siram di dalamnya, lalu akhiri dengan Akhir Pengulangan.",
+      },
+      {
+        level: 4,
+        title: "Level 4: Solusi Terpandu (Guided Solution)",
+        text: "Urutan 4 blok optimal: REPEAT_3 → MOVE → WATER → END_LOOP. Pasang blok ini untuk mendapatkan 3 bintang penuh!",
+      },
+    ],
+  },
+  "ch-10": {
+    id: "ch-10",
+    chapterId: "sprout-garden",
+    order: 2,
+    title: "Kebun Berbaris (Garden Rows)",
+    concept: "loop",
+    conceptLabel: "Sequence & Loop (Kombinasi Urutan & Loop)",
+    story:
+      "Di kebun berbaris, Kibo harus melintasi jalan setapak terlebih dahulu sebelum mencapai barisan bunga mawar digital. Setelah menyiram ketiga baris bunga, Kibo harus mengaktifkan Katup Pengairan Utama di ujung kebun!",
+    goal: "Gabungkan langkah persiapan, blok loop untuk menyiram bunga berbaris, dan langkah aktivasi katup di akhir jalur.",
+    gridTiles: 6,
+    startPosition: 0,
+    lampPosition: 5,
+    optimalBlocks: 7,
+    maxBlocks: 10,
+    availableBlocks: ["MOVE", "WATER", "REPEAT_3", "END_LOOP", "ACTIVATE"],
+    targets: [
+      {
+        id: "flower-1",
+        type: "flower",
+        position: 2,
+        label: "BUNGA BARIS 1",
+        required: true,
+        activationMessage:
+          "Bunga baris pertama disiram dan kelopaknya mekar merah merekah! 🌷",
+      },
+      {
+        id: "flower-2",
+        type: "flower",
+        position: 3,
+        label: "BUNGA BARIS 2",
+        required: true,
+        activationMessage:
+          "Bunga baris kedua disiram dan harum segar semerbak! 🌷",
+      },
+      {
+        id: "flower-3",
+        type: "flower",
+        position: 4,
+        label: "BUNGA BARIS 3",
+        required: true,
+        activationMessage:
+          "Bunga baris ketiga mekar sempurna! Seluruh barisan bunga telah segar! 🌷",
+      },
+      {
+        id: "garden-pump",
+        type: "fountain",
+        position: 5,
+        label: "KATUP PENGAIRAN",
+        required: true,
+        activationMessage:
+          "Katup Pengairan Utama terbuka! Air segar mengalir deras ke seluruh saluran kebun berbaris! 🌊",
+      },
+    ],
+    hints: [
+      {
+        level: 1,
+        title: "Level 1: Berpikir (Thinking)",
+        text: "Petak 2 adalah jalan setapak kosong. Tiga bunga berbaris di Petak 3, 4, dan 5. Di Petak 6 ada Katup Pengairan Utama yang harus diaktifkan.",
+      },
+      {
+        level: 2,
+        title: "Level 2: Arah (Direction)",
+        text: "Maju dulu 1 langkah ke Petak 2 di luar loop. Lalu gunakan blok Ulangi 3 Kali untuk [Maju → Siram]. Terakhir, di luar loop maju ke Petak 6 dan aktifkan Katup Pengairan.",
+      },
+      {
+        level: 3,
+        title: "Level 3: Konsep (Concept)",
+        text: "Kombinasi Urutan & Loop: Letakkan aksi yang tidak berulang di luar blok loop, dan masukkan pola yang berulang ke dalam blok loop.",
+      },
+      {
+        level: 4,
+        title: "Level 4: Solusi Terpandu (Guided Solution)",
+        text: "Urutan 7 blok optimal: MOVE → REPEAT_3 → MOVE → WATER → END_LOOP → MOVE → ACTIVATE. Ayo pasang dan buktikan efisiensinya!",
+      },
+    ],
+  },
+  "ch-11": {
+    id: "ch-11",
+    chapterId: "sprout-garden",
+    order: 3,
+    title: "Festival Bunga (Flower Festival)",
+    concept: "loop",
+    conceptLabel: "Compound Loop (Pola Majemuk & Air Mancur Megah)",
+    story:
+      "Puncak perayaan di Sprout Garden adalah Festival Bunga! Terdapat dua blok taman bunga kembar yang luas dan Air Mancur Megah di alun-alun. Rawat seluruh bunga dengan pola berulang majemuk, lalu nyalakan Air Mancur Megah untuk memulihkan seluruh Sprout Garden!",
+    goal: "Gunakan pengulangan 2 kali untuk merawat sepasang bunga di tiap blok taman, lalu aktifkan Air Mancur Megah di garis akhir.",
+    gridTiles: 6,
+    startPosition: 0,
+    lampPosition: 5,
+    optimalBlocks: 8,
+    maxBlocks: 12,
+    availableBlocks: ["MOVE", "WATER", "REPEAT_2", "END_LOOP", "ACTIVATE"],
+    targets: [
+      {
+        id: "fest-flower-1",
+        type: "flower",
+        position: 1,
+        label: "BUNGA TAMAN A1",
+        required: true,
+        activationMessage: "Bunga Melati Taman A mekar benderang! 🌸",
+      },
+      {
+        id: "fest-flower-2",
+        type: "flower",
+        position: 2,
+        label: "BUNGA TAMAN A2",
+        required: true,
+        activationMessage: "Bunga Mawar Taman A bermekaran megah! 🌺",
+      },
+      {
+        id: "fest-flower-3",
+        type: "flower",
+        position: 3,
+        label: "BUNGA TAMAN B1",
+        required: true,
+        activationMessage: "Bunga Melati Taman B mekar benderang! 🌸",
+      },
+      {
+        id: "fest-flower-4",
+        type: "flower",
+        position: 4,
+        label: "BUNGA TAMAN B2",
+        required: true,
+        activationMessage: "Bunga Mawar Taman B bermekaran megah! 🌺",
+      },
+      {
+        id: "grand-fountain",
+        type: "fountain",
+        position: 5,
+        label: "AIR MANCUR MEGAH",
+        required: true,
+        activationMessage:
+          "Air Mancur Megah menyemburkan pelangi air yang indah! Seluruh Sprout Garden telah pulih seutuhnya! ⛲🌈",
+      },
+    ],
+    hints: [
+      {
+        level: 1,
+        title: "Level 1: Berpikir (Thinking)",
+        text: "Festival bunga memiliki 2 taman kembar: Taman A (Petak 2 & 3) dan Taman B (Petak 4 & 5). Pola merawat dua bunga berturut-turut ini berulang sebanyak 2 kali!",
+      },
+      {
+        level: 2,
+        title: "Level 2: Arah (Direction)",
+        text: "Untuk setiap taman kembar, polanya adalah Maju → Siram → Maju → Siram. Gunakan blok Ulangi 2 Kali untuk pola ini, lalu maju ke Air Mancur di Petak 6 dan aktifkan.",
+      },
+      {
+        level: 3,
+        title: "Level 3: Konsep (Concept)",
+        text: "Pola Majemuk dalam Loop: Loop tidak hanya mengulang 1 instruksi, tapi bisa mengulang serangkaian langkah: REPEAT_2 → [MOVE, WATER, MOVE, WATER] → END_LOOP.",
+      },
+      {
+        level: 4,
+        title: "Level 4: Solusi Terpandu (Guided Solution)",
+        text: "Urutan 8 blok optimal: REPEAT_2 → MOVE → WATER → MOVE → WATER → END_LOOP → MOVE → ACTIVATE. Ayo pulihkan Sprout Garden seutuhnya!",
       },
     ],
   },

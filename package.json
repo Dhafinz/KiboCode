@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "test": "npx tsx tests/lumina-town.test.ts"
+    "test": "npx tsx tests/lumina-town.test.ts && npx tsx tests/gate-valley.test.ts && npx tsx tests/sprout-garden.test.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.4.1",

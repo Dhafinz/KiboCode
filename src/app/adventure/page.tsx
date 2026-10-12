@@ -25,6 +25,16 @@ export default function AdventurePage() {
     progress.completedChallenges["ch-04"] &&
     progress.completedChallenges["ch-05"]
   );
+  const isGateValleyRestored = Boolean(
+    progress.completedChallenges["ch-06"] &&
+    progress.completedChallenges["ch-07"] &&
+    progress.completedChallenges["ch-08"]
+  );
+  const isSproutGardenRestored = Boolean(
+    progress.completedChallenges["ch-09"] &&
+    progress.completedChallenges["ch-10"] &&
+    progress.completedChallenges["ch-11"]
+  );
 
   return (
     <div
@@ -179,7 +189,13 @@ export default function AdventurePage() {
             >
               <KiboAvatar
                 size={160}
-                variant={isLuminaTownRestored ? "celebrate" : isAnyCompleted ? "happy" : "idle"}
+                variant={
+                  isSproutGardenRestored || isGateValleyRestored || isLuminaTownRestored
+                    ? "celebrate"
+                    : isAnyCompleted
+                    ? "happy"
+                    : "idle"
+                }
                 showGlow={true}
                 isCircle={true}
               />
@@ -197,7 +213,11 @@ export default function AdventurePage() {
                   boxShadow: "0 4px 12px rgba(0, 0, 0, 0.4)",
                 }}
               >
-                {isLuminaTownRestored
+                {isSproutGardenRestored
+                  ? "Kibo: Sprout Garden Pulih Sepenuhnya! 🌱"
+                  : isGateValleyRestored
+                  ? "Kibo: Gate Valley Pulih Sepenuhnya! ⛩️"
+                  : isLuminaTownRestored
                   ? "Kibo: Lumina Town Pulih Sepenuhnya! ✨"
                   : isAnyCompleted
                   ? "Kibo: Petualangan Berlanjut! 💡"
@@ -220,8 +240,14 @@ export default function AdventurePage() {
 
           <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
             {CHAPTERS.map((ch, idx) => {
-              const isFirstArea = idx === 0; // Lumina Town is currently available
-              const isAreaUnlocked = isFirstArea;
+              const isAreaUnlocked =
+                idx === 0 ||
+                (idx === 1 && isLuminaTownRestored) ||
+                (idx === 2 && isGateValleyRestored);
+              const hasPlayableChallenges =
+                ch.id === "lumina-town" ||
+                ch.id === "gate-valley" ||
+                ch.id === "sprout-garden";
               const chapterIcons = ["💡", "⛩️", "🌱", "💾", "🔮"];
 
               return (
@@ -334,8 +360,8 @@ export default function AdventurePage() {
                     {ch.description}
                   </p>
 
-                  {/* Playable Challenge Cards for Lumina Town */}
-                  {isFirstArea ? (
+                  {/* Playable Challenge Cards */}
+                  {hasPlayableChallenges ? (
                     <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
                       {Object.values(CHALLENGES)
                         .filter((chal) => chal.chapterId === ch.id)
@@ -387,7 +413,19 @@ export default function AdventurePage() {
                                       ? "🌟"
                                       : chal.id === "ch-04"
                                       ? "🚪"
-                                      : "🔮"}
+                                      : chal.id === "ch-05"
+                                      ? "🔮"
+                                      : chal.id === "ch-06"
+                                      ? "⛩️"
+                                      : chal.id === "ch-07"
+                                      ? "🌉"
+                                      : chal.id === "ch-08"
+                                      ? "⚡"
+                                      : chal.id === "ch-09"
+                                      ? "🌱"
+                                      : chal.id === "ch-10"
+                                      ? "🌷"
+                                      : "🌸"}
                                   </span>
                                   <div>
                                     <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
@@ -543,11 +581,7 @@ export default function AdventurePage() {
                     >
                       <span style={{ fontSize: "1.2rem" }}>🔒</span>
                       <span style={{ fontSize: "0.875rem", color: "var(--text-dim)" }}>
-                        {idx === 1
-                          ? isLuminaTownRestored
-                            ? "Gerbang Gate Valley telah siap dibuka! Wilayah ini akan hadir pada tahap petualangan berikutnya."
-                            : "Wilayah ini terkunci. Selesaikan seluruh 5 misi di Lumina Town untuk membuka gerbang bab ini."
-                          : "Wilayah ini terkunci. Selesaikan tantangan di wilayah sebelumnya untuk membuka gerbang bab ini."}
+                        Wilayah ini terkunci. Selesaikan tantangan di wilayah sebelumnya untuk membuka gerbang bab ini.
                       </span>
                     </div>
                   )}

@@ -27,7 +27,7 @@ export const CHAPTERS: Chapter[] = [
     concept: "condition",
     conceptLabel: "Condition (Kondisi IF/ELSE)",
     description: "Bantu gerbang lembah mengenali kapan harus membuka dan menutup.",
-    totalChallenges: 5,
+    totalChallenges: 3,
   },
   {
     id: "sprout-garden",
@@ -36,7 +36,7 @@ export const CHAPTERS: Chapter[] = [
     concept: "loop",
     conceptLabel: "Loop (Pengulangan)",
     description: "Pulihkan sistem pengairan otomatis dengan pengulangan aksi efisien.",
-    totalChallenges: 5,
+    totalChallenges: 3,
   },
   {
     id: "memory-station",

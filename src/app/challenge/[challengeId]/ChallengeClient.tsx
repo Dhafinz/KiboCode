@@ -9,6 +9,8 @@ import { StreetLamp } from "@/components/gameplay/StreetLamp";
 import { PowerGenerator } from "@/components/gameplay/PowerGenerator";
 import { LightCrystal } from "@/components/gameplay/LightCrystal";
 import { SmartGate } from "@/components/gameplay/SmartGate";
+import { EnergyBridge } from "@/components/gameplay/EnergyBridge";
+import { GardenPlant } from "@/components/gameplay/GardenPlant";
 import { DigitalPlatform } from "@/components/gameplay/DigitalPlatform";
 import {
   CHALLENGES,
@@ -51,13 +53,20 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
   const [isRunning, setIsRunning] = useState<boolean>(false);
   const [activeStepIndex, setActiveStepIndex] = useState<number | null>(null);
 
+  const initialFeedbackMessage =
+    challenge.chapterId === "sprout-garden"
+      ? "Coba susun langkahnya untuk menyiram tanaman dan merawat kebun."
+      : challenge.chapterId === "gate-valley"
+      ? "Coba susun langkahnya untuk membuka gerbang dan menyeberangi jembatan."
+      : "Coba susun langkahnya dari titik awal hingga tiang lampu.";
+
   // Kibo Feedback
   const [feedback, setFeedback] = useState<{
     type: "info" | "success" | "error";
     message: string;
   }>({
     type: "info",
-    message: "Coba susun langkahnya dari titik awal hingga tiang lampu.",
+    message: initialFeedbackMessage,
   });
 
   // Modal victory state
@@ -177,7 +186,7 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
         setActiveStepIndex(step.stepIndex);
         setKiboPos(step.kiboPosition);
         setLampOn(step.lampActive);
-        setActiveTargetIds(step.activeTargetIds ?? (step.lampActive ? [challenge.targets[0]?.id || "lamp-1"] : []));
+        setActiveTargetIds(step.activeTargetIds ?? (step.lampActive ? [challenge.targets[0]?.id || "target-1"] : []));
         setKiboMood(step.kiboMood);
         setFeedback({
           type: step.status === "failure" ? "error" : "info",
@@ -244,9 +253,15 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
 
   const isUnlocked = isChallengeUnlocked(challenge.id, progress);
   const prereqChallenge = getPrerequisiteChallenge(challenge.id);
-  const nextChallenge = Object.values(CHALLENGES).find(
-    (c) => c.chapterId === challenge.chapterId && c.order === challenge.order + 1
-  );
+  const nextChallenge =
+    Object.values(CHALLENGES).find(
+      (c) => c.chapterId === challenge.chapterId && c.order === challenge.order + 1
+    ) ||
+    (challenge.id === "ch-05"
+      ? CHALLENGES["ch-06"]
+      : challenge.id === "ch-08"
+      ? CHALLENGES["ch-09"]
+      : undefined);
 
   if (!isUnlocked) {
     return (
@@ -385,22 +400,36 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
         >
           {/* Kolom Kiri: Ikon Bohlam + Judul & Target */}
           <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-            {/* Circular Bulb Badge */}
+            {/* Circular Mission Badge */}
             <div
               style={{
                 width: "48px",
                 height: "48px",
                 borderRadius: "50%",
-                background: "radial-gradient(circle, #fde047 0%, #f59e0b 60%, #b45309 100%)",
+                background:
+                  challenge.chapterId === "sprout-garden"
+                    ? "radial-gradient(circle, #34d399 0%, #10b981 60%, #065f46 100%)"
+                    : challenge.chapterId === "gate-valley"
+                    ? "radial-gradient(circle, #fdba74 0%, #f97316 60%, #c2410c 100%)"
+                    : "radial-gradient(circle, #fde047 0%, #f59e0b 60%, #b45309 100%)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 fontSize: "1.6rem",
-                boxShadow: "0 0 20px rgba(245, 158, 11, 0.6)",
+                boxShadow:
+                  challenge.chapterId === "sprout-garden"
+                    ? "0 0 20px rgba(16, 185, 129, 0.6)"
+                    : challenge.chapterId === "gate-valley"
+                    ? "0 0 20px rgba(249, 115, 22, 0.6)"
+                    : "0 0 20px rgba(245, 158, 11, 0.6)",
                 flexShrink: 0,
               }}
             >
-              💡
+              {challenge.chapterId === "sprout-garden"
+                ? "🌱"
+                : challenge.chapterId === "gate-valley"
+                ? "⛩️"
+                : "💡"}
             </div>
 
             <div>
@@ -509,9 +538,9 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
               gap: "6px",
             }}
           >
-            <span>🏮</span>
+            <span>{challenge.chapterId === "gate-valley" ? "⛩️" : "🏮"}</span>
             <span>
-              Lumina Town — Misi 0{challenge.order}: {challenge.title.split("(")[0].trim()}
+              {challenge.chapterId === "gate-valley" ? "Gate Valley" : "Lumina Town"} — Misi 0{challenge.order}: {challenge.title.split("(")[0].trim()}
             </span>
           </div>
 
@@ -620,7 +649,13 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                 if (isStart) {
                   label = "TITIK AWAL";
                 } else if (isTarget) {
-                  label = targetAtTile?.label || "TIANG LAMPU";
+                  const defaultTargetLabel =
+                    challenge.chapterId === "sprout-garden"
+                      ? "KEBUN DIGITAL"
+                      : challenge.chapterId === "gate-valley"
+                      ? "RINTANGAN LEMBAH"
+                      : "TIANG LAMPU";
+                  label = targetAtTile?.label || defaultTargetLabel;
                 } else {
                   label = "JALUR DIGITAL";
                 }
@@ -654,6 +689,18 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                           )}
                           {targetAtTile?.type === "gate" && (
                             <SmartGate isOpen={isTargetActive} />
+                          )}
+                          {targetAtTile?.type === "bridge" && (
+                            <EnergyBridge isActive={isTargetActive} />
+                          )}
+                          {targetAtTile?.type === "sprout" && (
+                            <GardenPlant type="sprout" isBloomed={isTargetActive} />
+                          )}
+                          {targetAtTile?.type === "flower" && (
+                            <GardenPlant type="flower" isBloomed={isTargetActive} />
+                          )}
+                          {targetAtTile?.type === "fountain" && (
+                            <GardenPlant type="fountain" isBloomed={isTargetActive} />
                           )}
                         </>
                       )}
@@ -757,7 +804,22 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                     const isCurrentStep = activeStepIndex === index;
                     const isMove = item.type === "MOVE";
                     const isGate = item.type === "IF_GATE";
+                    const isBridge = item.type === "IF_BRIDGE";
+                    const isWater = item.type === "WATER";
+                    const isRepeat = item.type === "REPEAT_2" || item.type === "REPEAT_3";
+                    const isEndLoop = item.type === "END_LOOP";
                     const blockCfg = AVAILABLE_BLOCK_CONFIGS[item.type];
+
+                    // Deteksi apakah blok ini berada di dalam pengulangan (loop)
+                    let openLoop = false;
+                    for (let k = 0; k < index; k++) {
+                      if (blocks[k].type === "REPEAT_2" || blocks[k].type === "REPEAT_3") {
+                        openLoop = true;
+                      } else if (blocks[k].type === "END_LOOP") {
+                        openLoop = false;
+                      }
+                    }
+                    const isInsideLoop = openLoop && !isEndLoop;
 
                     return (
                       <div
@@ -767,6 +829,9 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                           alignItems: "center",
                           gap: "10px",
                           width: "100%",
+                          paddingLeft: isInsideLoop ? "18px" : "0",
+                          borderLeft: isInsideLoop ? "3px solid #10b981" : "3px solid transparent",
+                          transition: "all 150ms ease",
                         }}
                       >
                         {/* Lingkaran Nomor Langkah */}
@@ -777,8 +842,10 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                             borderRadius: "50%",
                             backgroundColor: isCurrentStep
                               ? "var(--cyan-core)"
+                              : isInsideLoop
+                              ? "rgba(16, 185, 129, 0.25)"
                               : "rgba(255, 255, 255, 0.1)",
-                            color: isCurrentStep ? "#070a14" : "#ffffff",
+                            color: isCurrentStep ? "#070a14" : isInsideLoop ? "#6ee7b7" : "#ffffff",
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
@@ -801,17 +868,33 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                             justifyContent: "space-between",
                             padding: "10px 16px",
                             borderRadius: "14px",
-                            background: isGate
+                            background: isRepeat
+                              ? "linear-gradient(135deg, #059669 0%, #047857 100%)"
+                              : isEndLoop
+                              ? "linear-gradient(135deg, #047857 0%, #064e3b 100%)"
+                              : isWater
+                              ? "linear-gradient(135deg, #0891b2 0%, #0e7490 100%)"
+                              : isBridge
+                              ? "linear-gradient(135deg, #0284c7 0%, #0369a1 100%)"
+                              : isGate
                               ? "linear-gradient(135deg, #d97706 0%, #b45309 100%)"
                               : isMove
-                              ? "linear-gradient(135deg, #0284c7 0%, #0369a1 100%)"
+                              ? "linear-gradient(135deg, #4f46e5 0%, #4338ca 100%)"
                               : "linear-gradient(135deg, #9333ea 0%, #7e22ce 100%)",
                             border: isCurrentStep
                               ? "2px solid #ffffff"
+                              : isRepeat
+                              ? "1px solid rgba(52, 211, 153, 0.5)"
+                              : isEndLoop
+                              ? "1px solid rgba(16, 185, 129, 0.4)"
+                              : isWater
+                              ? "1px solid rgba(6, 182, 212, 0.5)"
+                              : isBridge
+                              ? "1px solid rgba(56, 189, 248, 0.4)"
                               : isGate
                               ? "1px solid rgba(245, 158, 11, 0.4)"
                               : isMove
-                              ? "1px solid rgba(56, 189, 248, 0.4)"
+                              ? "1px solid rgba(129, 140, 248, 0.4)"
                               : "1px solid rgba(192, 132, 252, 0.4)",
                             boxShadow: isCurrentStep
                               ? "0 0 18px var(--cyan-glow), inset 0 0 10px rgba(255, 255, 255, 0.3)"
@@ -907,6 +990,10 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                       const cfg = AVAILABLE_BLOCK_CONFIGS[bType];
                       const isMove = bType === "MOVE";
                       const isGate = bType === "IF_GATE";
+                      const isBridge = bType === "IF_BRIDGE";
+                      const isWater = bType === "WATER";
+                      const isRepeat = bType === "REPEAT_2" || bType === "REPEAT_3";
+                      const isEndLoop = bType === "END_LOOP";
                       const btnId =
                         bType === "MOVE"
                           ? "block-add-move"
@@ -924,15 +1011,31 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                           style={{
                             padding: "10px 14px",
                             borderRadius: "12px",
-                            background: isGate
+                            background: isRepeat
+                              ? "linear-gradient(135deg, #059669 0%, #047857 100%)"
+                              : isEndLoop
+                              ? "linear-gradient(135deg, #047857 0%, #064e3b 100%)"
+                              : isWater
+                              ? "linear-gradient(135deg, #0891b2 0%, #0e7490 100%)"
+                              : isBridge
+                              ? "linear-gradient(135deg, #0284c7 0%, #0369a1 100%)"
+                              : isGate
                               ? "linear-gradient(135deg, #d97706 0%, #b45309 100%)"
                               : isMove
-                              ? "linear-gradient(135deg, #0284c7 0%, #0369a1 100%)"
+                              ? "linear-gradient(135deg, #4f46e5 0%, #4338ca 100%)"
                               : "linear-gradient(135deg, #9333ea 0%, #7e22ce 100%)",
-                            border: isGate
+                            border: isRepeat
+                              ? "1px solid rgba(52, 211, 153, 0.5)"
+                              : isEndLoop
+                              ? "1px solid rgba(16, 185, 129, 0.4)"
+                              : isWater
+                              ? "1px solid rgba(6, 182, 212, 0.5)"
+                              : isBridge
+                              ? "1px solid rgba(56, 189, 248, 0.4)"
+                              : isGate
                               ? "1px solid rgba(245, 158, 11, 0.4)"
                               : isMove
-                              ? "1px solid rgba(56, 189, 248, 0.4)"
+                              ? "1px solid rgba(129, 140, 248, 0.4)"
                               : "1px solid rgba(192, 132, 252, 0.4)",
                             color: "#ffffff",
                             fontWeight: 700,
@@ -1198,11 +1301,19 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
               >
                 {challenge.id === "ch-05"
                   ? "Lumina Town Pulih Sepenuhnya! 🌟"
+                  : challenge.id === "ch-08"
+                  ? "Gate Valley Pulih Sepenuhnya! ⛩️"
+                  : challenge.id === "ch-11"
+                  ? "Sprout Garden Pulih Sepenuhnya! 🌱"
                   : "Misi Selesai! Hebat! 🎉"}
               </h2>
               <p style={{ color: "var(--text-muted)", fontSize: "0.95rem", lineHeight: 1.6 }}>
                 {challenge.id === "ch-05"
                   ? "Luar biasa! Kamu berhasil menuntaskan seluruh 5 misi di Lumina Town! Seluruh lentera, generator, dan Kristal Cahaya Agung kini bersinar benderang."
+                  : challenge.id === "ch-08"
+                  ? "Luar biasa! Kamu berhasil menuntaskan seluruh misi di Gate Valley! Seluruh gerbang penjaga dan jembatan energi telah pulih sempurna."
+                  : challenge.id === "ch-11"
+                  ? "Luar biasa! Kamu berhasil menuntaskan seluruh misi di Sprout Garden! Seluruh tunas, barisan bunga mawar, dan Air Mancur Megah telah mekar bersemi mempesona!"
                   : `Kamu berhasil menyelesaikan misi "${challenge.title}" dengan urutan instruksi yang tepat!`}
               </p>
             </div>

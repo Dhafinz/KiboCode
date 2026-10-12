@@ -178,7 +178,21 @@ export function getPrerequisiteChallenge(
   challengeId: string
 ): ChallengeDetail | undefined {
   const challenge = CHALLENGES[challengeId];
-  if (!challenge || challenge.order <= 1) {
+  if (!challenge) {
+    return undefined;
+  }
+
+  // Jika tantangan pertama di Gate Valley (ch-06), prasyaratnya adalah ch-05 (akhir Lumina Town)
+  if (challenge.chapterId === "gate-valley" && challenge.order === 1) {
+    return CHALLENGES["ch-05"];
+  }
+
+  // Jika tantangan pertama di Sprout Garden (ch-09), prasyaratnya adalah ch-08 (akhir Gate Valley)
+  if (challenge.chapterId === "sprout-garden" && challenge.order === 1) {
+    return CHALLENGES["ch-08"];
+  }
+
+  if (challenge.order <= 1) {
     return undefined;
   }
 
@@ -191,8 +205,8 @@ export function getPrerequisiteChallenge(
 /**
  * Checks if a challenge is unlocked based on player progress.
  * Rule:
- * - Challenge 01 (order 1 in chapter 1) is unlocked by default.
- * - Challenge with order > 1 is unlocked IF the previous challenge in the chapter is completed.
+ * - Challenge 01 (Lumina Town) is unlocked by default.
+ * - Challenge with order > 1 is unlocked IF the previous prerequisite challenge is completed.
  */
 export function isChallengeUnlocked(
   challengeId: string,
@@ -201,8 +215,8 @@ export function isChallengeUnlocked(
   const challenge = CHALLENGES[challengeId];
   if (!challenge) return false;
 
-  // Tantangan pertama dari Lumina Town selalu terbuka
-  if (challenge.order === 1) {
+  // Hanya tantangan pertama dari Lumina Town yang selalu terbuka secara default
+  if (challenge.id === "ch-01") {
     return true;
   }
 
