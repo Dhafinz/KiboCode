@@ -14,6 +14,7 @@ export interface SimulationStep {
   kiboPosition: number;
   lampActive: boolean;
   activeTargetIds?: string[];
+  memoryValue?: number | null;
   status: "success" | "failure";
   message: string;
   kiboMood: KiboVariant;
@@ -24,6 +25,7 @@ export interface SimulationResult {
   finalPosition: number;
   lampActive: boolean;
   activeTargetIds: string[];
+  memoryValue?: number | null;
   steps: SimulationStep[];
   feedbackMessage: string;
   kiboMood: KiboVariant;

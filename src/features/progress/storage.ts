@@ -19,7 +19,6 @@ export interface PlayerProgressData {
 }
 
 const STORAGE_KEY = "kibocode_player_progress_v1";
-const TOTAL_CHALLENGES_IN_WORLD = 25;
 
 const DEFAULT_PROGRESS: PlayerProgressData = {
   playerId: "local_player",
@@ -130,11 +129,12 @@ export function saveChallengeResult(
       0
     );
 
-    // Hitung persentase pemulihan dunia (dari total 15 misi)
+    // Hitung persentase pemulihan dunia dari progres aktual
+    const totalPlayableCount = Object.keys(CHALLENGES).length;
     const completedCount = Object.keys(updatedCompleted).length;
     const worldRestoredPct = Math.min(
       100,
-      parseFloat(((completedCount / TOTAL_CHALLENGES_IN_WORLD) * 100).toFixed(1))
+      parseFloat(((completedCount / totalPlayableCount) * 100).toFixed(1))
     );
 
     const updatedData: PlayerProgressData = {
@@ -192,6 +192,11 @@ export function getPrerequisiteChallenge(
     return CHALLENGES["ch-08"];
   }
 
+  // Jika tantangan pertama di Memory Station (ch-12), prasyaratnya adalah ch-11 (akhir Sprout Garden)
+  if (challenge.chapterId === "memory-station" && challenge.order === 1) {
+    return CHALLENGES["ch-11"];
+  }
+
   if (challenge.order <= 1) {
     return undefined;
   }
@@ -200,6 +205,50 @@ export function getPrerequisiteChallenge(
   return Object.values(CHALLENGES).find(
     (c) => c.chapterId === challenge.chapterId && c.order === prevOrder
   );
+}
+
+/**
+ * Helper to check if all challenges in a given chapter have been completed
+ */
+export function isChapterRestored(
+  chapterId: ChapterId,
+  progressData?: PlayerProgressData
+): boolean {
+  const current = progressData ?? loadProgress();
+  const chapterChallenges = Object.values(CHALLENGES).filter(
+    (c) => c.chapterId === chapterId
+  );
+  if (chapterChallenges.length === 0) return false;
+  return chapterChallenges.every((c) => Boolean(current.completedChallenges[c.id]));
+}
+
+/**
+ * Returns calculated progress metrics for a chapter based on actual player progress
+ */
+export function getChapterProgress(
+  chapterId: ChapterId,
+  progressData?: PlayerProgressData
+): {
+  completed: number;
+  total: number;
+  percentage: number;
+  isRestored: boolean;
+} {
+  const current = progressData ?? loadProgress();
+  const chapterChallenges = Object.values(CHALLENGES).filter(
+    (c) => c.chapterId === chapterId
+  );
+  const total = chapterChallenges.length;
+  const completed = chapterChallenges.filter(
+    (c) => Boolean(current.completedChallenges[c.id])
+  ).length;
+  const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+  return {
+    completed,
+    total,
+    percentage,
+    isRestored: total > 0 && completed === total,
+  };
 }
 
 /**

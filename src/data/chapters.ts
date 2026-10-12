@@ -45,7 +45,7 @@ export const CHAPTERS: Chapter[] = [
     concept: "variable",
     conceptLabel: "Variable (Variabel & Nilai)",
     description: "Simpan dan gunakan kembali nilai data yang dibutuhkan dunia digital.",
-    totalChallenges: 5,
+    totalChallenges: 3,
   },
   {
     id: "kibo-core",

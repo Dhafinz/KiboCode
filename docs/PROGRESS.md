@@ -29,10 +29,10 @@ Priority:
 ## Phase 1 — Core Navigation
 
 - [x] P0 Home / Landing (Verified)
-- [x] P0 Adventure / World Map (Verified: `/adventure` with 5 regions, lock states, restoration stats)
+- [x] P0 Adventure / World Map (Verified: `/adventure` with 5 regions, 4 playable chapters, Memory Station dynamic unlocking, lock states, restoration badges, and inter-chapter progression)
 - [ ] P0 Progress page (Integrated into Adventure World Map header)
 - [ ] P0 How-to-play page
-- [x] P0 Responsive navigation (Verified: Navbar desktop + mobile drawer)
+- [x] P0 Responsive navigation (Verified: Navbar desktop + mobile drawer, cross-chapter navigation ch-11 -> ch-12 -> ch-13 -> ch-14)
 
 ## Phase 2 — Kibo
 
@@ -47,13 +47,15 @@ Priority:
 ## Phase 3 — Block Coding Engine
 
 - [x] P0 Block data model (Verified: `BlockType`, `BlockItem`, `SimulationStep`, `ChallengeTarget`)
-- [x] P0 Block library (Verified: Child-friendly set MOVE, ACTIVATE, and conditional block IF_GATE for Smart Gate puzzle)
+- [x] P0 Block library (Verified: Child-friendly set MOVE, ACTIVATE, IF_GATE, IF_BRIDGE, WATER, REPEAT_2, REPEAT_3, END_LOOP, SET_VALUE_2..5, USE_VALUE)
+- [x] P0 Variable state & simulation (Verified: runtime memoryValue tracking, empty memory validation, value discrimination, value updating, and per-step memory logging)
+- [x] P0 Variable visual & HUD (Verified: "Kotak Memori Kibo" HUD with responsive reactive status, floating memory chip above Kibo, and isometric 2.5D MemoryStationVault for terminal, reactor, and vault targets)
 - [ ] P0 Drag/drop (Deferred to later iteration; click-to-add implemented)
 - [ ] P0 Snap behavior (Deferred to visual puzzle iteration)
 - [ ] P0 Nested blocks (Deferred to Condition/Loop chapters)
 - [x] P0 Remove/reset blocks (Verified: single remove ✕, clear all 🗑️, reset stage ↺)
 - [x] P0 Program execution (Verified: pure deterministic engine `runSimulation` parameterized for arbitrary gridTiles and targets without hardcoding)
-- [x] P0 Execution visualization (Verified: dynamic linear interpolation track, laser conduit chevrons, and StreetLamp lighting states)
+- [x] P0 Execution visualization (Verified: dynamic linear interpolation track, laser conduit chevrons, StreetLamp lighting states, and MemoryStationVault reactive states)
 - [x] P0 Success/failure validation (Verified: dynamic targets matching, chapter-aware & target-specific feedback without Lumina Town lamp hardcoding, premature activation check, overstep check, and dynamic optimalBlocks star rating)
 - [x] P0 Route & Progress validation (Verified: Server-side `notFound()` for invalid challenge IDs, fake progress record prevention in `storage.ts`)
 - [ ] P1 Undo/redo if feasible
@@ -79,12 +81,10 @@ Priority:
 - [x] P0 Challenge 10 (Verified: "Kebun Berbaris (Garden Rows)" sequence + loop combination with 6 platforms, entry path, 3 flower rows at tiles 3, 4, 5, irrigation pump at tile 6, optimal 7 blocks: `MOVE -> REPEAT_3 -> MOVE -> WATER -> END_LOOP -> MOVE -> ACTIVATE` at `/challenge/ch-10`)
 - [x] P0 Challenge 11 (Verified: "Festival Bunga (Flower Festival)" compound multi-step loop pattern with 6 platforms, 4 festival flowers across 2 twin garden beds at tiles 2, 3, 4, 5, Grand Fountain finale at tile 6, optimal 8 blocks: `REPEAT_2 -> MOVE -> WATER -> MOVE -> WATER -> END_LOOP -> MOVE -> ACTIVATE` at `/challenge/ch-11`)
 
-### Memory Station (Variable)
-- [ ] P0 Challenge 16
-- [ ] P0 Challenge 17
-- [ ] P0 Challenge 18
-- [ ] P0 Challenge 19
-- [ ] P0 Challenge 20
+### Memory Station (Variable — Selesai Penuh: Tahap 1 Engine & Data, Tahap 2 Visual Arena & HUD, Tahap 3 World Map & Unlocking)
+- [x] P0 Challenge 12 (Verified: "Kotak Memori Pertama (Save the Data)" konsep deklarasi & penyimpanan nilai SET_VALUE_3, target Terminal Alpha dengan requiredValue: 3, optimal 5 blok di `/challenge/ch-12`)
+- [x] P0 Challenge 13 (Verified: "Kirimkan Nilai Data (Use the Data)" konsep penyaluran nilai memori SET_VALUE_5 + USE_VALUE, target Reaktor Memori dengan requiredValue: 5, optimal 6 blok di `/challenge/ch-13`)
+- [x] P0 Challenge 14 (Verified: "Sinkronisasi Dua Nilai (Data Delivery & Update)" konsep pembaruan nilai variabel berurutan dengan Konsol Alpha [nilai 2] & Kubah Memori Utama [nilai 4], optimal 9 blok di `/challenge/ch-14`)
 
 ### Kibo Core (Problem Solving)
 - [ ] P0 Challenge 21

@@ -138,6 +138,14 @@ function getTargetStandingInstruction(target: ChallengeTarget): string {
       return `Kibo sudah berdiri tepat di depan ${label}, tapi generator belum dinyalakan! Tambahkan instruksi [Nyalakan Lampu / Aktifkan] ya.`;
     case "crystal":
       return `Kibo sudah berdiri tepat di depan ${label}, tapi kristal belum diaktifkan! Tambahkan instruksi [Nyalakan Lampu / Aktifkan] ya.`;
+    case "terminal":
+      return target.requiredValue !== undefined
+        ? `Kibo sudah berdiri tepat di depan ${label}, tapi terminal belum diaktifkan! Pastikan Kotak Memori terisi daya dan aktifkan terminal ya.`
+        : `Kibo sudah berdiri tepat di depan ${label}, tapi terminal belum diaktifkan! Tambahkan instruksi Aktifkan ya.`;
+    case "reactor":
+      return `Kibo sudah berdiri tepat di depan ${label}, tapi reaktor belum dinyalakan! Gunakan blok Gunakan Nilai Data ya.`;
+    case "vault":
+      return `Kibo sudah berdiri tepat di depan ${label}, tapi kubah memori belum dibuka! Salurkan data dengan blok Gunakan Nilai Data ya.`;
     case "lamp":
     default:
       return `Kibo sudah berdiri tepat di depan ${target.label || "tiang lampu"}, tapi saklarnya belum dinyalakan! Tambahkan instruksi Nyalakan Lampu ya.`;
@@ -163,6 +171,10 @@ function getPartialCompletionFeedback(
     return `Sebagian rintangan telah dilewati, tapi ${label} belum diselesaikan! Periksa kembali setiap gerbang, jembatan, dan kristal di lembah.`;
   }
 
+  if (chapterId === "memory-station") {
+    return `Sebagian stasiun data telah aktif, tapi ${label} belum diaktifkan! Periksa kembali alur pengiriman data Kibo.`;
+  }
+
   return `Sebagian lampu sudah menyala, tapi ${label} masih padam! Periksa kembali apakah Kibo sudah menyalakan setiap lampu di jalurnya.`;
 }
 
@@ -176,6 +188,9 @@ function getUnreachedTargetFeedback(chapterId: ChapterId): string {
   if (chapterId === "gate-valley") {
     return "Kibo belum mencapai tujuan akhir di lembah. Periksa kembali urutan langkah maju dan rintangan Kibo!";
   }
+  if (chapterId === "memory-station") {
+    return "Kibo belum mencapai terminal atau stasiun data target. Periksa kembali urutan langkah Kibo!";
+  }
   return "Kibo belum sampai di tiang lampu. Periksa kembali urutan langkah maju Kibo!";
 }
 
@@ -188,6 +203,9 @@ function getEmptyActivateFeedback(chapterId: ChapterId): string {
   }
   if (chapterId === "gate-valley") {
     return "Kibo belum sampai di depan saklar atau totem lembah! Di petak ini tidak ada saklar atau totem yang bisa diaktifkan.";
+  }
+  if (chapterId === "memory-station") {
+    return "Kibo belum sampai di depan terminal data atau reaktor! Di petak ini tidak ada saklar atau konsol data yang bisa diaktifkan.";
   }
   return "Kibo belum sampai di depan saklar atau tiang lampu! Di petak ini tidak ada saklar yang bisa dinyalakan.";
 }
@@ -215,6 +233,7 @@ export function runSimulation(
       finalPosition: normConfig.startPosition,
       lampActive: false,
       activeTargetIds: [],
+      memoryValue: null,
       steps: [],
       feedbackMessage:
         "Belum ada instruksi yang dipasang. Klik atau seret blok perintah untuk membantu Kibo melangkah!",
@@ -231,6 +250,7 @@ export function runSimulation(
       finalPosition: normConfig.startPosition,
       lampActive: false,
       activeTargetIds: [],
+      memoryValue: null,
       steps: [],
       feedbackMessage: parseResult.errorMessage,
       kiboMood: "confused",
@@ -240,6 +260,7 @@ export function runSimulation(
 
   const unrolled = parseResult.unrolled;
   let currentPos = normConfig.startPosition;
+  let currentMemoryValue: number | null = null;
   const activatedTargetIds = new Set<string>();
   const steps: SimulationStep[] = [];
   let simulationHalted = false;
@@ -266,6 +287,7 @@ export function runSimulation(
           kiboPosition: currentPos,
           lampActive: activatedTargetIds.size > 0,
           activeTargetIds: Array.from(activatedTargetIds),
+          memoryValue: currentMemoryValue,
           status: "failure",
           message: failureReason,
           kiboMood: "confused",
@@ -286,6 +308,7 @@ export function runSimulation(
           kiboPosition: currentPos,
           lampActive: activatedTargetIds.size > 0,
           activeTargetIds: Array.from(activatedTargetIds),
+          memoryValue: currentMemoryValue,
           status: "failure",
           message: failureReason,
           kiboMood: "confused",
@@ -306,6 +329,7 @@ export function runSimulation(
           kiboPosition: currentPos,
           lampActive: activatedTargetIds.size > 0,
           activeTargetIds: Array.from(activatedTargetIds),
+          memoryValue: currentMemoryValue,
           status: "failure",
           message: failureReason,
           kiboMood: "confused",
@@ -319,6 +343,7 @@ export function runSimulation(
           kiboPosition: currentPos,
           lampActive: activatedTargetIds.size > 0,
           activeTargetIds: Array.from(activatedTargetIds),
+          memoryValue: currentMemoryValue,
           status: "success",
           message: `Kibo maju 1 langkah ke petak ${currentPos + 1}.`,
           kiboMood: "idle",
@@ -340,6 +365,7 @@ export function runSimulation(
           kiboPosition: currentPos,
           lampActive: activatedTargetIds.size > 0,
           activeTargetIds: Array.from(activatedTargetIds),
+          memoryValue: currentMemoryValue,
           status: "success",
           message: gateMsg,
           kiboMood: "happy",
@@ -358,6 +384,7 @@ export function runSimulation(
           kiboPosition: currentPos,
           lampActive: activatedTargetIds.size > 0,
           activeTargetIds: Array.from(activatedTargetIds),
+          memoryValue: currentMemoryValue,
           status: "failure",
           message: failureReason,
           kiboMood: "confused",
@@ -380,6 +407,7 @@ export function runSimulation(
           kiboPosition: currentPos,
           lampActive: activatedTargetIds.size > 0,
           activeTargetIds: Array.from(activatedTargetIds),
+          memoryValue: currentMemoryValue,
           status: "success",
           message: bridgeMsg,
           kiboMood: "happy",
@@ -398,6 +426,7 @@ export function runSimulation(
           kiboPosition: currentPos,
           lampActive: activatedTargetIds.size > 0,
           activeTargetIds: Array.from(activatedTargetIds),
+          memoryValue: currentMemoryValue,
           status: "failure",
           message: failureReason,
           kiboMood: "confused",
@@ -420,6 +449,7 @@ export function runSimulation(
           kiboPosition: currentPos,
           lampActive: activatedTargetIds.size > 0,
           activeTargetIds: Array.from(activatedTargetIds),
+          memoryValue: currentMemoryValue,
           status: "success",
           message: waterMsg,
           kiboMood: "happy",
@@ -438,12 +468,158 @@ export function runSimulation(
           kiboPosition: currentPos,
           lampActive: activatedTargetIds.size > 0,
           activeTargetIds: Array.from(activatedTargetIds),
+          memoryValue: currentMemoryValue,
           status: "failure",
           message: failureReason,
           kiboMood: "confused",
         });
         break;
       }
+    } else if (
+      block === "SET_VALUE_2" ||
+      block === "SET_VALUE_3" ||
+      block === "SET_VALUE_4" ||
+      block === "SET_VALUE_5"
+    ) {
+      let valToSet = 0;
+      if (block === "SET_VALUE_2") valToSet = 2;
+      else if (block === "SET_VALUE_3") valToSet = 3;
+      else if (block === "SET_VALUE_4") valToSet = 4;
+      else if (block === "SET_VALUE_5") valToSet = 5;
+
+      currentMemoryValue = valToSet;
+      steps.push({
+        stepIndex: originalIndex,
+        blockType: block,
+        kiboPosition: currentPos,
+        lampActive: activatedTargetIds.size > 0,
+        activeTargetIds: Array.from(activatedTargetIds),
+        memoryValue: currentMemoryValue,
+        status: "success",
+        message: `Kotak Memori terisi: Nilai ${valToSet} berhasil disimpan! 💾`,
+        kiboMood: "happy",
+      });
+    } else if (block === "USE_VALUE") {
+      const targetAtPos = normConfig.targets.find((t) => t.position === currentPos);
+
+      if (!targetAtPos) {
+        // Berada di petak kosong tanpa target
+        simulationHalted = true;
+        failureReason =
+          "Kibo mencoba menyalurkan nilai data, tapi di petak ini tidak ada terminal atau perangkat data yang membutuhkan nilai!";
+        steps.push({
+          stepIndex: originalIndex,
+          blockType: block,
+          kiboPosition: currentPos,
+          lampActive: activatedTargetIds.size > 0,
+          activeTargetIds: Array.from(activatedTargetIds),
+          memoryValue: currentMemoryValue,
+          status: "failure",
+          message: failureReason,
+          kiboMood: "confused",
+        });
+        break;
+      }
+
+      // Target ada di petak ini, apakah target menerima data memori?
+      if (
+        targetAtPos.type !== "terminal" &&
+        targetAtPos.type !== "reactor" &&
+        targetAtPos.type !== "vault"
+      ) {
+        simulationHalted = true;
+        failureReason = `Ups! ${targetAtPos.label || "Perangkat ini"} tidak membutuhkan nilai data dari Kotak Memori! Periksa kembali instruksi yang sesuai ya.`;
+        steps.push({
+          stepIndex: originalIndex,
+          blockType: block,
+          kiboPosition: currentPos,
+          lampActive: activatedTargetIds.size > 0,
+          activeTargetIds: Array.from(activatedTargetIds),
+          memoryValue: currentMemoryValue,
+          status: "failure",
+          message: failureReason,
+          kiboMood: "confused",
+        });
+        break;
+      }
+
+      // Cek apakah prasyarat urutan sudah terpenuhi
+      if (targetAtPos.dependsOn && !activatedTargetIds.has(targetAtPos.dependsOn)) {
+        simulationHalted = true;
+        failureReason =
+          targetAtPos.prerequisiteMessage ||
+          `Perangkat ${targetAtPos.label || "ini"} belum bisa diaktifkan karena sumber dayanya belum dinyalakan terlebih dahulu! Aktifkan perangkat sebelumnya ya.`;
+        steps.push({
+          stepIndex: originalIndex,
+          blockType: block,
+          kiboPosition: currentPos,
+          lampActive: activatedTargetIds.size > 0,
+          activeTargetIds: Array.from(activatedTargetIds),
+          memoryValue: currentMemoryValue,
+          status: "failure",
+          message: failureReason,
+          kiboMood: "confused",
+        });
+        break;
+      }
+
+      // Cek apakah memori Kibo kosong
+      if (currentMemoryValue === null) {
+        simulationHalted = true;
+        failureReason =
+          "Kotak Memori Kibo masih kosong! Simpan nilai data terlebih dahulu sebelum menggunakan blok Gunakan Nilai Data ya.";
+        steps.push({
+          stepIndex: originalIndex,
+          blockType: block,
+          kiboPosition: currentPos,
+          lampActive: activatedTargetIds.size > 0,
+          activeTargetIds: Array.from(activatedTargetIds),
+          memoryValue: currentMemoryValue,
+          status: "failure",
+          message: failureReason,
+          kiboMood: "confused",
+        });
+        break;
+      }
+
+      // Cek apakah nilai cocok dengan requiredValue (jika target meminta nilai tertentu)
+      if (
+        targetAtPos.requiredValue !== undefined &&
+        currentMemoryValue !== targetAtPos.requiredValue
+      ) {
+        simulationHalted = true;
+        failureReason = `${targetAtPos.label || "Perangkat ini"} membutuhkan Nilai ${targetAtPos.requiredValue}, tetapi Kotak Memori Kibo berisi Nilai ${currentMemoryValue}! Simpan nilai yang sesuai ya.`;
+        steps.push({
+          stepIndex: originalIndex,
+          blockType: block,
+          kiboPosition: currentPos,
+          lampActive: activatedTargetIds.size > 0,
+          activeTargetIds: Array.from(activatedTargetIds),
+          memoryValue: currentMemoryValue,
+          status: "failure",
+          message: failureReason,
+          kiboMood: "confused",
+        });
+        break;
+      }
+
+      // Berhasil disalurkan dan diaktifkan
+      activatedTargetIds.add(targetAtPos.id);
+      const useSuccessMsg =
+        targetAtPos.activationMessage ||
+        `${targetAtPos.label || "Perangkat data"} menerima Nilai ${currentMemoryValue} dan berhasil diaktifkan! 💾✨`;
+
+      steps.push({
+        stepIndex: originalIndex,
+        blockType: block,
+        kiboPosition: currentPos,
+        lampActive: true,
+        activeTargetIds: Array.from(activatedTargetIds),
+        memoryValue: currentMemoryValue,
+        status: "success",
+        message: useSuccessMsg,
+        kiboMood: "happy",
+      });
     } else if (block === "ACTIVATE") {
       const targetAtPos = normConfig.targets.find((t) => t.position === currentPos);
 
@@ -460,11 +636,67 @@ export function runSimulation(
             kiboPosition: currentPos,
             lampActive: activatedTargetIds.size > 0,
             activeTargetIds: Array.from(activatedTargetIds),
+            memoryValue: currentMemoryValue,
             status: "failure",
             message: failureReason,
             kiboMood: "confused",
           });
           break;
+        }
+
+        // Cek apakah target memerlukan blok USE_VALUE khusus (seperti reactor atau vault)
+        if (targetAtPos.type === "reactor" || targetAtPos.type === "vault") {
+          simulationHalted = true;
+          failureReason = `${targetAtPos.label || "Perangkat ini"} memerlukan penyaluran data spesifik! Gunakan blok Gunakan Nilai Data ya.`;
+          steps.push({
+            stepIndex: originalIndex,
+            blockType: block,
+            kiboPosition: currentPos,
+            lampActive: activatedTargetIds.size > 0,
+            activeTargetIds: Array.from(activatedTargetIds),
+            memoryValue: currentMemoryValue,
+            status: "failure",
+            message: failureReason,
+            kiboMood: "confused",
+          });
+          break;
+        }
+
+        // Cek jika target adalah terminal data yang memerlukan memoryValue
+        if (targetAtPos.type === "terminal" && targetAtPos.requiredValue !== undefined) {
+          if (currentMemoryValue === null) {
+            simulationHalted = true;
+            failureReason = `${targetAtPos.label || "Terminal Data"} membutuhkan ${targetAtPos.requiredValue} unit daya, tetapi Kotak Memori Kibo masih kosong! Gunakan blok Simpan Nilai terlebih dahulu ya.`;
+            steps.push({
+              stepIndex: originalIndex,
+              blockType: block,
+              kiboPosition: currentPos,
+              lampActive: activatedTargetIds.size > 0,
+              activeTargetIds: Array.from(activatedTargetIds),
+              memoryValue: currentMemoryValue,
+              status: "failure",
+              message: failureReason,
+              kiboMood: "confused",
+            });
+            break;
+          }
+
+          if (currentMemoryValue !== targetAtPos.requiredValue) {
+            simulationHalted = true;
+            failureReason = `${targetAtPos.label || "Terminal Data"} membutuhkan Nilai ${targetAtPos.requiredValue}, tetapi Kotak Memori Kibo berisi Nilai ${currentMemoryValue}! Simpan nilai yang sesuai ya.`;
+            steps.push({
+              stepIndex: originalIndex,
+              blockType: block,
+              kiboPosition: currentPos,
+              lampActive: activatedTargetIds.size > 0,
+              activeTargetIds: Array.from(activatedTargetIds),
+              memoryValue: currentMemoryValue,
+              status: "failure",
+              message: failureReason,
+              kiboMood: "confused",
+            });
+            break;
+          }
         }
 
         activatedTargetIds.add(targetAtPos.id);
@@ -476,6 +708,8 @@ export function runSimulation(
             ? "Kristal Cahaya Agung bersinar megah! Seluruh Lumina Town kembali benderang!"
             : targetAtPos.type === "fountain"
             ? "Katup diputar! Air mancur digital menyemburkan air jernih ke seluruh taman! ⛲"
+            : targetAtPos.type === "terminal"
+            ? `Terminal Data menerima ${currentMemoryValue ?? 0} unit daya dan kini aktif! 💾✨`
             : "Saklar disentuh! Lampu jalan Lumina Town kembali bersinar terang!");
 
         steps.push({
@@ -484,6 +718,7 @@ export function runSimulation(
           kiboPosition: currentPos,
           lampActive: true,
           activeTargetIds: Array.from(activatedTargetIds),
+          memoryValue: currentMemoryValue,
           status: "success",
           message: activationMsg,
           kiboMood: "happy",
@@ -498,6 +733,7 @@ export function runSimulation(
           kiboPosition: currentPos,
           lampActive: activatedTargetIds.size > 0,
           activeTargetIds: Array.from(activatedTargetIds),
+          memoryValue: currentMemoryValue,
           status: "failure",
           message: failureReason,
           kiboMood: "confused",
@@ -554,6 +790,18 @@ export function runSimulation(
       successMsg = isOptimal
         ? "Luar biasa! Festival Bunga berlangsung megah! Seluruh bunga mekar dan Air Mancur Megah menyala, Sprout Garden pulih seutuhnya! ⛲🌸✨"
         : "Bagus sekali! Festival Bunga berhasil dirayakan, tapi coba buat susunan blok lebih ringkas untuk 3 bintang penuh!";
+    } else if (normConfig.id === "ch-12") {
+      successMsg = isOptimal
+        ? "Luar biasa! Terminal Data Alpha berhasil diisi daya dari Kotak Memori dengan urutan instruksi yang tepat dan efisien! 💾✨"
+        : "Bagus sekali! Terminal Data Alpha berhasil diaktifkan, tapi coba buat susunan blok lebih ringkas untuk 3 bintang penuh!";
+    } else if (normConfig.id === "ch-13") {
+      successMsg = isOptimal
+        ? "Hebat sekali! Nilai data berhasil disalurkan dan Reaktor Memori kembali aktif benderang! ⚡🔋"
+        : "Bagus sekali! Reaktor Memori berhasil dinyalakan, coba buat susunan blok lebih ringkas untuk 3 bintang penuh!";
+    } else if (normConfig.id === "ch-14") {
+      successMsg = isOptimal
+        ? "Luar biasa! Sinkronisasi dua nilai data berhasil sempurna! Seluruh Memory Station kini pulih seutuhnya! 🏛️💾🌟"
+        : "Bagus sekali! Memory Station berhasil dipulihkan, tapi coba buat susunan blok lebih ringkas untuk 3 bintang penuh!";
     }
 
     return {
@@ -561,6 +809,7 @@ export function runSimulation(
       finalPosition: currentPos,
       lampActive: true,
       activeTargetIds: Array.from(activatedTargetIds),
+      memoryValue: currentMemoryValue,
       steps,
       feedbackMessage: successMsg,
       kiboMood: "celebrate",
@@ -597,6 +846,7 @@ export function runSimulation(
     finalPosition: currentPos,
     lampActive: activatedTargetIds.size > 0,
     activeTargetIds: Array.from(activatedTargetIds),
+    memoryValue: currentMemoryValue,
     steps,
     feedbackMessage: finalFeedback,
     kiboMood: finalMood,

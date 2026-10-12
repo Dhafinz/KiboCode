@@ -12,6 +12,7 @@ import { SmartGate } from "@/components/gameplay/SmartGate";
 import { EnergyBridge } from "@/components/gameplay/EnergyBridge";
 import { GardenPlant } from "@/components/gameplay/GardenPlant";
 import { DigitalPlatform } from "@/components/gameplay/DigitalPlatform";
+import { MemoryStationVault } from "@/components/gameplay/MemoryStationVault";
 import {
   CHALLENGES,
   BlockType,
@@ -49,12 +50,15 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
   const [kiboPos, setKiboPos] = useState<number>(challenge.startPosition);
   const [lampOn, setLampOn] = useState<boolean>(false);
   const [activeTargetIds, setActiveTargetIds] = useState<string[]>([]);
+  const [currentMemoryValue, setCurrentMemoryValue] = useState<number | null>(null);
   const [kiboMood, setKiboMood] = useState<KiboVariant>("idle");
   const [isRunning, setIsRunning] = useState<boolean>(false);
   const [activeStepIndex, setActiveStepIndex] = useState<number | null>(null);
 
   const initialFeedbackMessage =
-    challenge.chapterId === "sprout-garden"
+    challenge.chapterId === "memory-station"
+      ? "Simpan angka ke dalam Kotak Memori Kibo, lalu gunakan nilainya pada terminal atau kubah."
+      : challenge.chapterId === "sprout-garden"
       ? "Coba susun langkahnya untuk menyiram tanaman dan merawat kebun."
       : challenge.chapterId === "gate-valley"
       ? "Coba susun langkahnya untuk membuka gerbang dan menyeberangi jembatan."
@@ -141,6 +145,7 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
     setKiboPos(challenge.startPosition);
     setLampOn(false);
     setActiveTargetIds([]);
+    setCurrentMemoryValue(null);
     setKiboMood("idle");
     setFeedback({
       type: "info",
@@ -156,6 +161,7 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
     setKiboPos(challenge.startPosition);
     setLampOn(false);
     setActiveTargetIds([]);
+    setCurrentMemoryValue(null);
     setActiveStepIndex(null);
     setKiboMood("idle");
 
@@ -187,6 +193,9 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
         setKiboPos(step.kiboPosition);
         setLampOn(step.lampActive);
         setActiveTargetIds(step.activeTargetIds ?? (step.lampActive ? [challenge.targets[0]?.id || "target-1"] : []));
+        if (step.memoryValue !== undefined) {
+          setCurrentMemoryValue(step.memoryValue);
+        }
         setKiboMood(step.kiboMood);
         setFeedback({
           type: step.status === "failure" ? "error" : "info",
@@ -203,6 +212,9 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
         setIsRunning(false);
         setActiveStepIndex(null);
         setKiboMood(result.kiboMood);
+        if (result.memoryValue !== undefined) {
+          setCurrentMemoryValue(result.memoryValue);
+        }
 
         if (result.success) {
           setFeedback({
@@ -261,6 +273,8 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
       ? CHALLENGES["ch-06"]
       : challenge.id === "ch-08"
       ? CHALLENGES["ch-09"]
+      : challenge.id === "ch-11"
+      ? CHALLENGES["ch-12"]
       : undefined);
 
   if (!isUnlocked) {
@@ -407,7 +421,9 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                 height: "48px",
                 borderRadius: "50%",
                 background:
-                  challenge.chapterId === "sprout-garden"
+                  challenge.chapterId === "memory-station"
+                    ? "radial-gradient(circle, #c084fc 0%, #8b5cf6 60%, #4c1d95 100%)"
+                    : challenge.chapterId === "sprout-garden"
                     ? "radial-gradient(circle, #34d399 0%, #10b981 60%, #065f46 100%)"
                     : challenge.chapterId === "gate-valley"
                     ? "radial-gradient(circle, #fdba74 0%, #f97316 60%, #c2410c 100%)"
@@ -417,7 +433,9 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                 justifyContent: "center",
                 fontSize: "1.6rem",
                 boxShadow:
-                  challenge.chapterId === "sprout-garden"
+                  challenge.chapterId === "memory-station"
+                    ? "0 0 20px rgba(139, 92, 246, 0.6)"
+                    : challenge.chapterId === "sprout-garden"
                     ? "0 0 20px rgba(16, 185, 129, 0.6)"
                     : challenge.chapterId === "gate-valley"
                     ? "0 0 20px rgba(249, 115, 22, 0.6)"
@@ -425,7 +443,9 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                 flexShrink: 0,
               }}
             >
-              {challenge.chapterId === "sprout-garden"
+              {challenge.chapterId === "memory-station"
+                ? "💾"
+                : challenge.chapterId === "sprout-garden"
                 ? "🌱"
                 : challenge.chapterId === "gate-valley"
                 ? "⛩️"
@@ -499,7 +519,10 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
             display: "flex",
             flexDirection: "column",
             justifyContent: "flex-end",
-            backgroundImage: "url('/assets/environment/lumina-town-bg.jpg')",
+            backgroundImage:
+              challenge.chapterId === "memory-station"
+                ? "radial-gradient(circle at 50% 25%, rgba(124, 58, 237, 0.35) 0%, rgba(15, 23, 42, 0.9) 75%), url('/assets/environment/lumina-town-bg.jpg')"
+                : "url('/assets/environment/lumina-town-bg.jpg')",
             backgroundSize: "cover",
             backgroundPosition: "center 68%",
           }}
@@ -517,31 +540,152 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
             }}
           />
 
-          {/* Banner Papan Nama "Lumina Town" di Kiri Arena */}
+          {/* Top Arena Header: Chapter Banner (Kiri) & HUD Kotak Memori (Kanan) */}
           <div
-            aria-hidden="true"
             style={{
               position: "absolute",
-              top: "20px",
-              left: "24px",
-              zIndex: 2,
-              padding: "6px 14px",
-              borderRadius: "10px",
-              backgroundColor: "rgba(15, 23, 42, 0.8)",
-              border: "1px solid rgba(255, 255, 255, 0.15)",
-              backdropFilter: "blur(6px)",
-              color: "#f8fafc",
-              fontSize: "0.825rem",
-              fontWeight: 700,
+              top: "16px",
+              left: "16px",
+              right: "16px",
+              zIndex: 10,
               display: "flex",
               alignItems: "center",
-              gap: "6px",
+              justifyContent: "space-between",
+              flexWrap: "wrap",
+              gap: "10px",
+              pointerEvents: "none",
             }}
           >
-            <span>{challenge.chapterId === "gate-valley" ? "⛩️" : "🏮"}</span>
-            <span>
-              {challenge.chapterId === "gate-valley" ? "Gate Valley" : "Lumina Town"} — Misi 0{challenge.order}: {challenge.title.split("(")[0].trim()}
-            </span>
+            {/* Banner Papan Nama Arena */}
+            <div
+              aria-hidden="true"
+              style={{
+                pointerEvents: "auto",
+                padding: "6px 14px",
+                borderRadius: "10px",
+                backgroundColor: "rgba(15, 23, 42, 0.8)",
+                border: "1px solid rgba(255, 255, 255, 0.15)",
+                backdropFilter: "blur(6px)",
+                color: "#f8fafc",
+                fontSize: "0.825rem",
+                fontWeight: 700,
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+              }}
+            >
+              <span>
+                {challenge.chapterId === "memory-station"
+                  ? "💾"
+                  : challenge.chapterId === "gate-valley"
+                  ? "⛩️"
+                  : challenge.chapterId === "sprout-garden"
+                  ? "🌱"
+                  : "🏮"}
+              </span>
+              <span>
+                {challenge.chapterId === "memory-station"
+                  ? "Memory Station"
+                  : challenge.chapterId === "gate-valley"
+                  ? "Gate Valley"
+                  : challenge.chapterId === "sprout-garden"
+                  ? "Sprout Garden"
+                  : "Lumina Town"}{" "}
+                — Misi 0{challenge.order}: {challenge.title.split("(")[0].trim()}
+              </span>
+            </div>
+
+            {/* HUD Kotak Memori Kibo (Tampil jika chapter memory-station) */}
+            {challenge.chapterId === "memory-station" && (
+              <div
+                id="hud-kibo-memory-box"
+                style={{
+                  pointerEvents: "auto",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  padding: "6px 14px",
+                  borderRadius: "14px",
+                  backgroundColor: "rgba(10, 15, 29, 0.92)",
+                  border:
+                    currentMemoryValue !== null
+                      ? "1.5px solid #00f2fe"
+                      : "1.5px dashed rgba(168, 85, 247, 0.45)",
+                  backdropFilter: "blur(8px)",
+                  boxShadow:
+                    currentMemoryValue !== null
+                      ? "0 0 20px rgba(0, 242, 254, 0.4), 0 4px 12px rgba(0, 0, 0, 0.5)"
+                      : "0 4px 12px rgba(0, 0, 0, 0.3)",
+                  transition: "all 300ms ease",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "flex-end",
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: "0.68rem",
+                      fontWeight: 800,
+                      letterSpacing: "0.05em",
+                      color: "#c4b5fd",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "4px",
+                    }}
+                  >
+                    <span>💾</span>
+                    <span>KOTAK MEMORI</span>
+                  </div>
+                  <span
+                    style={{
+                      fontSize: "0.74rem",
+                      fontWeight: 700,
+                      color: currentMemoryValue !== null ? "#38bdf8" : "#94a3b8",
+                    }}
+                  >
+                    {currentMemoryValue !== null ? "Tersimpan" : "Kosong"}
+                  </span>
+                </div>
+
+                {/* Slot Angka Memori */}
+                <div
+                  id="hud-kibo-memory-value"
+                  style={{
+                    width: "38px",
+                    height: "38px",
+                    borderRadius: "10px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    background:
+                      currentMemoryValue !== null
+                        ? "linear-gradient(135deg, #0284c7 0%, #7c3aed 100%)"
+                        : "rgba(30, 41, 59, 0.75)",
+                    border:
+                      currentMemoryValue !== null
+                        ? "2px solid #38bdf8"
+                        : "1.5px dashed rgba(148, 163, 184, 0.4)",
+                    boxShadow:
+                      currentMemoryValue !== null
+                        ? "0 0 14px rgba(0, 242, 254, 0.6)"
+                        : "none",
+                    color: currentMemoryValue !== null ? "#ffffff" : "#64748b",
+                    fontSize: currentMemoryValue !== null ? "1.35rem" : "0.95rem",
+                    fontWeight: 900,
+                    fontFamily: "monospace",
+                    transition: "all 250ms ease",
+                    transform: currentMemoryValue !== null ? "scale(1.05)" : "scale(1)",
+                  }}
+                  title={currentMemoryValue !== null ? `Nilai: ${currentMemoryValue}` : "Memori kosong"}
+                >
+                  {currentMemoryValue !== null ? currentMemoryValue : "—"}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* AREA JALUR & 3 PLATFORM DIGITAL (ISOMETRIC) */}
@@ -614,6 +758,39 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                   animation: isRunning ? "kiboFloat 1.2s ease-in-out infinite" : "none",
                 }}
               >
+                {/* Floating Pocket Memory Badge di atas Kibo */}
+                {challenge.chapterId === "memory-station" && (
+                  <div
+                    style={{
+                      marginBottom: "4px",
+                      padding: "2px 8px",
+                      borderRadius: "9999px",
+                      backgroundColor:
+                        currentMemoryValue !== null
+                          ? "rgba(14, 165, 233, 0.95)"
+                          : "rgba(30, 41, 59, 0.85)",
+                      border:
+                        currentMemoryValue !== null
+                          ? "1px solid #38bdf8"
+                          : "1px dashed rgba(148, 163, 184, 0.5)",
+                      color: "#ffffff",
+                      fontSize: "0.68rem",
+                      fontWeight: 800,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "4px",
+                      boxShadow:
+                        currentMemoryValue !== null
+                          ? "0 0 10px rgba(56, 189, 248, 0.7)"
+                          : "0 2px 4px rgba(0, 0, 0, 0.4)",
+                      transition: "all 250ms ease",
+                    }}
+                  >
+                    <span>💾</span>
+                    <span>{currentMemoryValue !== null ? `Memori: ${currentMemoryValue}` : "Kosong"}</span>
+                  </div>
+                )}
+
                 <KiboAvatar
                   size={105}
                   variant={kiboMood}
@@ -650,7 +827,9 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                   label = "TITIK AWAL";
                 } else if (isTarget) {
                   const defaultTargetLabel =
-                    challenge.chapterId === "sprout-garden"
+                    challenge.chapterId === "memory-station"
+                      ? "STASIUN MEMORI"
+                      : challenge.chapterId === "sprout-garden"
                       ? "KEBUN DIGITAL"
                       : challenge.chapterId === "gate-valley"
                       ? "RINTANGAN LEMBAH"
@@ -701,6 +880,18 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                           )}
                           {targetAtTile?.type === "fountain" && (
                             <GardenPlant type="fountain" isBloomed={isTargetActive} />
+                          )}
+                          {(targetAtTile?.type === "terminal" ||
+                            targetAtTile?.type === "reactor" ||
+                            targetAtTile?.type === "vault") && (
+                            <MemoryStationVault
+                              type={targetAtTile.type}
+                              isActive={isTargetActive}
+                              requiredValue={targetAtTile.requiredValue}
+                              currentMemoryValue={currentMemoryValue}
+                              label={targetAtTile.label}
+                              isKiboHere={isCurrentKibo}
+                            />
                           )}
                         </>
                       )}
@@ -808,6 +999,8 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                     const isWater = item.type === "WATER";
                     const isRepeat = item.type === "REPEAT_2" || item.type === "REPEAT_3";
                     const isEndLoop = item.type === "END_LOOP";
+                    const isSetValue = item.type.startsWith("SET_VALUE_");
+                    const isUseValue = item.type === "USE_VALUE";
                     const blockCfg = AVAILABLE_BLOCK_CONFIGS[item.type];
 
                     // Deteksi apakah blok ini berada di dalam pengulangan (loop)
@@ -878,6 +1071,10 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                               ? "linear-gradient(135deg, #0284c7 0%, #0369a1 100%)"
                               : isGate
                               ? "linear-gradient(135deg, #d97706 0%, #b45309 100%)"
+                              : isSetValue
+                              ? "linear-gradient(135deg, #0284c7 0%, #0369a1 100%)"
+                              : isUseValue
+                              ? "linear-gradient(135deg, #7c3aed 0%, #c026d3 100%)"
                               : isMove
                               ? "linear-gradient(135deg, #4f46e5 0%, #4338ca 100%)"
                               : "linear-gradient(135deg, #9333ea 0%, #7e22ce 100%)",
@@ -893,6 +1090,10 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                               ? "1px solid rgba(56, 189, 248, 0.4)"
                               : isGate
                               ? "1px solid rgba(245, 158, 11, 0.4)"
+                              : isSetValue
+                              ? "1px solid rgba(56, 189, 248, 0.6)"
+                              : isUseValue
+                              ? "1px solid rgba(232, 121, 249, 0.6)"
                               : isMove
                               ? "1px solid rgba(129, 140, 248, 0.4)"
                               : "1px solid rgba(192, 132, 252, 0.4)",
@@ -994,6 +1195,8 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                       const isWater = bType === "WATER";
                       const isRepeat = bType === "REPEAT_2" || bType === "REPEAT_3";
                       const isEndLoop = bType === "END_LOOP";
+                      const isSetValue = bType.startsWith("SET_VALUE_");
+                      const isUseValue = bType === "USE_VALUE";
                       const btnId =
                         bType === "MOVE"
                           ? "block-add-move"
@@ -1021,6 +1224,10 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                               ? "linear-gradient(135deg, #0284c7 0%, #0369a1 100%)"
                               : isGate
                               ? "linear-gradient(135deg, #d97706 0%, #b45309 100%)"
+                              : isSetValue
+                              ? "linear-gradient(135deg, #0284c7 0%, #0369a1 100%)"
+                              : isUseValue
+                              ? "linear-gradient(135deg, #7c3aed 0%, #c026d3 100%)"
                               : isMove
                               ? "linear-gradient(135deg, #4f46e5 0%, #4338ca 100%)"
                               : "linear-gradient(135deg, #9333ea 0%, #7e22ce 100%)",
@@ -1034,6 +1241,10 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                               ? "1px solid rgba(56, 189, 248, 0.4)"
                               : isGate
                               ? "1px solid rgba(245, 158, 11, 0.4)"
+                              : isSetValue
+                              ? "1px solid rgba(56, 189, 248, 0.6)"
+                              : isUseValue
+                              ? "1px solid rgba(232, 121, 249, 0.6)"
                               : isMove
                               ? "1px solid rgba(129, 140, 248, 0.4)"
                               : "1px solid rgba(192, 132, 252, 0.4)",
@@ -1305,6 +1516,8 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                   ? "Gate Valley Pulih Sepenuhnya! ⛩️"
                   : challenge.id === "ch-11"
                   ? "Sprout Garden Pulih Sepenuhnya! 🌱"
+                  : challenge.id === "ch-14"
+                  ? "Memory Station Pulih Sepenuhnya! 💾"
                   : "Misi Selesai! Hebat! 🎉"}
               </h2>
               <p style={{ color: "var(--text-muted)", fontSize: "0.95rem", lineHeight: 1.6 }}>
@@ -1314,6 +1527,8 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                   ? "Luar biasa! Kamu berhasil menuntaskan seluruh misi di Gate Valley! Seluruh gerbang penjaga dan jembatan energi telah pulih sempurna."
                   : challenge.id === "ch-11"
                   ? "Luar biasa! Kamu berhasil menuntaskan seluruh misi di Sprout Garden! Seluruh tunas, barisan bunga mawar, dan Air Mancur Megah telah mekar bersemi mempesona!"
+                  : challenge.id === "ch-14"
+                  ? "Luar biasa! Kamu berhasil menuntaskan seluruh misi di Memory Station! Seluruh terminal data, reaktor plasma, dan Kubah Memori Utama telah aktif dengan kode angka yang presisi!"
                   : `Kamu berhasil menyelesaikan misi "${challenge.title}" dengan urutan instruksi yang tepat!`}
               </p>
             </div>

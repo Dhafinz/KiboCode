@@ -8,7 +8,12 @@ export type BlockType =
   | "WATER"
   | "REPEAT_2"
   | "REPEAT_3"
-  | "END_LOOP";
+  | "END_LOOP"
+  | "SET_VALUE_2"
+  | "SET_VALUE_3"
+  | "SET_VALUE_4"
+  | "SET_VALUE_5"
+  | "USE_VALUE";
 
 export interface BlockConfig {
   type: BlockType;
@@ -84,6 +89,46 @@ export const AVAILABLE_BLOCK_CONFIGS: Record<BlockType, BlockConfig> = {
     color: "#047857",
     description: "Menandai batas akhir dari blok pengulangan (loop).",
   },
+  SET_VALUE_2: {
+    type: "SET_VALUE_2",
+    label: "Simpan Nilai 2",
+    keyword: "SET_VALUE_2",
+    icon: "💾",
+    color: "#8b5cf6",
+    description: "Menyimpan nilai data 2 ke dalam Kotak Memori Kibo.",
+  },
+  SET_VALUE_3: {
+    type: "SET_VALUE_3",
+    label: "Simpan Nilai 3",
+    keyword: "SET_VALUE_3",
+    icon: "💾",
+    color: "#8b5cf6",
+    description: "Menyimpan nilai data 3 ke dalam Kotak Memori Kibo.",
+  },
+  SET_VALUE_4: {
+    type: "SET_VALUE_4",
+    label: "Simpan Nilai 4",
+    keyword: "SET_VALUE_4",
+    icon: "💾",
+    color: "#8b5cf6",
+    description: "Menyimpan nilai data 4 ke dalam Kotak Memori Kibo.",
+  },
+  SET_VALUE_5: {
+    type: "SET_VALUE_5",
+    label: "Simpan Nilai 5",
+    keyword: "SET_VALUE_5",
+    icon: "💾",
+    color: "#8b5cf6",
+    description: "Menyimpan nilai data 5 ke dalam Kotak Memori Kibo.",
+  },
+  USE_VALUE: {
+    type: "USE_VALUE",
+    label: "Gunakan Nilai Data",
+    keyword: "USE_VALUE",
+    icon: "📤",
+    color: "#ec4899",
+    description: "Menyalurkan nilai dari Kotak Memori Kibo ke terminal atau perangkat data sasaran.",
+  },
 };
 
 export type TargetType =
@@ -94,7 +139,10 @@ export type TargetType =
   | "bridge"
   | "sprout"
   | "flower"
-  | "fountain";
+  | "fountain"
+  | "terminal"
+  | "reactor"
+  | "vault";
 
 export interface ChallengeTarget {
   id: string;
@@ -102,6 +150,7 @@ export interface ChallengeTarget {
   position: number;
   label?: string;
   required: boolean;
+  requiredValue?: number; // Nilai data/energi yang dibutuhkan dari Kotak Memori Kibo
   dependsOn?: string;
   prerequisiteMessage?: string;
   activationMessage?: string;
@@ -832,6 +881,169 @@ export const CHALLENGES: Record<string, ChallengeDetail> = {
         level: 4,
         title: "Level 4: Solusi Terpandu (Guided Solution)",
         text: "Urutan 8 blok optimal: REPEAT_2 → MOVE → WATER → MOVE → WATER → END_LOOP → MOVE → ACTIVATE. Ayo pulihkan Sprout Garden seutuhnya!",
+      },
+    ],
+  },
+  "ch-12": {
+    id: "ch-12",
+    chapterId: "memory-station",
+    order: 1,
+    title: "Kotak Memori Pertama (Save the Data)",
+    concept: "variable",
+    conceptLabel: "Variable (Penyimpanan Nilai — SET)",
+    story:
+      "Selamat datang di Memory Station! Terminal Data Alpha di Petak 4 kehilangan daya operasionalnya karena System Glitch. Kibo harus menyiapkan 3 unit daya di dalam Kotak Memori, lalu mengaktifkan terminal di ujung jalur!",
+    goal: "Simpan nilai 3 ke Kotak Memori Kibo, lalu melangkah ke Terminal Data Alpha dan aktifkan sistemnya.",
+    gridTiles: 4,
+    startPosition: 0,
+    optimalBlocks: 5,
+    maxBlocks: 8,
+    availableBlocks: ["MOVE", "SET_VALUE_3", "ACTIVATE"],
+    targets: [
+      {
+        id: "terminal-alpha",
+        type: "terminal",
+        position: 3,
+        label: "TERMINAL DATA ALPHA",
+        required: true,
+        requiredValue: 3,
+        activationMessage:
+          "Terminal Data Alpha menerima 3 unit daya! Aliran data memori kembali terhubung! 💾✨",
+      },
+    ],
+    hints: [
+      {
+        level: 1,
+        title: "Level 1: Berpikir (Thinking)",
+        text: "Terminal Data membutuhkan unit daya yang tersimpan di Kibo sebelum bisa diaktifkan. Apa yang perlu Kibo siapkan?",
+      },
+      {
+        level: 2,
+        title: "Level 2: Arah (Direction)",
+        text: "Gunakan blok Simpan Nilai 3 terlebih dahulu agar Kotak Memori Kibo terisi daya, baru kemudian melangkah ke Petak 4.",
+      },
+      {
+        level: 3,
+        title: "Level 3: Konsep (Concept)",
+        text: "Variabel adalah tempat menyimpan nilai atau data yang bisa digunakan kapan saja saat program berjalan.",
+      },
+      {
+        level: 4,
+        title: "Level 4: Solusi Terpandu (Guided Solution)",
+        text: "Urutan 5 blok optimal: SET_VALUE_3 → MOVE → MOVE → MOVE → ACTIVATE. Ayo pasang dan pulihkan Terminal Alpha!",
+      },
+    ],
+  },
+  "ch-13": {
+    id: "ch-13",
+    chapterId: "memory-station",
+    order: 2,
+    title: "Kirimkan Nilai Data (Use the Data)",
+    concept: "variable",
+    conceptLabel: "Variable (Penyaluran Nilai — SET + USE)",
+    story:
+      "Reaktor Memori di Petak 5 membutuhkan kode sandi 5 untuk menyalakan kembali sirkuit stasiun. Kibo harus menyimpan angka 5 di titik awal, membawanya melintasi jalur data, lalu menyalurkannya menggunakan blok Gunakan Nilai Data!",
+    goal: "Simpan nilai 5 ke dalam memori, lalu gunakan blok Gunakan Nilai Data tepat di depan Reaktor Memori.",
+    gridTiles: 5,
+    startPosition: 0,
+    optimalBlocks: 6,
+    maxBlocks: 10,
+    availableBlocks: ["MOVE", "SET_VALUE_5", "USE_VALUE", "ACTIVATE"],
+    targets: [
+      {
+        id: "reactor-core",
+        type: "reactor",
+        position: 4,
+        label: "REAKTOR MEMORI",
+        required: true,
+        requiredValue: 5,
+        activationMessage:
+          "Kode sandi 5 berhasil disalurkan! Reaktor Memori berputar kencang dan memancarkan energi digital! ⚡🔋",
+      },
+    ],
+    hints: [
+      {
+        level: 1,
+        title: "Level 1: Berpikir (Thinking)",
+        text: "Reaktor tidak bisa dibuka dengan saklar biasa. Reaktor memerlukan kode data yang tersimpan di Kotak Memori Kibo.",
+      },
+      {
+        level: 2,
+        title: "Level 2: Arah (Direction)",
+        text: "Simpan nilai 5 di awal, maju ke Petak 5, lalu gunakan blok Gunakan Nilai Data (USE_VALUE) tepat di depan reaktor.",
+      },
+      {
+        level: 3,
+        title: "Level 3: Konsep (Concept)",
+        text: "Konsep SET dan USE: Nilai yang telah disimpan (SET) dapat diambil dan disalurkan kembali (USE) saat dibutuhkan.",
+      },
+      {
+        level: 4,
+        title: "Level 4: Solusi Terpandu (Guided Solution)",
+        text: "Urutan 6 blok optimal: SET_VALUE_5 → MOVE → MOVE → MOVE → MOVE → USE_VALUE. Ayo buktikan kekuatan data!",
+      },
+    ],
+  },
+  "ch-14": {
+    id: "ch-14",
+    chapterId: "memory-station",
+    order: 3,
+    title: "Sinkronisasi Dua Nilai (Data Delivery & Update)",
+    concept: "variable",
+    conceptLabel: "Variable (Pembaruan Nilai Berurutan)",
+    story:
+      "Dua stasiun data penting kehilangan sinkronisasi! Konsol Alpha di Petak 3 membutuhkan Nilai 2, sedangkan Kubah Memori Utama di Petak 6 membutuhkan Nilai 4. Bantu Kibo menyetel nilai pertama, mengantarkannya, lalu memperbarui memorinya dengan nilai kedua untuk memulihkan seluruh Memory Station!",
+    goal: "Simpan nilai 2 untuk Konsol Alpha di Petak 3, lalu perbarui isi memori dengan nilai 4 untuk Kubah Memori di Petak 6.",
+    gridTiles: 6,
+    startPosition: 0,
+    optimalBlocks: 9,
+    maxBlocks: 14,
+    availableBlocks: ["MOVE", "SET_VALUE_2", "SET_VALUE_4", "USE_VALUE"],
+    targets: [
+      {
+        id: "console-alpha",
+        type: "terminal",
+        position: 2,
+        label: "KONSOL ALPHA",
+        required: true,
+        requiredValue: 2,
+        activationMessage:
+          "Konsol Alpha terisi Nilai 2! Jalur data menuju kubah utama kini terbuka lebar! 📟✨",
+      },
+      {
+        id: "memory-vault",
+        type: "vault",
+        position: 5,
+        label: "KUBAH MEMORI UTAMA",
+        required: true,
+        requiredValue: 4,
+        dependsOn: "console-alpha",
+        prerequisiteMessage:
+          "Kubah Memori Utama terkunci! Aktifkan Konsol Alpha terlebih dahulu untuk membuka akses daya kubah.",
+        activationMessage:
+          "Kubah Memori Utama menerima Nilai 4! Seluruh basis data Memory Station telah pulih seutuhnya! 🏛️💾🌟",
+      },
+    ],
+    hints: [
+      {
+        level: 1,
+        title: "Level 1: Berpikir (Thinking)",
+        text: "Ada dua terminal yang memerlukan nilai berbeda: Konsol Alpha butuh nilai 2, dan Kubah Memori butuh nilai 4.",
+      },
+      {
+        level: 2,
+        title: "Level 2: Arah (Direction)",
+        text: "Simpan nilai 2 dan antarkan ke Petak 3. Setelah itu, simpan nilai baru (4) sebelum melangkah ke Kubah Memori di Petak 6.",
+      },
+      {
+        level: 3,
+        title: "Level 3: Konsep (Concept)",
+        text: "Nilai variabel bersifat dinamis! Kamu bisa mengubah atau memperbarui isi Kotak Memori kapan saja sesuai kebutuhan.",
+      },
+      {
+        level: 4,
+        title: "Level 4: Solusi Terpandu (Guided Solution)",
+        text: "Urutan 9 blok optimal: SET_VALUE_2 → MOVE → MOVE → USE_VALUE → SET_VALUE_4 → MOVE → MOVE → MOVE → USE_VALUE. Ayo pulihkan Memory Station!",
       },
     ],
   },

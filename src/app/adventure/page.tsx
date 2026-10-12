@@ -11,6 +11,8 @@ import {
   usePlayerProgress,
   isChallengeUnlocked,
   getPrerequisiteChallenge,
+  isChapterRestored,
+  getChapterProgress,
 } from "@/features/progress/storage";
 
 export default function AdventurePage() {
@@ -18,23 +20,10 @@ export default function AdventurePage() {
   const totalStars = progress.totalStars;
   const worldRestoredPct = progress.worldRestoredPct;
   const isAnyCompleted = Object.keys(progress.completedChallenges).length > 0;
-  const isLuminaTownRestored = Boolean(
-    progress.completedChallenges["ch-01"] &&
-    progress.completedChallenges["ch-02"] &&
-    progress.completedChallenges["ch-03"] &&
-    progress.completedChallenges["ch-04"] &&
-    progress.completedChallenges["ch-05"]
-  );
-  const isGateValleyRestored = Boolean(
-    progress.completedChallenges["ch-06"] &&
-    progress.completedChallenges["ch-07"] &&
-    progress.completedChallenges["ch-08"]
-  );
-  const isSproutGardenRestored = Boolean(
-    progress.completedChallenges["ch-09"] &&
-    progress.completedChallenges["ch-10"] &&
-    progress.completedChallenges["ch-11"]
-  );
+  const isLuminaTownRestored = isChapterRestored("lumina-town", progress);
+  const isGateValleyRestored = isChapterRestored("gate-valley", progress);
+  const isSproutGardenRestored = isChapterRestored("sprout-garden", progress);
+  const isMemoryStationRestored = isChapterRestored("memory-station", progress);
 
   return (
     <div
@@ -190,7 +179,7 @@ export default function AdventurePage() {
               <KiboAvatar
                 size={160}
                 variant={
-                  isSproutGardenRestored || isGateValleyRestored || isLuminaTownRestored
+                  isMemoryStationRestored || isSproutGardenRestored || isGateValleyRestored || isLuminaTownRestored
                     ? "celebrate"
                     : isAnyCompleted
                     ? "happy"
@@ -213,7 +202,9 @@ export default function AdventurePage() {
                   boxShadow: "0 4px 12px rgba(0, 0, 0, 0.4)",
                 }}
               >
-                {isSproutGardenRestored
+                {isMemoryStationRestored
+                  ? "Kibo: Memory Station Pulih Sepenuhnya! 💾"
+                  : isSproutGardenRestored
                   ? "Kibo: Sprout Garden Pulih Sepenuhnya! 🌱"
                   : isGateValleyRestored
                   ? "Kibo: Gate Valley Pulih Sepenuhnya! ⛩️"
@@ -241,13 +232,13 @@ export default function AdventurePage() {
           <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
             {CHAPTERS.map((ch, idx) => {
               const isAreaUnlocked =
-                idx === 0 ||
-                (idx === 1 && isLuminaTownRestored) ||
-                (idx === 2 && isGateValleyRestored);
+                idx === 0 || isChapterRestored(CHAPTERS[idx - 1].id, progress);
+              const chapterProg = getChapterProgress(ch.id, progress);
               const hasPlayableChallenges =
                 ch.id === "lumina-town" ||
                 ch.id === "gate-valley" ||
-                ch.id === "sprout-garden";
+                ch.id === "sprout-garden" ||
+                ch.id === "memory-station";
               const chapterIcons = ["💡", "⛩️", "🌱", "💾", "🔮"];
 
               return (
@@ -313,9 +304,19 @@ export default function AdventurePage() {
                             WILAYAH 0{ch.order}
                           </span>
                           {isAreaUnlocked ? (
-                            <Badge variant="green" size="sm">
-                              Tersedia & Aktif 🟢
-                            </Badge>
+                            chapterProg.isRestored ? (
+                              <Badge variant="yellow" size="sm">
+                                Pulih Sepenuhnya ⭐
+                              </Badge>
+                            ) : chapterProg.completed > 0 ? (
+                              <Badge variant="green" size="sm">
+                                {chapterProg.completed}/{chapterProg.total} Misi Selesai 🟢
+                              </Badge>
+                            ) : (
+                              <Badge variant="cyan" size="sm">
+                                Tersedia & Aktif 🟢
+                              </Badge>
+                            )
                           ) : (
                             <Badge variant="neutral" size="sm">
                               Terkunci 🔒
@@ -425,7 +426,13 @@ export default function AdventurePage() {
                                       ? "🌱"
                                       : chal.id === "ch-10"
                                       ? "🌷"
-                                      : "🌸"}
+                                      : chal.id === "ch-11"
+                                      ? "🌸"
+                                      : chal.id === "ch-12"
+                                      ? "💾"
+                                      : chal.id === "ch-13"
+                                      ? "🔋"
+                                      : "🔒"}
                                   </span>
                                   <div>
                                     <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
