@@ -57,7 +57,7 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
 
   const initialFeedbackMessage =
     challenge.chapterId === "memory-station"
-      ? "Simpan angka ke dalam Kotak Memori Kibo, lalu gunakan nilainya pada terminal atau kubah."
+      ? "Simpan nilai data ke dalam Kotak Memori Kibo, lalu gunakan nilainya pada terminal, reaktor, atau kubah."
       : challenge.chapterId === "sprout-garden"
       ? "Coba susun langkahnya untuk menyiram tanaman dan merawat kebun."
       : challenge.chapterId === "gate-valley"

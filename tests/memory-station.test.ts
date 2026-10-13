@@ -33,14 +33,44 @@ assert.equal(ch14.order, 3);
 assert.equal(ch12.hints.length, 4, "Ch-12 harus memiliki 4 tingkat hint");
 assert.equal(ch13.hints.length, 4, "Ch-13 harus memiliki 4 tingkat hint");
 assert.equal(ch14.hints.length, 4, "Ch-14 harus memiliki 4 tingkat hint");
-console.log("  ✓ Struktur data ch-12, ch-13, ch-14 valid dan masing-masing memiliki 4 tingkat hint.");
+
+// Verifikasi blok yang tersedia: ACTIVATE tidak boleh ada di Ch-12 dan Ch-13
+assert.deepEqual(
+  ch12.availableBlocks,
+  ["MOVE", "SET_VALUE_3", "USE_VALUE"],
+  "Ch-12 hanya boleh memiliki blok MOVE, SET_VALUE_3, dan USE_VALUE"
+);
+assert.equal(
+  ch12.availableBlocks.includes("ACTIVATE"),
+  false,
+  "Blok ACTIVATE tidak boleh tersedia pada Ch-12"
+);
+
+assert.deepEqual(
+  ch13.availableBlocks,
+  ["MOVE", "SET_VALUE_5", "USE_VALUE"],
+  "Ch-13 hanya boleh memiliki blok MOVE, SET_VALUE_5, dan USE_VALUE"
+);
+assert.equal(
+  ch13.availableBlocks.includes("ACTIVATE"),
+  false,
+  "Blok ACTIVATE tidak boleh tersedia pada Ch-13"
+);
+
+assert.equal(
+  ch14.availableBlocks.includes("ACTIVATE"),
+  false,
+  "Blok ACTIVATE tidak boleh tersedia pada Ch-14"
+);
+
+console.log("  ✓ Struktur data ch-12, ch-13, ch-14 valid, 4 hint, dan bebas dari blok ACTIVATE yang tidak relevan.");
 
 // 2. Pengujian Eksekusi Solusi Optimal & Penilaian Bintang
 console.log("\n2. Pengujian Solusi Optimal & Penilaian Bintang:");
 
-// Ch-12 Solusi Optimal: SET_VALUE_3 -> MOVE -> MOVE -> MOVE -> ACTIVATE (5 blok = 3 bintang)
+// Ch-12 Solusi Optimal: SET_VALUE_3 -> MOVE -> MOVE -> MOVE -> USE_VALUE (5 blok = 3 bintang)
 const solCh12Optimal = runSimulation(
-  ["SET_VALUE_3", "MOVE", "MOVE", "MOVE", "ACTIVATE"],
+  ["SET_VALUE_3", "MOVE", "MOVE", "MOVE", "USE_VALUE"],
   ch12
 );
 assert.equal(solCh12Optimal.success, true, "Ch-12 optimal harus berhasil");
@@ -48,11 +78,11 @@ assert.equal(solCh12Optimal.starsEarned, 3, "Ch-12 optimal harus mendapat 3 bint
 assert.equal(solCh12Optimal.finalPosition, 3, "Kibo harus berada di petak terminal (indeks 3)");
 assert.equal(solCh12Optimal.memoryValue, 3, "Nilai memori akhir harus 3");
 assert.equal(solCh12Optimal.activeTargetIds.length, 1, "Terminal Alpha harus aktif");
-console.log("  ✓ Ch-12 Solusi Optimal (SET_VALUE_3 -> MOVE x3 -> ACTIVATE) sukses 3 bintang.");
+console.log("  ✓ Ch-12 Solusi Optimal (SET_VALUE_3 -> MOVE x3 -> USE_VALUE) sukses 3 bintang.");
 
 // Ch-12 Solusi Non-Optimal (> 5 blok = 2 bintang)
 const solCh12NonOptimal = runSimulation(
-  ["SET_VALUE_2", "SET_VALUE_3", "MOVE", "MOVE", "MOVE", "ACTIVATE"],
+  ["SET_VALUE_2", "SET_VALUE_3", "MOVE", "MOVE", "MOVE", "USE_VALUE"],
   ch12
 );
 assert.equal(solCh12NonOptimal.success, true, "Ch-12 dengan blok ekstra harus berhasil");
@@ -71,6 +101,15 @@ assert.equal(solCh13Optimal.memoryValue, 5, "Nilai memori akhir harus 5");
 assert.equal(solCh13Optimal.activeTargetIds.length, 1, "Reaktor Memori harus aktif");
 console.log("  ✓ Ch-13 Solusi Optimal (SET_VALUE_5 -> MOVE x4 -> USE_VALUE) sukses 3 bintang.");
 
+// Ch-13 Solusi Non-Optimal (> 6 blok = 2 bintang)
+const solCh13NonOptimal = runSimulation(
+  ["SET_VALUE_3", "SET_VALUE_5", "MOVE", "MOVE", "MOVE", "MOVE", "USE_VALUE"],
+  ch13
+);
+assert.equal(solCh13NonOptimal.success, true, "Ch-13 dengan blok ekstra harus berhasil");
+assert.equal(solCh13NonOptimal.starsEarned, 2, "Ch-13 melebihi batas optimal harus mendapat 2 bintang");
+console.log("  ✓ Ch-13 Solusi Non-Optimal mendapat 2 bintang secara adil.");
+
 // Ch-14 Solusi Optimal: SET_VALUE_2 -> MOVE x2 -> USE_VALUE -> SET_VALUE_4 -> MOVE x3 -> USE_VALUE (9 blok = 3 bintang)
 const solCh14Optimal = runSimulation(
   ["SET_VALUE_2", "MOVE", "MOVE", "USE_VALUE", "SET_VALUE_4", "MOVE", "MOVE", "MOVE", "USE_VALUE"],
@@ -86,31 +125,68 @@ console.log("  ✓ Ch-14 Solusi Optimal Sinkronisasi Dua Nilai (SET 2 -> USE -> 
 // 3. Pengujian Validasi Nilai & Penanganan Kasus Salah (Mistake Awareness)
 console.log("\n3. Pengujian Validasi Nilai & Penanganan Kasus Salah:");
 
-// Kasus Ch-12: Mencoba mengaktifkan Terminal tanpa SET (Memori Kosong)
+// Kasus Ch-12: USE_VALUE saat memori kosong (tanpa SET)
 const resCh12EmptyMemory = runSimulation(
-  ["MOVE", "MOVE", "MOVE", "ACTIVATE"],
+  ["MOVE", "MOVE", "MOVE", "USE_VALUE"],
   ch12
 );
-assert.equal(resCh12EmptyMemory.success, false, "Aktivasi terminal dengan memori kosong harus gagal");
+assert.equal(resCh12EmptyMemory.success, false, "USE_VALUE pada terminal dengan memori kosong harus gagal");
 assert.ok(
   resCh12EmptyMemory.feedbackMessage.includes("Kotak Memori Kibo masih kosong") ||
-    resCh12EmptyMemory.feedbackMessage.includes("Simpan Nilai"),
+    resCh12EmptyMemory.feedbackMessage.includes("Simpan nilai"),
   "Feedback harus memberitahu bahwa memori masih kosong dan perlu menyimpan nilai"
 );
-console.log("  ✓ Aktivasi terminal dengan memori kosong ditolak dengan pesan edukatif.");
+console.log("  ✓ USE_VALUE pada terminal dengan memori kosong ditolak dengan pesan edukatif.");
 
-// Kasus Ch-12: Mencoba mengaktifkan Terminal dengan Nilai yang Salah (misal 2 padahal butuh 3)
+// Kasus Ch-12: USE_VALUE dengan nilai yang salah (misal 2 padahal butuh 3)
 const resCh12WrongValue = runSimulation(
-  ["SET_VALUE_2", "MOVE", "MOVE", "MOVE", "ACTIVATE"],
+  ["SET_VALUE_2", "MOVE", "MOVE", "MOVE", "USE_VALUE"],
   ch12
 );
-assert.equal(resCh12WrongValue.success, false, "Aktivasi terminal dengan nilai salah harus gagal");
+assert.equal(resCh12WrongValue.success, false, "USE_VALUE pada terminal dengan nilai salah harus gagal");
 assert.ok(
   resCh12WrongValue.feedbackMessage.includes("membutuhkan Nilai 3") ||
     resCh12WrongValue.feedbackMessage.includes("3 unit daya"),
   "Feedback harus menginformasikan nilai yang dibutuhkan terminal"
 );
-console.log("  ✓ Aktivasi terminal dengan nilai salah menghasilkan feedback diskriminasi nilai.");
+console.log("  ✓ USE_VALUE pada terminal dengan nilai salah menghasilkan feedback diskriminasi nilai.");
+
+// Kasus Ch-12: USE_VALUE di petak tanah kosong
+const resCh12UseEmptyTile = runSimulation(
+  ["SET_VALUE_3", "MOVE", "USE_VALUE"],
+  ch12
+);
+assert.equal(resCh12UseEmptyTile.success, false, "USE_VALUE di petak tanah kosong harus gagal");
+assert.ok(
+  resCh12UseEmptyTile.feedbackMessage.includes("tidak ada terminal atau perangkat data"),
+  "Feedback harus memberitahu tidak ada terminal data di petak tersebut"
+);
+console.log("  ✓ USE_VALUE di petak tanah kosong pada Ch-12 dicegah dengan feedback lokasi yang tepat.");
+
+// Kasus Ch-12: Mencoba menggunakan ACTIVATE pada Terminal (tidak boleh diterima, harus diarahkan ke USE_VALUE)
+const resCh12ActivateOnTerminal = runSimulation(
+  ["SET_VALUE_3", "MOVE", "MOVE", "MOVE", "ACTIVATE"],
+  ch12
+);
+assert.equal(resCh12ActivateOnTerminal.success, false, "ACTIVATE pada Terminal Alpha harus ditolak");
+assert.ok(
+  resCh12ActivateOnTerminal.feedbackMessage.includes("Gunakan blok Gunakan Nilai Data") ||
+    resCh12ActivateOnTerminal.feedbackMessage.includes("penyaluran data spesifik"),
+  "Feedback ACTIVATE pada Terminal Alpha harus mengarahkan ke Gunakan Nilai Data"
+);
+console.log("  ✓ ACTIVATE pada Terminal Data Alpha ditolak dan diarahkan ke blok USE_VALUE.");
+
+// Kasus Ch-12: Hanya berdiri di atas terminal tanpa USE_VALUE
+const resCh12StandingOnly = runSimulation(
+  ["SET_VALUE_3", "MOVE", "MOVE", "MOVE"],
+  ch12
+);
+assert.equal(resCh12StandingOnly.success, false, "Hanya berdiri di atas terminal tidak boleh dianggap selesai");
+assert.ok(
+  resCh12StandingOnly.feedbackMessage.includes("Gunakan blok Gunakan Nilai Data"),
+  "Feedback harus memandu pemain untuk menggunakan blok Gunakan Nilai Data"
+);
+console.log("  ✓ Berdiri di atas terminal tanpa USE_VALUE ditolak secara konsisten.");
 
 // Kasus Ch-13: Menggunakan USE_VALUE saat memori kosong
 const resCh13EmptyUse = runSimulation(
@@ -123,6 +199,18 @@ assert.ok(
   "Feedback USE_VALUE harus menginformasikan bahwa memori masih kosong"
 );
 console.log("  ✓ USE_VALUE saat memori kosong menghasilkan panduan menyimpan nilai data.");
+
+// Kasus Ch-13: Menggunakan USE_VALUE dengan nilai yang salah (misal 3 padahal butuh 5)
+const resCh13WrongValue = runSimulation(
+  ["SET_VALUE_3", "MOVE", "MOVE", "MOVE", "MOVE", "USE_VALUE"],
+  ch13
+);
+assert.equal(resCh13WrongValue.success, false, "USE_VALUE pada reaktor dengan nilai salah harus gagal");
+assert.ok(
+  resCh13WrongValue.feedbackMessage.includes("membutuhkan Nilai 5"),
+  "Feedback harus menginformasikan reaktor butuh Nilai 5"
+);
+console.log("  ✓ USE_VALUE pada reaktor dengan nilai salah menghasilkan feedback diskriminasi nilai.");
 
 // Kasus Ch-13: Menggunakan USE_VALUE di petak tanah kosong
 const resCh13UseEmptyTile = runSimulation(
@@ -148,6 +236,18 @@ assert.ok(
   "Feedback harus mengarahkan anak menggunakan blok USE_VALUE"
 );
 console.log("  ✓ Menggunakan ACTIVATE pada reaktor ditolak dan diarahkan ke blok USE_VALUE.");
+
+// Kasus Ch-13: Hanya berdiri di atas reaktor tanpa USE_VALUE
+const resCh13StandingOnly = runSimulation(
+  ["SET_VALUE_5", "MOVE", "MOVE", "MOVE", "MOVE"],
+  ch13
+);
+assert.equal(resCh13StandingOnly.success, false, "Hanya berdiri di atas reaktor tidak boleh dianggap selesai");
+assert.ok(
+  resCh13StandingOnly.feedbackMessage.includes("Gunakan blok Gunakan Nilai Data"),
+  "Feedback harus memandu pemain untuk menggunakan blok Gunakan Nilai Data"
+);
+console.log("  ✓ Berdiri di atas reaktor tanpa USE_VALUE ditolak secara konsisten.");
 
 // Kasus Ch-14: Prasyarat target berurutan — Kubah Memori Utama tidak bisa dibuka jika Konsol Alpha belum aktif
 const resCh14SkipConsole = runSimulation(

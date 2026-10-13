@@ -892,13 +892,13 @@ export const CHALLENGES: Record<string, ChallengeDetail> = {
     concept: "variable",
     conceptLabel: "Variable (Penyimpanan Nilai — SET)",
     story:
-      "Selamat datang di Memory Station! Terminal Data Alpha di Petak 4 kehilangan daya operasionalnya karena System Glitch. Kibo harus menyiapkan 3 unit daya di dalam Kotak Memori, lalu mengaktifkan terminal di ujung jalur!",
-    goal: "Simpan nilai 3 ke Kotak Memori Kibo, lalu melangkah ke Terminal Data Alpha dan aktifkan sistemnya.",
+      "Selamat datang di Memory Station! Terminal Data Alpha di Petak 4 kehilangan daya operasionalnya karena System Glitch. Kibo harus menyiapkan 3 unit daya di dalam Kotak Memori, membawanya ke terminal di ujung jalur, lalu menyalurkannya menggunakan blok Gunakan Nilai Data!",
+    goal: "Simpan nilai 3 ke Kotak Memori Kibo, lalu melangkah ke Terminal Data Alpha dan salurkan nilainya menggunakan blok Gunakan Nilai Data.",
     gridTiles: 4,
     startPosition: 0,
     optimalBlocks: 5,
     maxBlocks: 8,
-    availableBlocks: ["MOVE", "SET_VALUE_3", "ACTIVATE"],
+    availableBlocks: ["MOVE", "SET_VALUE_3", "USE_VALUE"],
     targets: [
       {
         id: "terminal-alpha",
@@ -915,22 +915,22 @@ export const CHALLENGES: Record<string, ChallengeDetail> = {
       {
         level: 1,
         title: "Level 1: Berpikir (Thinking)",
-        text: "Terminal Data membutuhkan unit daya yang tersimpan di Kibo sebelum bisa diaktifkan. Apa yang perlu Kibo siapkan?",
+        text: "Terminal Data membutuhkan unit daya yang tersimpan di Kibo sebelum bisa menerima data. Apa yang perlu Kibo siapkan?",
       },
       {
         level: 2,
         title: "Level 2: Arah (Direction)",
-        text: "Gunakan blok Simpan Nilai 3 terlebih dahulu agar Kotak Memori Kibo terisi daya, baru kemudian melangkah ke Petak 4.",
+        text: "Gunakan blok Simpan Nilai 3 terlebih dahulu agar Kotak Memori Kibo terisi daya, melangkah ke Petak 4, lalu gunakan blok Gunakan Nilai Data.",
       },
       {
         level: 3,
         title: "Level 3: Konsep (Concept)",
-        text: "Variabel adalah tempat menyimpan nilai atau data yang bisa digunakan kapan saja saat program berjalan.",
+        text: "Variabel adalah tempat menyimpan nilai atau data yang bisa disalurkan kapan saja saat program berjalan.",
       },
       {
         level: 4,
         title: "Level 4: Solusi Terpandu (Guided Solution)",
-        text: "Urutan 5 blok optimal: SET_VALUE_3 → MOVE → MOVE → MOVE → ACTIVATE. Ayo pasang dan pulihkan Terminal Alpha!",
+        text: "Urutan 5 blok optimal: SET_VALUE_3 → MOVE → MOVE → MOVE → USE_VALUE. Ayo pasang dan pulihkan Terminal Alpha!",
       },
     ],
   },
@@ -948,7 +948,7 @@ export const CHALLENGES: Record<string, ChallengeDetail> = {
     startPosition: 0,
     optimalBlocks: 6,
     maxBlocks: 10,
-    availableBlocks: ["MOVE", "SET_VALUE_5", "USE_VALUE", "ACTIVATE"],
+    availableBlocks: ["MOVE", "SET_VALUE_5", "USE_VALUE"],
     targets: [
       {
         id: "reactor-core",
@@ -965,7 +965,7 @@ export const CHALLENGES: Record<string, ChallengeDetail> = {
       {
         level: 1,
         title: "Level 1: Berpikir (Thinking)",
-        text: "Reaktor tidak bisa dibuka dengan saklar biasa. Reaktor memerlukan kode data yang tersimpan di Kotak Memori Kibo.",
+        text: "Reaktor membutuhkan kode data yang tersimpan di Kotak Memori Kibo sebelum bisa menyala.",
       },
       {
         level: 2,

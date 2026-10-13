@@ -139,9 +139,7 @@ function getTargetStandingInstruction(target: ChallengeTarget): string {
     case "crystal":
       return `Kibo sudah berdiri tepat di depan ${label}, tapi kristal belum diaktifkan! Tambahkan instruksi [Nyalakan Lampu / Aktifkan] ya.`;
     case "terminal":
-      return target.requiredValue !== undefined
-        ? `Kibo sudah berdiri tepat di depan ${label}, tapi terminal belum diaktifkan! Pastikan Kotak Memori terisi daya dan aktifkan terminal ya.`
-        : `Kibo sudah berdiri tepat di depan ${label}, tapi terminal belum diaktifkan! Tambahkan instruksi Aktifkan ya.`;
+      return `Kibo sudah berdiri tepat di depan ${label}, tapi nilai data belum disalurkan! Gunakan blok Gunakan Nilai Data ya.`;
     case "reactor":
       return `Kibo sudah berdiri tepat di depan ${label}, tapi reaktor belum dinyalakan! Gunakan blok Gunakan Nilai Data ya.`;
     case "vault":
@@ -205,7 +203,7 @@ function getEmptyActivateFeedback(chapterId: ChapterId): string {
     return "Kibo belum sampai di depan saklar atau totem lembah! Di petak ini tidak ada saklar atau totem yang bisa diaktifkan.";
   }
   if (chapterId === "memory-station") {
-    return "Kibo belum sampai di depan terminal data atau reaktor! Di petak ini tidak ada saklar atau konsol data yang bisa diaktifkan.";
+    return "Kibo belum sampai di depan terminal data atau reaktor! Di petak ini tidak ada perangkat data yang bisa diaktifkan.";
   }
   return "Kibo belum sampai di depan saklar atau tiang lampu! Di petak ini tidak ada saklar yang bisa dinyalakan.";
 }
@@ -644,8 +642,12 @@ export function runSimulation(
           break;
         }
 
-        // Cek apakah target memerlukan blok USE_VALUE khusus (seperti reactor atau vault)
-        if (targetAtPos.type === "reactor" || targetAtPos.type === "vault") {
+        // Cek apakah target memerlukan blok USE_VALUE khusus (seperti terminal, reactor atau vault)
+        if (
+          targetAtPos.type === "terminal" ||
+          targetAtPos.type === "reactor" ||
+          targetAtPos.type === "vault"
+        ) {
           simulationHalted = true;
           failureReason = `${targetAtPos.label || "Perangkat ini"} memerlukan penyaluran data spesifik! Gunakan blok Gunakan Nilai Data ya.`;
           steps.push({
@@ -662,43 +664,6 @@ export function runSimulation(
           break;
         }
 
-        // Cek jika target adalah terminal data yang memerlukan memoryValue
-        if (targetAtPos.type === "terminal" && targetAtPos.requiredValue !== undefined) {
-          if (currentMemoryValue === null) {
-            simulationHalted = true;
-            failureReason = `${targetAtPos.label || "Terminal Data"} membutuhkan ${targetAtPos.requiredValue} unit daya, tetapi Kotak Memori Kibo masih kosong! Gunakan blok Simpan Nilai terlebih dahulu ya.`;
-            steps.push({
-              stepIndex: originalIndex,
-              blockType: block,
-              kiboPosition: currentPos,
-              lampActive: activatedTargetIds.size > 0,
-              activeTargetIds: Array.from(activatedTargetIds),
-              memoryValue: currentMemoryValue,
-              status: "failure",
-              message: failureReason,
-              kiboMood: "confused",
-            });
-            break;
-          }
-
-          if (currentMemoryValue !== targetAtPos.requiredValue) {
-            simulationHalted = true;
-            failureReason = `${targetAtPos.label || "Terminal Data"} membutuhkan Nilai ${targetAtPos.requiredValue}, tetapi Kotak Memori Kibo berisi Nilai ${currentMemoryValue}! Simpan nilai yang sesuai ya.`;
-            steps.push({
-              stepIndex: originalIndex,
-              blockType: block,
-              kiboPosition: currentPos,
-              lampActive: activatedTargetIds.size > 0,
-              activeTargetIds: Array.from(activatedTargetIds),
-              memoryValue: currentMemoryValue,
-              status: "failure",
-              message: failureReason,
-              kiboMood: "confused",
-            });
-            break;
-          }
-        }
-
         activatedTargetIds.add(targetAtPos.id);
         const activationMsg =
           targetAtPos.activationMessage ||
@@ -708,8 +673,6 @@ export function runSimulation(
             ? "Kristal Cahaya Agung bersinar megah! Seluruh Lumina Town kembali benderang!"
             : targetAtPos.type === "fountain"
             ? "Katup diputar! Air mancur digital menyemburkan air jernih ke seluruh taman! ⛲"
-            : targetAtPos.type === "terminal"
-            ? `Terminal Data menerima ${currentMemoryValue ?? 0} unit daya dan kini aktif! 💾✨`
             : "Saklar disentuh! Lampu jalan Lumina Town kembali bersinar terang!");
 
         steps.push({

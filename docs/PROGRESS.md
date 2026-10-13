@@ -81,9 +81,9 @@ Priority:
 - [x] P0 Challenge 10 (Verified: "Kebun Berbaris (Garden Rows)" sequence + loop combination with 6 platforms, entry path, 3 flower rows at tiles 3, 4, 5, irrigation pump at tile 6, optimal 7 blocks: `MOVE -> REPEAT_3 -> MOVE -> WATER -> END_LOOP -> MOVE -> ACTIVATE` at `/challenge/ch-10`)
 - [x] P0 Challenge 11 (Verified: "Festival Bunga (Flower Festival)" compound multi-step loop pattern with 6 platforms, 4 festival flowers across 2 twin garden beds at tiles 2, 3, 4, 5, Grand Fountain finale at tile 6, optimal 8 blocks: `REPEAT_2 -> MOVE -> WATER -> MOVE -> WATER -> END_LOOP -> MOVE -> ACTIVATE` at `/challenge/ch-11`)
 
-### Memory Station (Variable — Selesai Penuh: Tahap 1 Engine & Data, Tahap 2 Visual Arena & HUD, Tahap 3 World Map & Unlocking)
-- [x] P0 Challenge 12 (Verified: "Kotak Memori Pertama (Save the Data)" konsep deklarasi & penyimpanan nilai SET_VALUE_3, target Terminal Alpha dengan requiredValue: 3, optimal 5 blok di `/challenge/ch-12`)
-- [x] P0 Challenge 13 (Verified: "Kirimkan Nilai Data (Use the Data)" konsep penyaluran nilai memori SET_VALUE_5 + USE_VALUE, target Reaktor Memori dengan requiredValue: 5, optimal 6 blok di `/challenge/ch-13`)
+### Memory Station (Variable — Selesai Penuh: Perbaikan Blok Aktivasi Tidak Relevan & Standardisasi USE_VALUE)
+- [x] P0 Challenge 12 (Verified: "Kotak Memori Pertama (Save the Data)" konsep deklarasi & penyaluran nilai SET_VALUE_3 + USE_VALUE, target Terminal Alpha dengan requiredValue: 3, blok ACTIVATE yang tidak relevan dieliminasi, optimal 5 blok: `SET_VALUE_3 -> MOVE x3 -> USE_VALUE` di `/challenge/ch-12`)
+- [x] P0 Challenge 13 (Verified: "Kirimkan Nilai Data (Use the Data)" konsep penyaluran nilai memori SET_VALUE_5 + USE_VALUE, target Reaktor Memori dengan requiredValue: 5, blok ACTIVATE yang tidak relevan dieliminasi, optimal 6 blok: `SET_VALUE_5 -> MOVE x4 -> USE_VALUE` di `/challenge/ch-13`)
 - [x] P0 Challenge 14 (Verified: "Sinkronisasi Dua Nilai (Data Delivery & Update)" konsep pembaruan nilai variabel berurutan dengan Konsol Alpha [nilai 2] & Kubah Memori Utama [nilai 4], optimal 9 blok di `/challenge/ch-14`)
 
 ### Kibo Core (Problem Solving)
