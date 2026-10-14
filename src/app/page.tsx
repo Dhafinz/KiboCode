@@ -6,8 +6,10 @@ import { KiboAvatar } from "@/components/kibo/KiboAvatar";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { CHAPTERS, Chapter } from "@/data/chapters";
+import { usePlayerProgress, getChapterProgress } from "@/features/progress/storage";
 
 export default function HomePage() {
+  const progress = usePlayerProgress();
   const [selectedChapter, setSelectedChapter] = useState<Chapter | null>(null);
   const [activeHintLevel, setActiveHintLevel] = useState<number>(1);
 
@@ -77,7 +79,7 @@ export default function HomePage() {
   return (
     <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
       {/* =====================================================================
-          1. HERO SECTION
+          1. HERO SECTION (Friendly Future Bright & Playful)
           ===================================================================== */}
       <section
         id="hero"
@@ -105,9 +107,8 @@ export default function HomePage() {
                       width: "8px",
                       height: "8px",
                       borderRadius: "50%",
-                      backgroundColor: "var(--cyan-core)",
+                      backgroundColor: "var(--color-sky-blue-deep, #0284C7)",
                       display: "inline-block",
-                      boxShadow: "0 0 8px var(--cyan-core)",
                     }}
                   />
                   Petualangan Logika Coding SD
@@ -120,17 +121,17 @@ export default function HomePage() {
               <h1
                 id="hero-main-title"
                 style={{
-                  fontSize: "clamp(1.85rem, 4.5vw, 3.5rem)",
+                  fontSize: "clamp(2rem, 4.5vw, 3.5rem)",
                   fontWeight: 800,
                   lineHeight: 1.18,
                   letterSpacing: "-0.02em",
-                  color: "#ffffff",
+                  color: "var(--color-deep-slate, #24344D)",
                 }}
               >
                 Belajar Coding Bersama{" "}
                 <span
                   style={{
-                    background: "linear-gradient(135deg, #00f2fe 0%, #9d7df9 100%)",
+                    background: "linear-gradient(135deg, #0284C7 0%, #7C3AED 100%)",
                     WebkitBackgroundClip: "text",
                     WebkitTextFillColor: "transparent",
                   }}
@@ -142,12 +143,12 @@ export default function HomePage() {
               <p
                 style={{
                   fontSize: "clamp(1rem, 2.2vw, 1.2rem)",
-                  color: "var(--text-muted)",
+                  color: "var(--color-slate-muted, #526581)",
                   lineHeight: 1.6,
                   maxWidth: "560px",
                 }}
               >
-                Sebuah <strong style={{ color: "#ffffff" }}>System Glitch</strong> membuat Kibo World kehilangan instruksi. Bantu Kibo menyusun blok kode visual, hidupkan kembali kota lampu, dan jadilah pemecah masalah cilik yang hebat!
+                Sebuah <strong style={{ color: "var(--color-deep-slate, #24344D)" }}>System Glitch</strong> membuat Kibo World kehilangan instruksi. Bantu Kibo menyusun blok kode visual, hidupkan kembali kota lampu, dan jadilah pemecah masalah cilik yang hebat!
               </p>
 
               {/* Tagline Box */}
@@ -158,17 +159,42 @@ export default function HomePage() {
                   gap: "12px",
                   padding: "10px 18px",
                   borderRadius: "14px",
-                  backgroundColor: "rgba(121, 72, 247, 0.12)",
-                  border: "1px solid rgba(121, 72, 247, 0.3)",
+                  backgroundColor: "#FFFFFF",
+                  border: "1.5px solid var(--color-soft-purple, #D9CCFF)",
+                  boxShadow: "var(--shadow-sm)",
                   width: "fit-content",
                   maxWidth: "100%",
                 }}
               >
                 <span style={{ fontSize: "1.1rem" }}>✨</span>
-                <span style={{ fontSize: "0.95rem", fontWeight: 700, color: "var(--kibo-purple-light)" }}>
+                <span style={{ fontSize: "0.95rem", fontWeight: 700, color: "var(--color-soft-purple-deep, #6366F1)" }}>
                   &ldquo;Learn to Code. Help Kibo. Solve Problems.&rdquo;
                 </span>
               </div>
+
+              {/* Progress Indicator jika pemain sudah memiliki progres */}
+              {progress.totalStars > 0 && (
+                <div
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "10px",
+                    padding: "8px 16px",
+                    borderRadius: "9999px",
+                    backgroundColor: "#EEFAF2",
+                    border: "1.5px solid var(--color-mint-green, #B9F2D0)",
+                    color: "var(--color-mint-green-deep, #059669)",
+                    fontWeight: 800,
+                    fontSize: "0.875rem",
+                    width: "fit-content",
+                    boxShadow: "var(--shadow-sm)",
+                  }}
+                >
+                  <span>⭐ {progress.totalStars} Bintang Dikumpulkan</span>
+                  <span>•</span>
+                  <span>🔋 Dunia Pulih: {progress.worldRestoredPct}%</span>
+                </div>
+              )}
 
               {/* Tombol CTA Utama */}
               <div
@@ -189,10 +215,9 @@ export default function HomePage() {
                       padding: "14px 30px",
                       fontSize: "1.05rem",
                       fontWeight: 800,
-                      boxShadow: "0 8px 24px rgba(0, 242, 254, 0.35)",
                     }}
                   >
-                    Mulai Petualangan 🚀
+                    {progress.totalStars > 0 ? "Lanjutkan Petualangan 🚀" : "Mulai Petualangan 🚀"}
                   </Button>
                 </Link>
                 <a href="#cara-belajar">
@@ -203,7 +228,7 @@ export default function HomePage() {
                       borderRadius: "16px",
                       padding: "14px 26px",
                       fontSize: "1.05rem",
-                      fontWeight: 600,
+                      fontWeight: 700,
                     }}
                   >
                     Cara Belajar 💡
@@ -216,20 +241,21 @@ export default function HomePage() {
                 style={{
                   display: "flex",
                   flexWrap: "wrap",
-                  gap: "16px",
+                  gap: "18px",
                   paddingTop: "12px",
-                  fontSize: "0.875rem",
-                  color: "var(--text-dim)",
+                  fontSize: "0.9rem",
+                  color: "var(--color-slate-muted, #526581)",
+                  fontWeight: 600,
                 }}
               >
                 <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                  <span style={{ color: "var(--success-green)" }}>✓</span> Tanpa Sintaks Rumit
+                  <span style={{ color: "var(--color-mint-green-deep, #059669)", fontWeight: 800 }}>✓</span> Tanpa Sintaks Rumit
                 </span>
                 <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                  <span style={{ color: "var(--success-green)" }}>✓</span> AI Mentor Bersahabat
+                  <span style={{ color: "var(--color-mint-green-deep, #059669)", fontWeight: 800 }}>✓</span> AI Mentor Bersahabat
                 </span>
                 <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                  <span style={{ color: "var(--success-green)" }}>✓</span> 15 Misi Interaktif
+                  <span style={{ color: "var(--color-mint-green-deep, #059669)", fontWeight: 800 }}>✓</span> 15 Tantangan Coding
                 </span>
               </div>
             </div>
@@ -256,8 +282,8 @@ export default function HomePage() {
                   maxHeight: "85vw",
                   borderRadius: "50%",
                   background:
-                    "radial-gradient(circle, rgba(121, 72, 247, 0.35) 0%, rgba(0, 242, 254, 0.2) 50%, transparent 70%)",
-                  filter: "blur(32px)",
+                    "radial-gradient(circle, rgba(191, 232, 255, 0.45) 0%, rgba(217, 204, 255, 0.3) 50%, transparent 70%)",
+                  filter: "blur(24px)",
                   zIndex: 0,
                 }}
               />
@@ -279,28 +305,28 @@ export default function HomePage() {
                 <KiboAvatar
                   size={280}
                   variant="hero"
-                  showGlow={true}
+                  showGlow={false}
                   priority={true}
                   style={{
                     borderRadius: "28px",
-                    boxShadow: "0 16px 40px rgba(0, 0, 0, 0.45)",
-                    border: "2px solid rgba(0, 242, 254, 0.4)",
+                    boxShadow: "0 12px 28px rgba(36, 52, 77, 0.12)",
+                    border: "2.5px solid var(--color-sky-blue, #BFE8FF)",
+                    backgroundColor: "#FFFFFF",
                   }}
                 />
 
-                {/* Dialogue Badge di Bawah Kibo (Tanpa tumpang tindih) */}
+                {/* Dialogue Badge di Bawah Kibo */}
                 <div
                   style={{
-                    backgroundColor: "rgba(13, 18, 36, 0.95)",
-                    backdropFilter: "blur(12px)",
-                    border: "1px solid rgba(0, 242, 254, 0.4)",
+                    backgroundColor: "#FFFFFF",
+                    border: "1.5px solid var(--color-sky-blue, #BFE8FF)",
                     borderRadius: "18px",
                     padding: "10px 18px",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     gap: "10px",
-                    boxShadow: "0 8px 24px rgba(0, 0, 0, 0.4)",
+                    boxShadow: "var(--shadow-md)",
                     maxWidth: "100%",
                     textAlign: "center",
                   }}
@@ -310,13 +336,12 @@ export default function HomePage() {
                       width: "10px",
                       height: "10px",
                       borderRadius: "50%",
-                      backgroundColor: "var(--cyan-core)",
-                      boxShadow: "0 0 10px var(--cyan-core)",
+                      backgroundColor: "var(--color-sky-blue-deep, #0284C7)",
                       flexShrink: 0,
                     }}
                     className="core-pulse"
                   />
-                  <span style={{ fontSize: "clamp(0.85rem, 2.5vw, 0.95rem)", fontWeight: 700, color: "#ffffff", lineHeight: 1.4 }}>
+                  <span style={{ fontSize: "clamp(0.85rem, 2.5vw, 0.95rem)", fontWeight: 700, color: "var(--color-deep-slate, #24344D)", lineHeight: 1.4 }}>
                     &ldquo;Hai! Aku Kibo. Yuk bantu aku koding!&rdquo;
                   </span>
                 </div>
@@ -333,15 +358,15 @@ export default function HomePage() {
         id="cara-belajar"
         style={{
           padding: "72px 0",
-          backgroundColor: "rgba(13, 18, 36, 0.5)",
-          borderTop: "1px solid rgba(255, 255, 255, 0.05)",
-          borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
+          backgroundColor: "#EDF5FD",
+          borderTop: "1px solid var(--border-subtle, #DDE7F3)",
+          borderBottom: "1px solid var(--border-subtle, #DDE7F3)",
         }}
       >
         <div className="container" style={{ display: "flex", flexDirection: "column", gap: "48px" }}>
           <div style={{ textAlign: "center", maxWidth: "720px", margin: "0 auto" }}>
             <Badge variant="cyan" size="md">
-              Alur Belajar Ramah Anak
+              Bagaimana Cara Belajar di KiboCode?
             </Badge>
             <h2
               style={{
@@ -349,11 +374,12 @@ export default function HomePage() {
                 fontWeight: 800,
                 marginTop: "12px",
                 marginBottom: "12px",
+                color: "var(--color-deep-slate, #24344D)",
               }}
             >
               Belajar Logika Itu Seperti Menyusun Balok!
             </h2>
-            <p style={{ color: "var(--text-muted)", fontSize: "1.05rem", lineHeight: 1.6 }}>
+            <p style={{ color: "var(--color-slate-muted, #526581)", fontSize: "1.05rem", lineHeight: 1.6 }}>
               Tidak ada kode rumit atau hafalan syntax teks. Di KiboCode, kamu belajar cara berpikir komputer melalui 4 langkah seru:
             </p>
           </div>
@@ -372,8 +398,8 @@ export default function HomePage() {
                   width: "52px",
                   height: "52px",
                   borderRadius: "16px",
-                  backgroundColor: "rgba(121, 72, 247, 0.2)",
-                  border: "1px solid rgba(121, 72, 247, 0.4)",
+                  backgroundColor: "#F3EEFF",
+                  border: "1.5px solid var(--color-soft-purple, #D9CCFF)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -383,13 +409,13 @@ export default function HomePage() {
               >
                 🔍
               </div>
-              <div style={{ fontSize: "0.8rem", color: "var(--kibo-purple-light)", fontWeight: 700, marginBottom: "6px" }}>
+              <div style={{ fontSize: "0.8rem", color: "var(--color-soft-purple-deep, #6366F1)", fontWeight: 800, marginBottom: "6px" }}>
                 LANGKAH 1
               </div>
-              <h3 style={{ fontSize: "1.2rem", fontWeight: 700, marginBottom: "10px" }}>
+              <h3 style={{ fontSize: "1.2rem", fontWeight: 800, marginBottom: "10px", color: "var(--color-deep-slate, #24344D)" }}>
                 Kenali Masalah
               </h3>
-              <p style={{ color: "var(--text-muted)", fontSize: "0.925rem", lineHeight: 1.6 }}>
+              <p style={{ color: "var(--color-slate-muted, #526581)", fontSize: "0.925rem", lineHeight: 1.6 }}>
                 Amati apa yang rusak di Kibo World. Apakah lampunya padam, gerbangnya terkunci, atau tanaman yang kehausan?
               </p>
             </div>
@@ -401,8 +427,8 @@ export default function HomePage() {
                   width: "52px",
                   height: "52px",
                   borderRadius: "16px",
-                  backgroundColor: "rgba(0, 242, 254, 0.15)",
-                  border: "1px solid rgba(0, 242, 254, 0.35)",
+                  backgroundColor: "#EDF8FF",
+                  border: "1.5px solid var(--color-sky-blue, #BFE8FF)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -412,14 +438,14 @@ export default function HomePage() {
               >
                 🧩
               </div>
-              <div style={{ fontSize: "0.8rem", color: "var(--cyan-core)", fontWeight: 700, marginBottom: "6px" }}>
+              <div style={{ fontSize: "0.8rem", color: "var(--color-sky-blue-deep, #0284C7)", fontWeight: 800, marginBottom: "6px" }}>
                 LANGKAH 2
               </div>
-              <h3 style={{ fontSize: "1.2rem", fontWeight: 700, marginBottom: "10px" }}>
+              <h3 style={{ fontSize: "1.2rem", fontWeight: 800, marginBottom: "10px", color: "var(--color-deep-slate, #24344D)" }}>
                 Susun Blok Kode
               </h3>
-              <p style={{ color: "var(--text-muted)", fontSize: "0.925rem", lineHeight: 1.6 }}>
-                Tarik blok instruksi visual seperti <code style={{ color: "var(--cyan-core)" }}>MOVE</code>, <code style={{ color: "var(--cyan-core)" }}>IF</code>, dan <code style={{ color: "var(--cyan-core)" }}>REPEAT</code> sesuai urutan logikamu.
+              <p style={{ color: "var(--color-slate-muted, #526581)", fontSize: "0.925rem", lineHeight: 1.6 }}>
+                Pilih dan susun blok kode visual seperti <code style={{ color: "var(--color-sky-blue-deep, #0284C7)", fontWeight: 700 }}>MOVE</code>, <code style={{ color: "var(--color-sky-blue-deep, #0284C7)", fontWeight: 700 }}>IF</code>, dan <code style={{ color: "var(--color-sky-blue-deep, #0284C7)", fontWeight: 700 }}>REPEAT</code> sesuai urutan logikamu.
               </p>
             </div>
 
@@ -430,8 +456,8 @@ export default function HomePage() {
                   width: "52px",
                   height: "52px",
                   borderRadius: "16px",
-                  backgroundColor: "rgba(245, 158, 11, 0.15)",
-                  border: "1px solid rgba(245, 158, 11, 0.35)",
+                  backgroundColor: "#FFF9E6",
+                  border: "1.5px solid var(--color-warm-yellow, #FFE49A)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -441,13 +467,13 @@ export default function HomePage() {
               >
                 ▶️
               </div>
-              <div style={{ fontSize: "0.8rem", color: "var(--warm-yellow)", fontWeight: 700, marginBottom: "6px" }}>
+              <div style={{ fontSize: "0.8rem", color: "var(--color-warm-yellow-deep, #D97706)", fontWeight: 800, marginBottom: "6px" }}>
                 LANGKAH 3
               </div>
-              <h3 style={{ fontSize: "1.2rem", fontWeight: 700, marginBottom: "10px" }}>
+              <h3 style={{ fontSize: "1.2rem", fontWeight: 800, marginBottom: "10px", color: "var(--color-deep-slate, #24344D)" }}>
                 Jalankan Program
               </h3>
-              <p style={{ color: "var(--text-muted)", fontSize: "0.925rem", lineHeight: 1.6 }}>
+              <p style={{ color: "var(--color-slate-muted, #526581)", fontSize: "0.925rem", lineHeight: 1.6 }}>
                 Tekan tombol Run dan lihat Kibo mengeksekusi instruksimu secara langsung di dunia simulasi dengan mata kepalamu sendiri!
               </p>
             </div>
@@ -459,8 +485,8 @@ export default function HomePage() {
                   width: "52px",
                   height: "52px",
                   borderRadius: "16px",
-                  backgroundColor: "rgba(16, 185, 129, 0.15)",
-                  border: "1px solid rgba(16, 185, 129, 0.35)",
+                  backgroundColor: "#EEFAF2",
+                  border: "1.5px solid var(--color-mint-green, #B9F2D0)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -470,13 +496,13 @@ export default function HomePage() {
               >
                 🌟
               </div>
-              <div style={{ fontSize: "0.8rem", color: "var(--success-green)", fontWeight: 700, marginBottom: "6px" }}>
+              <div style={{ fontSize: "0.8rem", color: "var(--color-mint-green-deep, #059669)", fontWeight: 800, marginBottom: "6px" }}>
                 LANGKAH 4
               </div>
-              <h3 style={{ fontSize: "1.2rem", fontWeight: 700, marginBottom: "10px" }}>
+              <h3 style={{ fontSize: "1.2rem", fontWeight: 800, marginBottom: "10px", color: "var(--color-deep-slate, #24344D)" }}>
                 Bantu Kibo & Pulihkan
               </h3>
-              <p style={{ color: "var(--text-muted)", fontSize: "0.925rem", lineHeight: 1.6 }}>
+              <p style={{ color: "var(--color-slate-muted, #526581)", fontSize: "0.925rem", lineHeight: 1.6 }}>
                 Jika ada yang keliru, Kibo siap membantumu dengan petunjuk ramah. Bila berhasil, Kibo Core bersinar dan dunia kembali pulih!
               </p>
             </div>
@@ -499,11 +525,12 @@ export default function HomePage() {
                 fontWeight: 800,
                 marginTop: "12px",
                 marginBottom: "12px",
+                color: "var(--color-deep-slate, #24344D)",
               }}
             >
               5 Wilayah Kibo World yang Menantimu
             </h2>
-            <p style={{ color: "var(--text-muted)", fontSize: "1.05rem", lineHeight: 1.6 }}>
+            <p style={{ color: "var(--color-slate-muted, #526581)", fontSize: "1.05rem", lineHeight: 1.6 }}>
               Setiap wilayah mengajarkan satu konsep dasar pemrograman. Tantangan disusun bertahap dari yang paling mudah hingga pemecahan masalah utuh.
             </p>
           </div>
@@ -518,12 +545,13 @@ export default function HomePage() {
           >
             {CHAPTERS.map((ch, idx) => {
               const chapterIcons = ["💡", "⛩️", "🌱", "💾", "🔮"];
-              const chapterColors = [
-                "var(--kibo-purple-light)",
-                "var(--cyan-core)",
-                "var(--success-green)",
-                "var(--warm-yellow)",
-                "#f43f5e",
+              const chapterBadgeVariants = ["yellow", "yellow", "green", "cyan", "purple"] as const;
+              const chapterAccents = [
+                "var(--color-warm-yellow-deep, #D97706)",
+                "#B45309",
+                "var(--color-mint-green-deep, #059669)",
+                "var(--color-sky-blue-deep, #0284C7)",
+                "var(--color-soft-purple-deep, #6366F1)",
               ];
 
               return (
@@ -559,7 +587,7 @@ export default function HomePage() {
                       >
                         {chapterIcons[idx] ?? "✨"}
                       </span>
-                      <Badge variant={idx === 0 ? "purple" : idx === 1 ? "cyan" : idx === 2 ? "green" : idx === 3 ? "yellow" : "coral"} size="sm">
+                      <Badge variant={chapterBadgeVariants[idx] ?? "neutral"} size="sm">
                         BAB {ch.order}
                       </Badge>
                     </div>
@@ -568,7 +596,7 @@ export default function HomePage() {
                       style={{
                         fontSize: "1.3rem",
                         fontWeight: 800,
-                        color: "#ffffff",
+                        color: "var(--color-deep-slate, #24344D)",
                         marginBottom: "6px",
                       }}
                     >
@@ -579,7 +607,7 @@ export default function HomePage() {
                       style={{
                         fontSize: "0.85rem",
                         fontWeight: 700,
-                        color: chapterColors[idx],
+                        color: chapterAccents[idx],
                         marginBottom: "12px",
                       }}
                     >
@@ -589,7 +617,7 @@ export default function HomePage() {
                     <p
                       style={{
                         fontSize: "0.9rem",
-                        color: "var(--text-muted)",
+                        color: "var(--color-slate-muted, #526581)",
                         lineHeight: 1.6,
                       }}
                     >
@@ -600,7 +628,7 @@ export default function HomePage() {
                   {/* Footer Card */}
                   <div
                     style={{
-                      borderTop: "1px solid rgba(255, 255, 255, 0.08)",
+                      borderTop: "1px solid var(--border-subtle, #DDE7F3)",
                       paddingTop: "16px",
                       display: "flex",
                       justifyContent: "space-between",
@@ -609,21 +637,41 @@ export default function HomePage() {
                       flexWrap: "wrap",
                     }}
                   >
-                    <span style={{ fontSize: "0.85rem", color: "var(--text-dim)", fontWeight: 600 }}>
-                      🎯 3 Level Misi
-                    </span>
+                    {(() => {
+                      const chProg = getChapterProgress(ch.id, progress);
+                      return (
+                        <span
+                          style={{
+                            fontSize: "0.85rem",
+                            color: chProg.isRestored
+                              ? "var(--color-mint-green-deep, #059669)"
+                              : chProg.completed > 0
+                              ? "var(--color-sky-blue-deep, #0284C7)"
+                              : "var(--color-slate-dim, #7C8BA1)",
+                            fontWeight: 700,
+                          }}
+                        >
+                          {chProg.isRestored
+                            ? "✅ Pulih Sepenuhnya ✨"
+                            : chProg.completed > 0
+                            ? `🎯 ${chProg.completed}/${ch.totalChallenges} Selesai`
+                            : `🎯 ${ch.totalChallenges} Tantangan Coding`}
+                        </span>
+                      );
+                    })()}
                     <button
                       type="button"
                       onClick={() => setSelectedChapter(ch)}
                       style={{
-                        backgroundColor: "rgba(255, 255, 255, 0.1)",
-                        color: "#ffffff",
-                        padding: "10px 18px",
-                        minHeight: "44px",
+                        backgroundColor: "#FFFFFF",
+                        color: "var(--color-deep-slate, #24344D)",
+                        padding: "8px 16px",
+                        minHeight: "40px",
                         borderRadius: "12px",
                         fontSize: "0.875rem",
                         fontWeight: 700,
-                        border: "1px solid rgba(255, 255, 255, 0.2)",
+                        border: "1px solid var(--border-subtle, #DDE7F3)",
+                        boxShadow: "var(--shadow-sm)",
                         display: "inline-flex",
                         alignItems: "center",
                         justifyContent: "center",
@@ -649,8 +697,8 @@ export default function HomePage() {
               style={{
                 position: "fixed",
                 inset: 0,
-                backgroundColor: "rgba(0, 0, 0, 0.75)",
-                backdropFilter: "blur(8px)",
+                backgroundColor: "rgba(36, 52, 77, 0.45)",
+                backdropFilter: "blur(6px)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -670,8 +718,8 @@ export default function HomePage() {
                   flexDirection: "column",
                   gap: "20px",
                   position: "relative",
-                  border: "1px solid rgba(0, 242, 254, 0.4)",
-                  backgroundColor: "rgba(10, 15, 29, 0.98)",
+                  border: "1px solid var(--border-subtle, #DDE7F3)",
+                  boxShadow: "var(--shadow-lg)",
                 }}
                 onClick={(e) => e.stopPropagation()}
               >
@@ -684,15 +732,13 @@ export default function HomePage() {
                     onClick={() => setSelectedChapter(null)}
                     aria-label="Tutup dialog"
                     style={{
-                      width: "44px",
-                      height: "44px",
-                      minWidth: "44px",
-                      minHeight: "44px",
+                      width: "40px",
+                      height: "40px",
                       borderRadius: "50%",
-                      backgroundColor: "rgba(255, 255, 255, 0.12)",
-                      border: "1px solid rgba(255, 255, 255, 0.2)",
-                      color: "#ffffff",
-                      fontSize: "1.2rem",
+                      backgroundColor: "#F1F5F9",
+                      border: "1px solid var(--border-subtle, #DDE7F3)",
+                      color: "var(--color-deep-slate, #24344D)",
+                      fontSize: "1.1rem",
                       fontWeight: "bold",
                       cursor: "pointer",
                       display: "inline-flex",
@@ -706,21 +752,21 @@ export default function HomePage() {
                 </div>
 
                 <div>
-                  <h3 id="modal-chapter-title" style={{ fontSize: "1.6rem", fontWeight: 800, marginBottom: "8px" }}>
+                  <h3 id="modal-chapter-title" style={{ fontSize: "1.5rem", fontWeight: 800, marginBottom: "8px", color: "var(--color-deep-slate, #24344D)" }}>
                     {selectedChapter.title}
                   </h3>
-                  <div style={{ color: "var(--cyan-core)", fontWeight: 600, fontSize: "0.95rem", marginBottom: "12px" }}>
+                  <div style={{ color: "var(--color-sky-blue-deep, #0284C7)", fontWeight: 700, fontSize: "0.95rem", marginBottom: "12px" }}>
                     Fokus Pembelajaran: {selectedChapter.conceptLabel}
                   </div>
-                  <p style={{ color: "var(--text-muted)", lineHeight: 1.6, fontSize: "0.95rem" }}>
+                  <p style={{ color: "var(--color-slate-muted, #526581)", lineHeight: 1.6, fontSize: "0.95rem" }}>
                     {selectedChapter.description}
                   </p>
                 </div>
 
                 <div
                   style={{
-                    backgroundColor: "rgba(121, 72, 247, 0.1)",
-                    border: "1px solid rgba(121, 72, 247, 0.25)",
+                    backgroundColor: "#F4F9FF",
+                    border: "1.5px solid var(--color-sky-blue, #BFE8FF)",
                     borderRadius: "16px",
                     padding: "16px",
                     display: "flex",
@@ -729,16 +775,8 @@ export default function HomePage() {
                   }}
                 >
                   <KiboAvatar size={54} variant="happy" showGlow={false} isCircle={true} />
-                  <div style={{ fontSize: "0.875rem", color: "#ffffff", lineHeight: 1.5 }}>
-                    {selectedChapter.id === "lumina-town" ? (
-                      <>
-                        <strong>Wilayah Aktif!</strong> Misi 01 (Lampu Pertama) sudah siap dimainkan. Bantu Kibo menyusun instruksi untuk menyalakan kembali lampu kota!
-                      </>
-                    ) : (
-                      <>
-                        <strong>Status Pengembangan:</strong> Wilayah ini akan terbuka setelah misi di Lumina Town diselesaikan. Ayo selesaikan tantangan pertama!
-                      </>
-                    )}
+                  <div style={{ fontSize: "0.875rem", color: "var(--color-deep-slate, #24344D)", lineHeight: 1.5 }}>
+                    <strong>Wilayah Kibo World:</strong> Memiliki {selectedChapter.totalChallenges} tantangan coding yang membantumu menguasai konsep {selectedChapter.conceptLabel.toLowerCase()}.
                   </div>
                 </div>
 
@@ -751,26 +789,15 @@ export default function HomePage() {
                   >
                     Tutup
                   </Button>
-                  {selectedChapter.id === "lumina-town" ? (
-                    <Link href="/challenge/ch-01">
-                      <Button
-                        variant="cyan"
-                        size="md"
-                        style={{ minHeight: "44px", padding: "10px 24px", fontWeight: 800 }}
-                      >
-                        Mainkan Misi 01 Sekarang 🚀
-                      </Button>
-                    </Link>
-                  ) : (
+                  <Link href="/adventure">
                     <Button
-                      variant="primary"
+                      variant="cyan"
                       size="md"
-                      onClick={() => setSelectedChapter(null)}
-                      style={{ minHeight: "44px", padding: "10px 24px" }}
+                      style={{ minHeight: "44px", padding: "10px 24px", fontWeight: 800 }}
                     >
-                      Mengerti, Siap Belajar! 👍
+                      Buka di Peta Petualangan 🗺️
                     </Button>
-                  )}
+                  </Link>
                 </div>
               </div>
             </div>
@@ -785,9 +812,9 @@ export default function HomePage() {
         id="kibo-mentor"
         style={{
           padding: "80px 0",
-          backgroundColor: "rgba(10, 15, 29, 0.6)",
-          borderTop: "1px solid rgba(255, 255, 255, 0.05)",
-          borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
+          backgroundColor: "#EDF5FD",
+          borderTop: "1px solid var(--border-subtle, #DDE7F3)",
+          borderBottom: "1px solid var(--border-subtle, #DDE7F3)",
         }}
       >
         <div className="container" style={{ display: "flex", flexDirection: "column", gap: "48px" }}>
@@ -801,11 +828,12 @@ export default function HomePage() {
                 fontWeight: 800,
                 marginTop: "12px",
                 marginBottom: "12px",
+                color: "var(--color-deep-slate, #24344D)",
               }}
             >
               Sahabat Belajar yang Selalu Mendukungmu
             </h2>
-            <p style={{ color: "var(--text-muted)", fontSize: "1.05rem", lineHeight: 1.6 }}>
+            <p style={{ color: "var(--color-slate-muted, #526581)", fontSize: "1.05rem", lineHeight: 1.6 }}>
               Kibo bukan chatbot biasa yang langsung memberi contekan jawaban. Kibo adalah mentor suportif yang membimbing anak berpikir mandiri melalui 4 tingkat petunjuk bertahap (*Progressive Hints*).
             </p>
           </div>
@@ -819,8 +847,8 @@ export default function HomePage() {
             }}
           >
             {/* Kolom Kiri: 4 Tombol Pilihan Level Petunjuk */}
-            <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-              <h3 style={{ fontSize: "1.2rem", fontWeight: 700, color: "#ffffff", marginBottom: "4px" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+              <h3 style={{ fontSize: "1.2rem", fontWeight: 800, color: "var(--color-deep-slate, #24344D)", marginBottom: "4px" }}>
                 Coba Pilih Tingkat Petunjuk Kibo:
               </h3>
               {hintExamples.map((item) => {
@@ -832,14 +860,14 @@ export default function HomePage() {
                     onClick={() => setActiveHintLevel(item.level)}
                     style={{
                       textAlign: "left",
-                      padding: "18px 20px",
+                      padding: "16px 20px",
                       borderRadius: "16px",
-                      backgroundColor: isActive ? "rgba(121, 72, 247, 0.2)" : "rgba(21, 29, 56, 0.5)",
+                      backgroundColor: isActive ? "#EDF8FF" : "#FFFFFF",
                       border: isActive
-                        ? "2px solid var(--cyan-core)"
-                        : "1px solid rgba(255, 255, 255, 0.08)",
-                      boxShadow: isActive ? "0 0 20px rgba(0, 242, 254, 0.2)" : "none",
-                      transition: "all 200ms ease",
+                        ? "2px solid var(--color-sky-blue-deep, #0284C7)"
+                        : "1px solid var(--border-subtle, #DDE7F3)",
+                      boxShadow: isActive ? "0 2px 10px rgba(2, 132, 199, 0.15)" : "var(--shadow-sm)",
+                      transition: "all 180ms ease",
                       cursor: "pointer",
                       display: "flex",
                       alignItems: "center",
@@ -849,15 +877,15 @@ export default function HomePage() {
                     <div>
                       <div
                         style={{
-                          fontSize: "0.825rem",
-                          fontWeight: 700,
-                          color: isActive ? "var(--cyan-core)" : "var(--text-dim)",
+                          fontSize: "0.8rem",
+                          fontWeight: 800,
+                          color: isActive ? "var(--color-sky-blue-deep, #0284C7)" : "var(--color-slate-dim, #7C8BA1)",
                           marginBottom: "4px",
                         }}
                       >
                         TINGKAT {item.level}
                       </div>
-                      <div style={{ fontSize: "1.05rem", fontWeight: 700, color: "#ffffff" }}>
+                      <div style={{ fontSize: "1rem", fontWeight: 700, color: "var(--color-deep-slate, #24344D)" }}>
                         {item.title.split(": ")[1]}
                       </div>
                     </div>
@@ -878,8 +906,8 @@ export default function HomePage() {
                 display: "flex",
                 flexDirection: "column",
                 gap: "24px",
-                border: "1px solid rgba(0, 242, 254, 0.3)",
-                boxShadow: "0 16px 40px rgba(0, 0, 0, 0.4)",
+                border: "1.5px solid var(--color-sky-blue, #BFE8FF)",
+                boxShadow: "var(--shadow-md)",
               }}
             >
               {(() => {
@@ -890,17 +918,17 @@ export default function HomePage() {
                       <KiboAvatar
                         size={84}
                         variant={currentHint.avatarVariant}
-                        showGlow={true}
+                        showGlow={false}
                         isCircle={true}
                       />
                       <div>
                         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                          <h4 style={{ fontSize: "1.2rem", fontWeight: 800 }}>Kibo</h4>
+                          <h4 style={{ fontSize: "1.2rem", fontWeight: 800, color: "var(--color-deep-slate, #24344D)" }}>Kibo</h4>
                           <Badge variant={currentHint.badgeVariant} size="sm">
                             Mentor AI
                           </Badge>
                         </div>
-                        <span style={{ fontSize: "0.85rem", color: "var(--cyan-core)" }}>
+                        <span style={{ fontSize: "0.85rem", color: "var(--color-sky-blue-deep, #0284C7)", fontWeight: 700 }}>
                           {currentHint.title}
                         </span>
                       </div>
@@ -909,8 +937,8 @@ export default function HomePage() {
                     {/* Gelembung Percakapan */}
                     <div
                       style={{
-                        backgroundColor: "rgba(13, 18, 36, 0.9)",
-                        border: "1px solid rgba(255, 255, 255, 0.1)",
+                        backgroundColor: "#F4F9FF",
+                        border: "1.5px solid var(--color-soft-purple, #D9CCFF)",
                         borderRadius: "18px",
                         padding: "20px",
                         position: "relative",
@@ -918,10 +946,10 @@ export default function HomePage() {
                     >
                       <p
                         style={{
-                          fontSize: "1.1rem",
+                          fontSize: "1.05rem",
                           lineHeight: 1.6,
-                          color: "#ffffff",
-                          fontWeight: 500,
+                          color: "var(--color-deep-slate, #24344D)",
+                          fontWeight: 600,
                         }}
                       >
                         &ldquo;{currentHint.kiboSays}&rdquo;
@@ -931,8 +959,8 @@ export default function HomePage() {
                     <div
                       style={{
                         fontSize: "0.875rem",
-                        color: "var(--text-muted)",
-                        borderTop: "1px solid rgba(255, 255, 255, 0.08)",
+                        color: "var(--color-slate-muted, #526581)",
+                        borderTop: "1px solid var(--border-subtle, #DDE7F3)",
                         paddingTop: "16px",
                         display: "flex",
                         alignItems: "center",
@@ -965,11 +993,12 @@ export default function HomePage() {
                 fontWeight: 800,
                 marginTop: "12px",
                 marginBottom: "12px",
+                color: "var(--color-deep-slate, #24344D)",
               }}
             >
               Belajar Tanpa Rasa Takut Salah
             </h2>
-            <p style={{ color: "var(--text-muted)", fontSize: "1.05rem", lineHeight: 1.6 }}>
+            <p style={{ color: "var(--color-slate-muted, #526581)", fontSize: "1.05rem", lineHeight: 1.6 }}>
               KiboCode dirancang khusus dengan pendekatan ramah anak yang membangun kepercayaan diri dalam memecahkan masalah.
             </p>
           </div>
@@ -981,32 +1010,32 @@ export default function HomePage() {
               gap: "24px",
             }}
           >
-            <div className="glass-card" style={{ padding: "28px" }}>
+            <div className="glass-card interactive-card" style={{ padding: "28px" }}>
               <div style={{ fontSize: "2rem", marginBottom: "14px" }}>🔄</div>
-              <h3 style={{ fontSize: "1.2rem", fontWeight: 700, marginBottom: "8px" }}>
+              <h3 style={{ fontSize: "1.2rem", fontWeight: 800, marginBottom: "8px", color: "var(--color-deep-slate, #24344D)" }}>
                 Bebas Coba Berulang Kali
               </h3>
-              <p style={{ color: "var(--text-muted)", fontSize: "0.925rem", lineHeight: 1.6 }}>
+              <p style={{ color: "var(--color-slate-muted, #526581)", fontSize: "0.925rem", lineHeight: 1.6 }}>
                 Tidak ada pengurangan nilai atau sistem kalah yang membuat takut. Anak didorong untuk bereksperimen, mencoba lagi, dan belajar dari kesalahan.
               </p>
             </div>
 
-            <div className="glass-card" style={{ padding: "28px" }}>
+            <div className="glass-card interactive-card" style={{ padding: "28px" }}>
               <div style={{ fontSize: "2rem", marginBottom: "14px" }}>👀</div>
-              <h3 style={{ fontSize: "1.2rem", fontWeight: 700, marginBottom: "8px" }}>
+              <h3 style={{ fontSize: "1.2rem", fontWeight: 800, marginBottom: "8px", color: "var(--color-deep-slate, #24344D)" }}>
                 Hasil Visual Nyata
               </h3>
-              <p style={{ color: "var(--text-muted)", fontSize: "0.925rem", lineHeight: 1.6 }}>
+              <p style={{ color: "var(--color-slate-muted, #526581)", fontSize: "0.925rem", lineHeight: 1.6 }}>
                 Setiap blok yang disusun langsung terlihat dampaknya pada karakter Kibo dan lingkungan dunia simulasi, memudahkan pemahaman sebab-akibat.
               </p>
             </div>
 
-            <div className="glass-card" style={{ padding: "28px" }}>
+            <div className="glass-card interactive-card" style={{ padding: "28px" }}>
               <div style={{ fontSize: "2rem", marginBottom: "14px" }}>⭐</div>
-              <h3 style={{ fontSize: "1.2rem", fontWeight: 700, marginBottom: "8px" }}>
+              <h3 style={{ fontSize: "1.2rem", fontWeight: 800, marginBottom: "8px", color: "var(--color-deep-slate, #24344D)" }}>
                 Bintang Penguasaan Materi
               </h3>
-              <p style={{ color: "var(--text-muted)", fontSize: "0.925rem", lineHeight: 1.6 }}>
+              <p style={{ color: "var(--color-slate-muted, #526581)", fontSize: "0.925rem", lineHeight: 1.6 }}>
                 Tingkat bintang mengukur kemandirian berpikir anak. Misi dapat dimainkan ulang kapan saja untuk meningkatkan bintang tanpa risiko kehilangan capaian.
               </p>
             </div>
@@ -1025,17 +1054,16 @@ export default function HomePage() {
               padding: "clamp(36px, 6vw, 64px) clamp(24px, 5vw, 48px)",
               textAlign: "center",
               borderRadius: "32px",
-              background:
-                "radial-gradient(ellipse at 50% 20%, rgba(121, 72, 247, 0.25) 0%, rgba(13, 18, 36, 0.8) 70%, transparent 100%)",
-              border: "1px solid rgba(0, 242, 254, 0.3)",
+              background: "linear-gradient(135deg, #E0F2FE 0%, #EDE9FE 100%)",
+              border: "1.5px solid var(--color-sky-blue, #BFE8FF)",
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
               gap: "24px",
-              boxShadow: "0 20px 50px rgba(0, 0, 0, 0.4)",
+              boxShadow: "var(--shadow-md)",
             }}
           >
-            <KiboAvatar size={140} variant="celebrate" showGlow={true} isCircle={true} />
+            <KiboAvatar size={140} variant="celebrate" showGlow={false} isCircle={true} />
 
             <div style={{ maxWidth: "620px" }}>
               <h2
@@ -1043,11 +1071,12 @@ export default function HomePage() {
                   fontSize: "clamp(1.8rem, 4vw, 2.75rem)",
                   fontWeight: 800,
                   marginBottom: "12px",
+                  color: "var(--color-deep-slate, #24344D)",
                 }}
               >
                 Siap Memulai Petualangan Kodingmu?
               </h2>
-              <p style={{ color: "var(--text-muted)", fontSize: "1.1rem", lineHeight: 1.6 }}>
+              <p style={{ color: "var(--color-slate-muted, #526581)", fontSize: "1.1rem", lineHeight: 1.6 }}>
                 Bantu Kibo menyalakan lampu pertama di Lumina Town. Jelajahi kurikulum 5 bab dan mulailah belajar berpikir seperti programmer cilik!
               </p>
             </div>
@@ -1062,7 +1091,6 @@ export default function HomePage() {
                     padding: "16px 36px",
                     fontSize: "1.1rem",
                     fontWeight: 800,
-                    boxShadow: "0 8px 24px rgba(0, 242, 254, 0.4)",
                   }}
                 >
                   Jelajahi Peta 5 Bab Sekarang 🚀
@@ -1070,12 +1098,13 @@ export default function HomePage() {
               </Link>
               <a href="#hero">
                 <Button
-                  variant="outline"
+                  variant="secondary"
                   size="lg"
                   style={{
                     borderRadius: "16px",
                     padding: "16px 28px",
                     fontSize: "1.05rem",
+                    fontWeight: 700,
                   }}
                 >
                   Kembali ke Atas ⬆️

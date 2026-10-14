@@ -4,8 +4,7 @@
 
 MVP:
 - 5 chapters
-- 3 challenges each
-- 15 challenges total
+- 15 challenges total (didistribusikan dalam format 5–3–3–3–1 sesuai kurva kesulitan bertahap untuk anak SD)
 
 Difficulty increases gradually.
 
@@ -16,54 +15,68 @@ Difficulty increases gradually.
 Story:
 A System Glitch caused the lights in Lumina Town to lose their instructions.
 
-### Challenge 01 — First Light
+### Challenge 01 — Lampu Pertama (First Light)
 Goal:
-Move Kibo to the first light and activate it.
+Susun instruksi agar Kibo berjalan ke depan tiang lampu (2 langkah) lalu aktifkan lampu.
 
 Main concept:
-Sequence.
+Urutan Langkah (Sequence).
 
-### Challenge 02 — Light the Street
+### Challenge 02 — Terangi Jalanan (Light the Street)
 Goal:
-Activate multiple lights in the correct order.
+Susun instruksi agar Kibo menyalakan lampu pertama di petak 2, lalu maju ke petak 4 untuk menyalakan lampu kedua.
 
 Main concept:
-Longer sequence.
+Urutan Panjang (Multi-Target Sequence).
 
-### Challenge 03 — Night Walk
+### Challenge 03 — Jalan Malam (Night Walk)
 Goal:
-Guide Kibo through a path and activate the final lighting system.
+Pandu Kibo menyusuri jalan malam: nyalakan Lentera Jalur di petak 3, lalu lanjutkan perjalanan untuk menyalakan Menara Cahaya di petak 5.
 
 Main concept:
-Sequence with more steps.
+Sequence Lanjutan (Jalur Panjang).
+
+### Challenge 04 — Gerbang Pintar (Smart Gate)
+Goal:
+Pandu Kibo ke depan Gerbang Pintar di petak 3, buka gerbang dengan perintah IF_GATE, lalu maju ke petak 4 untuk menyalakan Menara Cahaya.
+
+Main concept:
+Kondisi Logika Dasar (IF–THEN).
+
+### Challenge 05 — Harmoni Cahaya (Festival of Lights)
+Goal:
+Pandu Kibo menyusuri 6 petak: aktifkan Relay Daya di petak 2, Lentera Taman di petak 4, dan Kristal Cahaya Agung di petak 6.
+
+Main concept:
+Rangkaian Penuh Lumina Town (Grand Sequence).
 
 ## 3. Chapter 2 — Gate Valley
 
 **Concept:** Condition
 
 Story:
-The gates in the valley no longer know when they should open.
+The gates and energy bridges in the valley no longer know when they should open or connect.
 
-### Challenge 04 — Open the Gate
+### Challenge 06 — Gerbang Penjaga (Guardian Gate)
 Goal:
-Check the gate condition and open it when appropriate.
+Pandu Kibo maju ke Petak 2 di depan Gerbang Penjaga, buka gerbang dengan perintah IF_GATE, lalu lanjutkan langkah ke Petak 4 untuk mengaktifkan Totem Lembah.
 
 Main concept:
-IF.
+Kondisi Tunggal (Single IF).
 
-### Challenge 05 — Which Way?
+### Challenge 07 — Jembatan Energi (Energy Bridge)
 Goal:
-Choose the correct path depending on a condition.
+Pandu Kibo ke Petak 3 di depan jembatan energi yang terputus, hubungkan jembatan dengan IF_BRIDGE, lalu seberangi celah menuju Petak 5 untuk menyalakan Stasiun Daya Lembah.
 
 Main concept:
-IF / ELSE.
+Pilihan Kondisi (Condition Action — IF_BRIDGE vs IF_GATE).
 
-### Challenge 06 — Safe Route
+### Challenge 08 — Persimpangan Lembah (Valley Crossroads)
 Goal:
-Navigate through multiple conditional situations.
+Atasi kedua rintangan secara adaptif: buka Gerbang Penjaga di Petak 2 dengan IF_GATE, hubungkan Jembatan Energi di Petak 4 dengan IF_BRIDGE, lalu aktifkan Kristal Agung Lembah di Petak 6.
 
 Main concept:
-Condition + Sequence.
+Logika Multi-Kondisi (Multi-Condition Sequential Logic).
 
 ## 4. Chapter 3 — Sprout Garden
 
@@ -72,26 +85,26 @@ Condition + Sequence.
 Story:
 The digital garden stopped growing because the watering system lost its instructions.
 
-### Challenge 07 — Water the First Plant
+### Challenge 09 — Tunas Pertama (First Sprout)
 Goal:
-Perform repeated watering actions.
+Gunakan blok Loop untuk mengulang gerakan maju dan menyiram 3 tunas secara efisien.
 
 Main concept:
-Recognize repetition.
+Loop (Pengulangan Sederhana — REPEAT_3).
 
-### Challenge 08 — Water Them All
+### Challenge 10 — Kebun Berbaris (Garden Rows)
 Goal:
-Water a group of plants efficiently.
+Gabungkan langkah persiapan, blok loop untuk menyiram bunga berbaris, dan langkah aktivasi katup di akhir jalur.
 
 Main concept:
-REPEAT.
+Sequence & Loop (Kombinasi Urutan Langkah & Pengulangan).
 
-### Challenge 09 — Growing Garden
+### Challenge 11 — Festival Bunga (Flower Festival)
 Goal:
-Use repetition together with a sequence of actions.
+Gunakan pengulangan 2 kali untuk merawat sepasang bunga di tiap blok taman, lalu aktifkan Air Mancur Megah di garis akhir.
 
 Main concept:
-Loop + Sequence.
+Compound Loop (Pola Pengulangan Majemuk & Air Mancur Megah).
 
 ## 5. Chapter 4 — Memory Station
 
@@ -100,26 +113,26 @@ Loop + Sequence.
 Story:
 The memory station lost important values needed by Kibo World.
 
-### Challenge 10 — Save the Number
+### Challenge 12 — Kotak Memori Pertama (Save the Data)
 Goal:
-Store a value.
+Simpan nilai 3 ke Kotak Memori Kibo, lalu melangkah ke Terminal Data Alpha dan salurkan nilainya menggunakan blok Gunakan Nilai Data.
 
 Main concept:
-SET.
+Variable (Penyimpanan Nilai — SET).
 
-### Challenge 11 — Use the Data
+### Challenge 13 — Kirimkan Nilai Data (Use the Data)
 Goal:
-Use a previously stored value.
+Simpan nilai 5 ke dalam memori, lalu gunakan blok Gunakan Nilai Data tepat di depan Reaktor Memori.
 
 Main concept:
-SET + USE.
+Variable (Penyaluran Nilai — SET + USE).
 
-### Challenge 12 — Data Delivery
+### Challenge 14 — Sinkronisasi Dua Nilai (Data Delivery & Update)
 Goal:
-Use stored data while completing a sequence.
+Simpan nilai 2 untuk Konsol Alpha di Petak 3, lalu perbarui isi memori dengan nilai 4 untuk Kubah Memori di Petak 6.
 
 Main concept:
-Variable + Sequence.
+Variable (Pembaruan Nilai Berurutan).
 
 ## 6. Chapter 5 — Kibo Core
 
@@ -128,22 +141,14 @@ Variable + Sequence.
 Story:
 Kibo reaches the center of the damaged world. The final system requires combining everything learned.
 
-### Challenge 13 — Restore the Energy
-Concept:
-Sequence + Condition.
-
-### Challenge 14 — Restart the System
-Concept:
-Condition + Loop + Variable.
-
-### Challenge 15 — Kibo Core
-Final challenge.
+### Challenge 15 — Inti Kibo (The Kibo Core)
+Final grand finale challenge.
 
 Concept:
-Sequence + Condition + Loop + Variable.
+Problem Solving (Sequence + Condition + Loop + Variable).
 
 Goal:
-Restore Kibo Core and complete the repair of Kibo World.
+Simpan kode 5 ke Kotak Memori, buka Gerbang Keamanan dengan IF_GATE, percepat langkah melintasi 6 petak koridor dengan blok pengulangan REPEAT_3, lalu salurkan energi data ke Altar Inti Kibo untuk memulihkan seluruh Kibo World.
 
 ## 7. Content Principles
 

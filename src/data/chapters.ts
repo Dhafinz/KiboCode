@@ -54,6 +54,6 @@ export const CHAPTERS: Chapter[] = [
     concept: "problem-solving",
     conceptLabel: "Problem Solving (Kombinasi Logika)",
     description: "Pusat Kibo World, gabungkan seluruh konsep untuk reaktivasi Kibo Core.",
-    totalChallenges: 5,
+    totalChallenges: 1,
   },
 ];

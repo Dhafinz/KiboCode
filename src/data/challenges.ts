@@ -142,7 +142,8 @@ export type TargetType =
   | "fountain"
   | "terminal"
   | "reactor"
-  | "vault";
+  | "vault"
+  | "core";
 
 export interface ChallengeTarget {
   id: string;
@@ -1044,6 +1045,68 @@ export const CHALLENGES: Record<string, ChallengeDetail> = {
         level: 4,
         title: "Level 4: Solusi Terpandu (Guided Solution)",
         text: "Urutan 9 blok optimal: SET_VALUE_2 → MOVE → MOVE → USE_VALUE → SET_VALUE_4 → MOVE → MOVE → MOVE → USE_VALUE. Ayo pulihkan Memory Station!",
+      },
+    ],
+  },
+  "ch-15": {
+    id: "ch-15",
+    chapterId: "kibo-core",
+    order: 1,
+    title: "Inti Kibo (The Kibo Core)",
+    concept: "problem-solving",
+    conceptLabel: "Problem Solving (Sequence + Condition + Loop + Variable)",
+    story:
+      "Selamat datang di Pusat Dunia Kibo! Altar Inti Kibo di Petak 8 kehilangan daya pemulihannya akibat System Glitch. Kibo harus menyiapkan Kode Pemulihan 5 di dalam Kotak Memori, membuka Gerbang Keamanan Inti di Petak 2, melintasi koridor transmisi data yang panjang menggunakan blok pengulangan, lalu menyalurkan energi ke Altar Inti Kibo!",
+    goal: "Simpan kode 5, buka Gerbang Keamanan, percepat langkah melintasi koridor dengan blok pengulangan, lalu salurkan data ke Altar Inti Kibo.",
+    gridTiles: 8,
+    startPosition: 0,
+    optimalBlocks: 8,
+    maxBlocks: 14,
+    availableBlocks: ["MOVE", "IF_GATE", "REPEAT_3", "END_LOOP", "SET_VALUE_5", "USE_VALUE"],
+    targets: [
+      {
+        id: "core-gate",
+        type: "gate",
+        position: 1,
+        label: "GERBANG KEAMANAN INTI",
+        required: true,
+        activationMessage:
+          "Kondisi diperiksa: Gerbang Keamanan Inti terbuka! Akses menuju koridor transmisi kini terbuka lebar! 🚪✨",
+      },
+      {
+        id: "core-chamber",
+        type: "core",
+        position: 7,
+        label: "ALTAR INTI KIBO",
+        required: true,
+        requiredValue: 5,
+        dependsOn: "core-gate",
+        prerequisiteMessage:
+          "Altar Inti Kibo terlindungi medan plasma! Buka Gerbang Keamanan Inti terlebih dahulu untuk mengakses altar.",
+        activationMessage:
+          "Kode Pemulihan 5 berhasil disalurkan! Inti Kibo bersinar benderang memancarkan energi kosmik dan memulihkan seluruh Kibo World! 🔮✨🌟",
+      },
+    ],
+    hints: [
+      {
+        level: 1,
+        title: "Level 1: Berpikir (Thinking)",
+        text: "Misi ini menggabungkan semua kemampuanmu: menyimpan nilai, membuka gerbang, mengulang langkah, dan menyalurkan data ke Altar Inti Kibo.",
+      },
+      {
+        level: 2,
+        title: "Level 2: Arah (Direction)",
+        text: "Simpan nilai 5 di awal, buka gerbang di Petak 2 dengan IF_GATE, lalu gunakan blok pengulangan untuk melintasi 6 petak koridor data.",
+      },
+      {
+        level: 3,
+        title: "Level 3: Konsep (Concept)",
+        text: "Alih-alih melangkah satu per satu sebanyak 6 kali, gunakan REPEAT_3 dengan dua langkah MOVE di dalamnya agar susunan blokmu hemat dan ringkas!",
+      },
+      {
+        level: 4,
+        title: "Level 4: Solusi Terpandu (Guided Solution)",
+        text: "Urutan 8 blok optimal: SET_VALUE_5 → MOVE → IF_GATE → REPEAT_3 → MOVE → MOVE → END_LOOP → USE_VALUE. Ayo pulihkan Kibo World seutuhnya!",
       },
     ],
   },

@@ -21,40 +21,43 @@ export function Button({
     gap: "8px",
     fontWeight: 700,
     borderRadius: "14px",
-    transition: "all 200ms ease",
+    transition: "all 180ms ease",
     cursor: disabled ? "not-allowed" : "pointer",
     opacity: disabled ? 0.6 : 1,
+    boxSizing: "border-box",
   };
 
   const variantStyles: Record<string, React.CSSProperties> = {
     primary: {
-      background: "linear-gradient(135deg, #7948f7 0%, #5824d6 100%)",
-      color: "#ffffff",
-      boxShadow: "0 4px 14px rgba(121, 72, 247, 0.4)",
-      border: "1px solid rgba(255, 255, 255, 0.15)",
-    },
-    cyan: {
-      background: "linear-gradient(135deg, #00f2fe 0%, #0ea5e9 100%)",
-      color: "#070a14",
-      boxShadow: "0 4px 14px rgba(0, 242, 254, 0.35)",
+      background: "linear-gradient(135deg, #6366F1 0%, #4F46E5 100%)",
+      color: "#FFFFFF",
+      boxShadow: "0 4px 12px rgba(79, 70, 229, 0.25)",
       border: "1px solid rgba(255, 255, 255, 0.2)",
     },
+    cyan: {
+      backgroundColor: "var(--color-sky-blue, #BFE8FF)",
+      color: "var(--color-deep-slate, #24344D)",
+      boxShadow: "0 3px 10px rgba(2, 132, 199, 0.15)",
+      border: "1px solid #7DD3FC",
+    },
     secondary: {
-      backgroundColor: "rgba(255, 255, 255, 0.1)",
-      color: "#ffffff",
-      border: "1px solid rgba(255, 255, 255, 0.12)",
+      backgroundColor: "#FFFFFF",
+      color: "var(--color-deep-slate, #24344D)",
+      border: "1px solid #DDE7F3",
+      boxShadow: "0 1px 3px rgba(36, 52, 77, 0.05)",
     },
     outline: {
-      backgroundColor: "transparent",
-      color: "#c4b5fd",
-      border: "2px solid rgba(121, 72, 247, 0.5)",
+      backgroundColor: "#FFFFFF",
+      color: "#4F46E5",
+      border: "2px solid #D9CCFF",
+      boxShadow: "0 1px 3px rgba(36, 52, 77, 0.04)",
     },
   };
 
   const sizeStyles: Record<string, React.CSSProperties> = {
     sm: { padding: "6px 14px", fontSize: "0.875rem" },
-    md: { padding: "10px 20px", fontSize: "1rem" },
-    lg: { padding: "14px 28px", fontSize: "1.125rem" },
+    md: { padding: "10px 20px", fontSize: "0.975rem" },
+    lg: { padding: "14px 28px", fontSize: "1.1rem" },
   };
 
   return (

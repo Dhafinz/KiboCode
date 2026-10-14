@@ -78,7 +78,23 @@ export function loadProgress(): PlayerProgressData {
 
     const parsed = JSON.parse(raw);
     if (isValidProgressData(parsed)) {
-      return parsed;
+      // Hitung ulang persentase pemulihan dan total bintang dari misi yang benar-benar selesai
+      // agar selalu sinkron dan konsisten dengan total 15 tantangan
+      const validCompleted = Object.values(parsed.completedChallenges).filter(
+        (rec) => rec && CHALLENGES[rec.challengeId]
+      );
+      const totalPlayableCount = Object.keys(CHALLENGES).length;
+      const worldRestoredPct = Math.min(
+        100,
+        parseFloat(((validCompleted.length / totalPlayableCount) * 100).toFixed(1))
+      );
+      const totalStars = validCompleted.reduce((sum, item) => sum + (item.stars || 0), 0);
+
+      return {
+        ...parsed,
+        totalStars,
+        worldRestoredPct,
+      };
     }
 
     // Data format mismatch, fallback
@@ -87,6 +103,15 @@ export function loadProgress(): PlayerProgressData {
     console.warn("Gagal membaca progres dari localStorage, menggunakan default:", err);
     return DEFAULT_PROGRESS;
   }
+}
+
+/**
+ * Memeriksa apakah seluruh 15 tantangan di Kibo World telah tuntas diselesaikan
+ */
+export function isAllChallengesCompleted(progressData?: PlayerProgressData): boolean {
+  const current = progressData ?? loadProgress();
+  const allIds = Object.keys(CHALLENGES);
+  return allIds.length > 0 && allIds.every((id) => Boolean(current.completedChallenges[id]));
 }
 
 /**
@@ -195,6 +220,11 @@ export function getPrerequisiteChallenge(
   // Jika tantangan pertama di Memory Station (ch-12), prasyaratnya adalah ch-11 (akhir Sprout Garden)
   if (challenge.chapterId === "memory-station" && challenge.order === 1) {
     return CHALLENGES["ch-11"];
+  }
+
+  // Jika tantangan pertama di Kibo Core (ch-15), prasyaratnya adalah ch-14 (akhir Memory Station)
+  if (challenge.chapterId === "kibo-core" && challenge.order === 1) {
+    return CHALLENGES["ch-14"];
   }
 
   if (challenge.order <= 1) {

@@ -144,6 +144,8 @@ function getTargetStandingInstruction(target: ChallengeTarget): string {
       return `Kibo sudah berdiri tepat di depan ${label}, tapi reaktor belum dinyalakan! Gunakan blok Gunakan Nilai Data ya.`;
     case "vault":
       return `Kibo sudah berdiri tepat di depan ${label}, tapi kubah memori belum dibuka! Salurkan data dengan blok Gunakan Nilai Data ya.`;
+    case "core":
+      return `Kibo sudah berdiri tepat di depan ${label}, tapi inti belum diaktifkan! Salurkan energi pemulihan dengan blok Gunakan Nilai Data ya.`;
     case "lamp":
     default:
       return `Kibo sudah berdiri tepat di depan ${target.label || "tiang lampu"}, tapi saklarnya belum dinyalakan! Tambahkan instruksi Nyalakan Lampu ya.`;
@@ -173,6 +175,10 @@ function getPartialCompletionFeedback(
     return `Sebagian stasiun data telah aktif, tapi ${label} belum diaktifkan! Periksa kembali alur pengiriman data Kibo.`;
   }
 
+  if (chapterId === "kibo-core") {
+    return `Sebagian sistem telah aktif, tapi ${label} belum diaktifkan! Periksa kembali instruksi pemulihan Kibo Core.`;
+  }
+
   return `Sebagian lampu sudah menyala, tapi ${label} masih padam! Periksa kembali apakah Kibo sudah menyalakan setiap lampu di jalurnya.`;
 }
 
@@ -189,6 +195,9 @@ function getUnreachedTargetFeedback(chapterId: ChapterId): string {
   if (chapterId === "memory-station") {
     return "Kibo belum mencapai terminal atau stasiun data target. Periksa kembali urutan langkah Kibo!";
   }
+  if (chapterId === "kibo-core") {
+    return "Kibo belum mencapai Gerbang Keamanan atau Altar Inti Kibo. Periksa kembali urutan langkah Kibo!";
+  }
   return "Kibo belum sampai di tiang lampu. Periksa kembali urutan langkah maju Kibo!";
 }
 
@@ -204,6 +213,9 @@ function getEmptyActivateFeedback(chapterId: ChapterId): string {
   }
   if (chapterId === "memory-station") {
     return "Kibo belum sampai di depan terminal data atau reaktor! Di petak ini tidak ada perangkat data yang bisa diaktifkan.";
+  }
+  if (chapterId === "kibo-core") {
+    return "Kibo belum sampai di depan Altar Inti Kibo! Di petak ini tidak ada perangkat inti yang bisa diaktifkan.";
   }
   return "Kibo belum sampai di depan saklar atau tiang lampu! Di petak ini tidak ada saklar yang bisa dinyalakan.";
 }
@@ -523,7 +535,8 @@ export function runSimulation(
       if (
         targetAtPos.type !== "terminal" &&
         targetAtPos.type !== "reactor" &&
-        targetAtPos.type !== "vault"
+        targetAtPos.type !== "vault" &&
+        targetAtPos.type !== "core"
       ) {
         simulationHalted = true;
         failureReason = `Ups! ${targetAtPos.label || "Perangkat ini"} tidak membutuhkan nilai data dari Kotak Memori! Periksa kembali instruksi yang sesuai ya.`;
@@ -642,11 +655,12 @@ export function runSimulation(
           break;
         }
 
-        // Cek apakah target memerlukan blok USE_VALUE khusus (seperti terminal, reactor atau vault)
+        // Cek apakah target memerlukan blok USE_VALUE khusus (seperti terminal, reactor, vault, atau core)
         if (
           targetAtPos.type === "terminal" ||
           targetAtPos.type === "reactor" ||
-          targetAtPos.type === "vault"
+          targetAtPos.type === "vault" ||
+          targetAtPos.type === "core"
         ) {
           simulationHalted = true;
           failureReason = `${targetAtPos.label || "Perangkat ini"} memerlukan penyaluran data spesifik! Gunakan blok Gunakan Nilai Data ya.`;
@@ -714,7 +728,13 @@ export function runSimulation(
   // Evaluasi kondisi keberhasilan akhir
   if (allRequiredTargetsActive && !simulationHalted) {
     // Keberhasilan: hitung bintang berdasarkan konfigurasi optimal tantangan
-    const isOptimal = blocks.length <= normConfig.optimalBlocks;
+    // Untuk ch-15 (Kibo Core), solusi optimal berbasis loop dapat berupa compound loop (8 blok)
+    // atau sequential loop ganda REPEAT_3 (10 blok). Solusi manual tanpa loop (10 blok tanpa REPEAT_3) dinilai 2 bintang.
+    let isOptimal = blocks.length <= normConfig.optimalBlocks;
+    if (normConfig.id === "ch-15") {
+      const usesLoop = blocks.includes("REPEAT_3");
+      isOptimal = usesLoop && blocks.length <= 10;
+    }
     const stars = isOptimal ? 3 : 2;
 
     let successMsg = isOptimal
@@ -765,6 +785,10 @@ export function runSimulation(
       successMsg = isOptimal
         ? "Luar biasa! Sinkronisasi dua nilai data berhasil sempurna! Seluruh Memory Station kini pulih seutuhnya! 🏛️💾🌟"
         : "Bagus sekali! Memory Station berhasil dipulihkan, tapi coba buat susunan blok lebih ringkas untuk 3 bintang penuh!";
+    } else if (normConfig.id === "ch-15") {
+      successMsg = isOptimal
+        ? "Luar biasa! Inti Dunia Kibo telah pulih seutuhnya! Seluruh Kibo World kini bersinar terang berkat penguasaan kode agungmu! 🌟🏛️✨"
+        : "Bagus sekali! Inti Dunia Kibo berhasil dipulihkan, tapi kamu bisa mencoba membuatnya lebih ringkas untuk 3 bintang penuh!";
     }
 
     return {

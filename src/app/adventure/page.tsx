@@ -24,6 +24,7 @@ export default function AdventurePage() {
   const isGateValleyRestored = isChapterRestored("gate-valley", progress);
   const isSproutGardenRestored = isChapterRestored("sprout-garden", progress);
   const isMemoryStationRestored = isChapterRestored("memory-station", progress);
+  const isKiboCoreRestored = isChapterRestored("kibo-core", progress);
 
   return (
     <div
@@ -51,13 +52,14 @@ export default function AdventurePage() {
               display: "inline-flex",
               alignItems: "center",
               gap: "8px",
-              color: "var(--text-muted)",
+              color: "var(--color-slate-muted, #526581)",
               fontSize: "0.95rem",
-              fontWeight: 600,
+              fontWeight: 700,
               padding: "8px 16px",
               borderRadius: "12px",
-              backgroundColor: "rgba(255, 255, 255, 0.05)",
-              border: "1px solid rgba(255, 255, 255, 0.1)",
+              backgroundColor: "#FFFFFF",
+              border: "1px solid var(--border-subtle, #DDE7F3)",
+              boxShadow: "var(--shadow-sm)",
               transition: "all 150ms ease",
             }}
           >
@@ -80,11 +82,12 @@ export default function AdventurePage() {
                 gap: "8px",
                 padding: "8px 16px",
                 borderRadius: "9999px",
-                backgroundColor: "rgba(245, 158, 11, 0.15)",
-                border: "1px solid rgba(245, 158, 11, 0.35)",
-                color: "var(--warm-yellow)",
-                fontWeight: 700,
+                backgroundColor: "#FFF9E6",
+                border: "1.5px solid var(--color-warm-yellow, #FFE49A)",
+                color: "var(--color-warm-yellow-deep, #D97706)",
+                fontWeight: 800,
                 fontSize: "0.95rem",
+                boxShadow: "var(--shadow-sm)",
               }}
             >
               <span>⭐</span>
@@ -98,11 +101,12 @@ export default function AdventurePage() {
                 gap: "8px",
                 padding: "8px 16px",
                 borderRadius: "9999px",
-                backgroundColor: "rgba(0, 242, 254, 0.12)",
-                border: "1px solid rgba(0, 242, 254, 0.3)",
-                color: "var(--cyan-core)",
-                fontWeight: 700,
+                backgroundColor: "#EEFAF2",
+                border: "1.5px solid var(--color-mint-green, #B9F2D0)",
+                color: "var(--color-mint-green-deep, #059669)",
+                fontWeight: 800,
                 fontSize: "0.95rem",
+                boxShadow: "var(--shadow-sm)",
               }}
             >
               <span>🔋</span>
@@ -117,13 +121,13 @@ export default function AdventurePage() {
           style={{
             padding: "clamp(24px, 4vw, 40px)",
             borderRadius: "24px",
-            background:
-              "linear-gradient(135deg, rgba(21, 29, 56, 0.85) 0%, rgba(10, 15, 29, 0.95) 100%)",
-            border: "1px solid rgba(121, 72, 247, 0.3)",
+            background: "linear-gradient(135deg, #FFFFFF 0%, #F4F9FF 100%)",
+            border: "1.5px solid var(--border-subtle, #DDE7F3)",
             display: "grid",
             gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 280px), 1fr))",
             alignItems: "center",
             gap: "32px",
+            boxShadow: "var(--shadow-md)",
           }}
         >
           <div>
@@ -142,12 +146,13 @@ export default function AdventurePage() {
                 fontWeight: 800,
                 marginBottom: "12px",
                 lineHeight: 1.2,
+                color: "var(--color-deep-slate, #24344D)",
               }}
             >
               Jelajahi & Pulihkan{" "}
               <span
                 style={{
-                  background: "linear-gradient(135deg, #00f2fe 0%, #9d7df9 100%)",
+                  background: "linear-gradient(135deg, #0284C7 0%, #7C3AED 100%)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                 }}
@@ -156,7 +161,7 @@ export default function AdventurePage() {
               </span>
             </h1>
 
-            <p style={{ color: "var(--text-muted)", fontSize: "1rem", lineHeight: 1.6 }}>
+            <p style={{ color: "var(--color-slate-muted, #526581)", fontSize: "1rem", lineHeight: 1.6 }}>
               Sebuah System Glitch misterius telah melumpuhkan lima wilayah di Kibo World. Setiap wilayah membutuhkan keahlian logika coding untuk dipulihkan kembali. Mulailah perjalananmu di <strong>Lumina Town</strong> dan hidupkan lentera kota!
             </p>
           </div>
@@ -179,14 +184,19 @@ export default function AdventurePage() {
               <KiboAvatar
                 size={160}
                 variant={
-                  isMemoryStationRestored || isSproutGardenRestored || isGateValleyRestored || isLuminaTownRestored
+                  isKiboCoreRestored || isMemoryStationRestored || isSproutGardenRestored || isGateValleyRestored || isLuminaTownRestored
                     ? "celebrate"
                     : isAnyCompleted
                     ? "happy"
                     : "idle"
                 }
-                showGlow={true}
+                showGlow={false}
                 isCircle={true}
+                style={{
+                  backgroundColor: "#FFFFFF",
+                  border: "2px solid var(--color-sky-blue, #BFE8FF)",
+                  boxShadow: "var(--shadow-md)",
+                }}
               />
               <div
                 style={{
@@ -194,15 +204,17 @@ export default function AdventurePage() {
                   zIndex: 2,
                   padding: "6px 16px",
                   borderRadius: "9999px",
-                  backgroundColor: "rgba(7, 10, 20, 0.9)",
-                  border: "1px solid var(--cyan-core)",
+                  backgroundColor: "#FFFFFF",
+                  border: "1.5px solid var(--color-sky-blue, #BFE8FF)",
                   fontSize: "0.85rem",
-                  fontWeight: 700,
-                  color: "#ffffff",
-                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.4)",
+                  fontWeight: 800,
+                  color: "var(--color-deep-slate, #24344D)",
+                  boxShadow: "var(--shadow-sm)",
                 }}
               >
-                {isMemoryStationRestored
+                {isKiboCoreRestored
+                  ? "Kibo: Kibo World Pulih Sepenuhnya! 🔮✨🌟"
+                  : isMemoryStationRestored
                   ? "Kibo: Memory Station Pulih Sepenuhnya! 💾"
                   : isSproutGardenRestored
                   ? "Kibo: Sprout Garden Pulih Sepenuhnya! 🌱"
@@ -221,10 +233,10 @@ export default function AdventurePage() {
         {/* Areas Path List */}
         <div>
           <div style={{ marginBottom: "24px" }}>
-            <h2 style={{ fontSize: "1.5rem", fontWeight: 800, marginBottom: "6px" }}>
+            <h2 style={{ fontSize: "1.5rem", fontWeight: 800, marginBottom: "6px", color: "var(--color-deep-slate, #24344D)" }}>
               Peta 5 Wilayah Kibo World
             </h2>
-            <p style={{ color: "var(--text-muted)", fontSize: "0.95rem" }}>
+            <p style={{ color: "var(--color-slate-muted, #526581)", fontSize: "0.95rem" }}>
               Selesaikan tantangan di setiap bab secara berurutan untuk membuka gerbang wilayah berikutnya.
             </p>
           </div>
@@ -238,7 +250,8 @@ export default function AdventurePage() {
                 ch.id === "lumina-town" ||
                 ch.id === "gate-valley" ||
                 ch.id === "sprout-garden" ||
-                ch.id === "memory-station";
+                ch.id === "memory-station" ||
+                ch.id === "kibo-core";
               const chapterIcons = ["💡", "⛩️", "🌱", "💾", "🔮"];
 
               return (
@@ -249,12 +262,11 @@ export default function AdventurePage() {
                     padding: "24px",
                     borderRadius: "20px",
                     border: isAreaUnlocked
-                      ? "1px solid rgba(0, 242, 254, 0.4)"
-                      : "1px solid rgba(255, 255, 255, 0.06)",
-                    backgroundColor: isAreaUnlocked
-                      ? "rgba(21, 29, 56, 0.75)"
-                      : "rgba(12, 17, 34, 0.45)",
-                    opacity: isAreaUnlocked ? 1 : 0.75,
+                      ? "1.5px solid var(--border-subtle, #DDE7F3)"
+                      : "1px dashed var(--border-subtle, #DDE7F3)",
+                    backgroundColor: isAreaUnlocked ? "#FFFFFF" : "#F8FAFC",
+                    boxShadow: isAreaUnlocked ? "var(--shadow-md)" : "none",
+                    opacity: isAreaUnlocked ? 1 : 0.85,
                     position: "relative",
                   }}
                 >
@@ -276,11 +288,11 @@ export default function AdventurePage() {
                           height: "56px",
                           borderRadius: "16px",
                           backgroundColor: isAreaUnlocked
-                            ? "rgba(121, 72, 247, 0.2)"
-                            : "rgba(255, 255, 255, 0.05)",
+                            ? "#EDF5FD"
+                            : "#F1F5F9",
                           border: isAreaUnlocked
-                            ? "1px solid rgba(121, 72, 247, 0.4)"
-                            : "1px solid rgba(255, 255, 255, 0.1)",
+                            ? "1.5px solid var(--color-sky-blue, #BFE8FF)"
+                            : "1px solid var(--border-subtle, #DDE7F3)",
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
@@ -296,8 +308,8 @@ export default function AdventurePage() {
                           <span
                             style={{
                               fontSize: "0.85rem",
-                              fontWeight: 700,
-                              color: "var(--text-dim)",
+                              fontWeight: 800,
+                              color: "var(--color-slate-dim, #7C8BA1)",
                               letterSpacing: "0.05em",
                             }}
                           >
@@ -327,7 +339,7 @@ export default function AdventurePage() {
                           style={{
                             fontSize: "1.35rem",
                             fontWeight: 800,
-                            color: isAreaUnlocked ? "#ffffff" : "var(--text-muted)",
+                            color: isAreaUnlocked ? "var(--color-deep-slate, #24344D)" : "var(--color-slate-muted, #526581)",
                             marginTop: "2px",
                           }}
                         >
@@ -340,10 +352,11 @@ export default function AdventurePage() {
                       style={{
                         padding: "6px 14px",
                         borderRadius: "10px",
-                        backgroundColor: "rgba(255, 255, 255, 0.05)",
+                        backgroundColor: "#EDF5FD",
+                        border: "1px solid var(--color-sky-blue, #BFE8FF)",
                         fontSize: "0.85rem",
-                        fontWeight: 600,
-                        color: isAreaUnlocked ? "var(--cyan-core)" : "var(--text-dim)",
+                        fontWeight: 700,
+                        color: isAreaUnlocked ? "var(--color-sky-blue-deep, #0284C7)" : "var(--color-slate-dim, #7C8BA1)",
                       }}
                     >
                       Konsep: {ch.conceptLabel}
@@ -352,7 +365,7 @@ export default function AdventurePage() {
 
                   <p
                     style={{
-                      color: isAreaUnlocked ? "var(--text-muted)" : "var(--text-dim)",
+                      color: isAreaUnlocked ? "var(--color-slate-muted, #526581)" : "var(--color-slate-dim, #7C8BA1)",
                       fontSize: "0.95rem",
                       lineHeight: 1.6,
                       marginBottom: "20px",
@@ -378,21 +391,20 @@ export default function AdventurePage() {
                             <div
                               key={chal.id}
                               style={{
-                                backgroundColor: isUnlocked
-                                  ? "rgba(10, 15, 29, 0.85)"
-                                  : "rgba(10, 15, 29, 0.5)",
+                                backgroundColor: isUnlocked ? "#FFFFFF" : "#F8FAFC",
                                 border: isCompleted
-                                  ? "1.5px solid rgba(16, 185, 129, 0.4)"
+                                  ? "1.5px solid #86EFAC"
                                   : isUnlocked
-                                  ? "1.5px solid rgba(0, 242, 254, 0.35)"
-                                  : "1px dashed rgba(255, 255, 255, 0.15)",
+                                  ? "1.5px solid var(--color-sky-blue, #BFE8FF)"
+                                  : "1px dashed var(--border-subtle, #DDE7F3)",
                                 borderRadius: "16px",
                                 padding: "20px",
                                 display: "flex",
                                 flexDirection: "column",
                                 gap: "14px",
-                                opacity: isUnlocked ? 1 : 0.75,
-                                transition: "all 200ms ease",
+                                opacity: isUnlocked ? 1 : 0.8,
+                                boxShadow: isUnlocked ? "var(--shadow-sm)" : "none",
+                                transition: "all 180ms ease",
                               }}
                             >
                               <div
@@ -432,11 +444,15 @@ export default function AdventurePage() {
                                       ? "💾"
                                       : chal.id === "ch-13"
                                       ? "🔋"
+                                      : chal.id === "ch-14"
+                                      ? "🏛️"
+                                      : chal.id === "ch-15"
+                                      ? "🔮"
                                       : "🔒"}
                                   </span>
                                   <div>
                                     <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
-                                      <span style={{ fontWeight: 800, color: "#ffffff", fontSize: "1.05rem" }}>
+                                      <span style={{ fontWeight: 800, color: "var(--color-deep-slate, #24344D)", fontSize: "1.05rem" }}>
                                         Misi 0{chal.order}: {chal.title}
                                       </span>
                                       {isCompleted && (
@@ -458,7 +474,8 @@ export default function AdventurePage() {
                                     <div
                                       style={{
                                         fontSize: "0.85rem",
-                                        color: isUnlocked ? "var(--cyan-core)" : "var(--text-dim)",
+                                        color: isUnlocked ? "var(--color-sky-blue-deep, #0284C7)" : "var(--color-slate-dim, #7C8BA1)",
+                                        fontWeight: 600,
                                         marginTop: "2px",
                                       }}
                                     >
@@ -476,15 +493,15 @@ export default function AdventurePage() {
                                     padding: "6px 12px",
                                     borderRadius: "10px",
                                     backgroundColor: isCompleted
-                                      ? "rgba(245, 158, 11, 0.2)"
+                                      ? "#FFF9E6"
                                       : isUnlocked
-                                      ? "rgba(0, 242, 254, 0.1)"
-                                      : "rgba(255, 255, 255, 0.04)",
+                                      ? "#EDF8FF"
+                                      : "#F1F5F9",
                                     border: isCompleted
-                                      ? "1px solid rgba(245, 158, 11, 0.4)"
+                                      ? "1px solid #FFE49A"
                                       : isUnlocked
-                                      ? "1px solid rgba(0, 242, 254, 0.25)"
-                                      : "1px solid rgba(255, 255, 255, 0.08)",
+                                      ? "1px solid #BFE8FF"
+                                      : "1px solid var(--border-subtle, #DDE7F3)",
                                   }}
                                 >
                                   <span style={{ fontSize: "1rem" }}>
@@ -493,12 +510,12 @@ export default function AdventurePage() {
                                   <span
                                     style={{
                                       fontSize: "0.85rem",
-                                      fontWeight: 700,
+                                      fontWeight: 800,
                                       color: isCompleted
-                                        ? "var(--warm-yellow)"
+                                        ? "var(--color-warm-yellow-deep, #D97706)"
                                         : isUnlocked
-                                        ? "var(--cyan-core)"
-                                        : "var(--text-dim)",
+                                        ? "var(--color-sky-blue-deep, #0284C7)"
+                                        : "var(--color-slate-dim, #7C8BA1)",
                                     }}
                                   >
                                     {isCompleted
@@ -510,7 +527,7 @@ export default function AdventurePage() {
                                 </div>
                               </div>
 
-                              <p style={{ fontSize: "0.9rem", color: "var(--text-muted)", lineHeight: 1.5 }}>
+                              <p style={{ fontSize: "0.9rem", color: "var(--color-slate-muted, #526581)", lineHeight: 1.5 }}>
                                 {chal.story}
                               </p>
 
@@ -522,10 +539,10 @@ export default function AdventurePage() {
                                   flexWrap: "wrap",
                                   gap: "12px",
                                   paddingTop: "12px",
-                                  borderTop: "1px solid rgba(255, 255, 255, 0.08)",
+                                  borderTop: "1px solid var(--border-subtle, #DDE7F3)",
                                 }}
                               >
-                                <div style={{ fontSize: "0.85rem", color: "var(--text-dim)" }}>
+                                <div style={{ fontSize: "0.85rem", color: "var(--color-slate-dim, #7C8BA1)", fontWeight: 600 }}>
                                   {!isUnlocked && prereq ? (
                                     <span>
                                       🔒 Selesaikan <strong>{prereq.title.split("(")[0].trim()}</strong> terlebih dahulu
@@ -545,7 +562,6 @@ export default function AdventurePage() {
                                         borderRadius: "12px",
                                         fontWeight: 800,
                                         padding: "8px 20px",
-                                        boxShadow: isCompleted ? undefined : "0 4px 16px rgba(0, 242, 254, 0.3)",
                                       }}
                                     >
                                       {isCompleted ? "Main Lagi ↺" : "Mainkan Misi ▶"}
@@ -579,15 +595,15 @@ export default function AdventurePage() {
                       style={{
                         padding: "14px 18px",
                         borderRadius: "12px",
-                        backgroundColor: "rgba(255, 255, 255, 0.03)",
-                        border: "1px dashed rgba(255, 255, 255, 0.12)",
+                        backgroundColor: "#F1F5F9",
+                        border: "1px dashed var(--border-subtle, #DDE7F3)",
                         display: "flex",
                         alignItems: "center",
                         gap: "12px",
                       }}
                     >
                       <span style={{ fontSize: "1.2rem" }}>🔒</span>
-                      <span style={{ fontSize: "0.875rem", color: "var(--text-dim)" }}>
+                      <span style={{ fontSize: "0.875rem", color: "var(--color-slate-dim, #7C8BA1)" }}>
                         Wilayah ini terkunci. Selesaikan tantangan di wilayah sebelumnya untuk membuka gerbang bab ini.
                       </span>
                     </div>

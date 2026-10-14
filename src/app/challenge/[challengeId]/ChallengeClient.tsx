@@ -13,6 +13,7 @@ import { EnergyBridge } from "@/components/gameplay/EnergyBridge";
 import { GardenPlant } from "@/components/gameplay/GardenPlant";
 import { DigitalPlatform } from "@/components/gameplay/DigitalPlatform";
 import { MemoryStationVault } from "@/components/gameplay/MemoryStationVault";
+import { KiboCoreChamber } from "@/components/gameplay/KiboCoreChamber";
 import {
   CHALLENGES,
   BlockType,
@@ -26,6 +27,7 @@ import {
   usePlayerProgress,
   isChallengeUnlocked,
   getPrerequisiteChallenge,
+  isAllChallengesCompleted,
 } from "@/features/progress/storage";
 
 let blockSequenceId = 0;
@@ -56,7 +58,9 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
   const [activeStepIndex, setActiveStepIndex] = useState<number | null>(null);
 
   const initialFeedbackMessage =
-    challenge.chapterId === "memory-station"
+    challenge.chapterId === "kibo-core"
+      ? "Siapkan Kode Pemulihan 5 di Kotak Memori, buka Gerbang Keamanan, percepat langkah melintasi koridor data, dan salurkan energi ke Altar Inti Kibo!"
+      : challenge.chapterId === "memory-station"
       ? "Simpan nilai data ke dalam Kotak Memori Kibo, lalu gunakan nilainya pada terminal, reaktor, atau kubah."
       : challenge.chapterId === "sprout-garden"
       ? "Coba susun langkahnya untuk menyiram tanaman dan merawat kebun."
@@ -275,6 +279,8 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
       ? CHALLENGES["ch-09"]
       : challenge.id === "ch-11"
       ? CHALLENGES["ch-12"]
+      : challenge.id === "ch-14"
+      ? CHALLENGES["ch-15"]
       : undefined);
 
   if (!isUnlocked) {
@@ -314,14 +320,14 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
             style={{
               padding: "clamp(32px, 5vw, 48px)",
               borderRadius: "24px",
-              border: "1.5px solid rgba(245, 158, 11, 0.4)",
-              backgroundColor: "rgba(10, 15, 29, 0.95)",
+              border: "1.5px solid #FFE49A",
+              backgroundColor: "#FFFFFF",
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
               textAlign: "center",
               gap: "24px",
-              boxShadow: "0 16px 40px rgba(0, 0, 0, 0.6), 0 0 30px rgba(245, 158, 11, 0.15)",
+              boxShadow: "0 12px 32px rgba(36, 52, 77, 0.08)",
               maxWidth: "600px",
               margin: "32px auto 0 auto",
             }}
@@ -332,10 +338,10 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
               <Badge variant="yellow" size="md">
                 🔒 Misi Masih Terkunci
               </Badge>
-              <h1 style={{ fontSize: "clamp(1.5rem, 3.5vw, 2rem)", fontWeight: 800, color: "#ffffff" }}>
+              <h1 style={{ fontSize: "clamp(1.5rem, 3.5vw, 2rem)", fontWeight: 800, color: "#24344D" }}>
                 {challenge.title}
               </h1>
-              <p style={{ color: "var(--text-muted)", fontSize: "1rem", lineHeight: 1.6, maxWidth: "500px" }}>
+              <p style={{ color: "#526581", fontSize: "1rem", lineHeight: 1.6, maxWidth: "500px" }}>
                 Wah, Kibo belum bisa membuka gerbang misi ini! Kamu perlu menyelesaikan misi sebelumnya terlebih dahulu agar Kibo mengumpulkan energi yang cukup.
               </p>
             </div>
@@ -346,8 +352,8 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                   width: "100%",
                   padding: "16px 20px",
                   borderRadius: "16px",
-                  backgroundColor: "rgba(255, 255, 255, 0.04)",
-                  border: "1px solid rgba(255, 255, 255, 0.1)",
+                  backgroundColor: "#F8FAFC",
+                  border: "1px solid #E2E8F0",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "space-between",
@@ -356,15 +362,15 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                 }}
               >
                 <div style={{ textAlign: "left" }}>
-                  <div style={{ fontSize: "0.8rem", color: "var(--text-dim)", fontWeight: 700 }}>
+                  <div style={{ fontSize: "0.8rem", color: "#64748B", fontWeight: 700 }}>
                     PRASYARAT MISI:
                   </div>
-                  <div style={{ fontWeight: 800, color: "#ffffff", fontSize: "1rem" }}>
+                  <div style={{ fontWeight: 800, color: "#24344D", fontSize: "1rem" }}>
                     {prereqChallenge.title}
                   </div>
                 </div>
                 <Link href={`/challenge/${prereqChallenge.id}`}>
-                  <Button variant="cyan" size="sm" style={{ borderRadius: "10px", fontWeight: 700 }}>
+                  <Button variant="primary" size="sm" style={{ borderRadius: "10px", fontWeight: 700 }}>
                     Mainkan Misi Prasyarat ▶
                   </Button>
                 </Link>
@@ -402,14 +408,14 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
           style={{
             padding: "16px 24px",
             borderRadius: "20px",
-            border: "1.5px solid rgba(121, 72, 247, 0.4)",
-            backgroundColor: "rgba(10, 15, 29, 0.95)",
+            border: "1.5px solid #DDE7F3",
+            backgroundColor: "#FFFFFF",
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
             flexWrap: "wrap",
             gap: "16px",
-            boxShadow: "0 8px 24px rgba(0, 0, 0, 0.4)",
+            boxShadow: "0 6px 20px rgba(36, 52, 77, 0.05)",
           }}
         >
           {/* Kolom Kiri: Ikon Bohlam + Judul & Target */}
@@ -432,14 +438,7 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                 alignItems: "center",
                 justifyContent: "center",
                 fontSize: "1.6rem",
-                boxShadow:
-                  challenge.chapterId === "memory-station"
-                    ? "0 0 20px rgba(139, 92, 246, 0.6)"
-                    : challenge.chapterId === "sprout-garden"
-                    ? "0 0 20px rgba(16, 185, 129, 0.6)"
-                    : challenge.chapterId === "gate-valley"
-                    ? "0 0 20px rgba(249, 115, 22, 0.6)"
-                    : "0 0 20px rgba(245, 158, 11, 0.6)",
+                boxShadow: "0 4px 12px rgba(36, 52, 77, 0.12)",
                 flexShrink: 0,
               }}
             >
@@ -457,13 +456,13 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                 style={{
                   fontSize: "clamp(1.2rem, 2.5vw, 1.55rem)",
                   fontWeight: 800,
-                  color: "#ffffff",
+                  color: "var(--color-deep-slate, #24344D)",
                   marginBottom: "2px",
                 }}
               >
                 {challenge.title}
               </h1>
-              <p style={{ color: "#c4b5fd", fontSize: "0.925rem", fontWeight: 500 }}>
+              <p style={{ color: "var(--color-slate-muted, #526581)", fontSize: "0.925rem", fontWeight: 600 }}>
                 {challenge.goal}
               </p>
             </div>
@@ -477,13 +476,14 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                 display: "inline-flex",
                 alignItems: "center",
                 gap: "6px",
-                color: "var(--cyan-core)",
+                color: "var(--color-deep-slate, #24344D)",
                 fontSize: "0.85rem",
                 fontWeight: 700,
                 padding: "8px 14px",
                 borderRadius: "12px",
-                backgroundColor: "rgba(0, 242, 254, 0.1)",
-                border: "1px solid rgba(0, 242, 254, 0.25)",
+                backgroundColor: "#FFFFFF",
+                border: "1px solid var(--border-subtle, #DDE7F3)",
+                boxShadow: "var(--shadow-sm)",
                 transition: "all 150ms ease",
               }}
             >
@@ -498,13 +498,13 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
 
             {/* Kibo Avatar Miniatur */}
             <div style={{ display: "flex", alignItems: "center" }}>
-              <KiboAvatar size={42} variant="hero" showGlow={true} isCircle={true} />
+              <KiboAvatar size={42} variant="hero" showGlow={false} isCircle={true} style={{ border: "1.5px solid var(--color-sky-blue, #BFE8FF)", backgroundColor: "#FFFFFF" }} />
             </div>
           </div>
         </div>
 
         {/* =====================================================================
-            2. IMMERSIVE GAME ARENA: LUMINA TOWN 2D LANDSCAPE
+            2. IMMERSIVE GAME ARENA: LUMINA TOWN 2D LANDSCAPE (Friendly Future)
             ===================================================================== */}
         <div
           className="glass-card"
@@ -513,16 +513,18 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
             width: "100%",
             borderRadius: "24px",
             overflow: "hidden",
-            border: "1.5px solid rgba(0, 242, 254, 0.4)",
-            boxShadow: "0 16px 40px rgba(0, 0, 0, 0.6), 0 0 30px rgba(0, 242, 254, 0.2)",
+            border: "1.5px solid var(--border-subtle, #DDE7F3)",
+            boxShadow: "var(--shadow-md)",
             minHeight: "380px",
             display: "flex",
             flexDirection: "column",
             justifyContent: "flex-end",
             backgroundImage:
-              challenge.chapterId === "memory-station"
-                ? "radial-gradient(circle at 50% 25%, rgba(124, 58, 237, 0.35) 0%, rgba(15, 23, 42, 0.9) 75%), url('/assets/environment/lumina-town-bg.jpg')"
-                : "url('/assets/environment/lumina-town-bg.jpg')",
+              challenge.chapterId === "kibo-core"
+                ? "radial-gradient(circle at 50% 25%, rgba(217, 204, 255, 0.45) 0%, rgba(191, 232, 255, 0.35) 45%, rgba(244, 249, 255, 0.88) 80%), url('/assets/environment/lumina-town-bg.jpg')"
+                : challenge.chapterId === "memory-station"
+                ? "radial-gradient(circle at 50% 25%, rgba(191, 232, 255, 0.45) 0%, rgba(244, 249, 255, 0.85) 75%), url('/assets/environment/lumina-town-bg.jpg')"
+                : "radial-gradient(circle at 50% 25%, rgba(255, 255, 255, 0.3) 0%, rgba(244, 249, 255, 0.78) 75%), url('/assets/environment/lumina-town-bg.jpg')",
             backgroundSize: "cover",
             backgroundPosition: "center 68%",
           }}
@@ -558,45 +560,88 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
           >
             {/* Banner Papan Nama Arena */}
             <div
-              aria-hidden="true"
               style={{
-                pointerEvents: "auto",
-                padding: "6px 14px",
-                borderRadius: "10px",
-                backgroundColor: "rgba(15, 23, 42, 0.8)",
-                border: "1px solid rgba(255, 255, 255, 0.15)",
-                backdropFilter: "blur(6px)",
-                color: "#f8fafc",
-                fontSize: "0.825rem",
-                fontWeight: 700,
                 display: "flex",
-                alignItems: "center",
+                flexDirection: "column",
                 gap: "6px",
+                pointerEvents: "auto",
               }}
             >
-              <span>
-                {challenge.chapterId === "memory-station"
-                  ? "💾"
-                  : challenge.chapterId === "gate-valley"
-                  ? "⛩️"
-                  : challenge.chapterId === "sprout-garden"
-                  ? "🌱"
-                  : "🏮"}
-              </span>
-              <span>
-                {challenge.chapterId === "memory-station"
-                  ? "Memory Station"
-                  : challenge.chapterId === "gate-valley"
-                  ? "Gate Valley"
-                  : challenge.chapterId === "sprout-garden"
-                  ? "Sprout Garden"
-                  : "Lumina Town"}{" "}
-                — Misi 0{challenge.order}: {challenge.title.split("(")[0].trim()}
-              </span>
+              <div
+                aria-hidden="true"
+                style={{
+                  padding: "6px 14px",
+                  borderRadius: "10px",
+                  backgroundColor: "#FFFFFF",
+                  border: "1px solid var(--border-subtle, #DDE7F3)",
+                  boxShadow: "var(--shadow-sm)",
+                  color: "var(--color-deep-slate, #24344D)",
+                  fontSize: "0.825rem",
+                  fontWeight: 700,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  width: "fit-content",
+                }}
+              >
+                <span>
+                  {challenge.chapterId === "kibo-core"
+                    ? "🔮"
+                    : challenge.chapterId === "memory-station"
+                    ? "💾"
+                    : challenge.chapterId === "gate-valley"
+                    ? "⛩️"
+                    : challenge.chapterId === "sprout-garden"
+                    ? "🌱"
+                    : "🏮"}
+                </span>
+                <span>
+                  {challenge.chapterId === "kibo-core"
+                    ? "Kibo Core"
+                    : challenge.chapterId === "memory-station"
+                    ? "Memory Station"
+                    : challenge.chapterId === "gate-valley"
+                    ? "Gate Valley"
+                    : challenge.chapterId === "sprout-garden"
+                    ? "Sprout Garden"
+                    : "Lumina Town"}{" "}
+                  — Misi 0{challenge.order}: {challenge.title.split("(")[0].trim()}
+                </span>
+              </div>
+
+              {/* Nexus 4-Wilayah Convergence Indicator khusus Kibo Core */}
+              {challenge.chapterId === "kibo-core" && (
+                <div
+                  aria-hidden="true"
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    padding: "4px 12px",
+                    borderRadius: "10px",
+                    backgroundColor: "#FFFFFF",
+                    border: "1.5px solid var(--color-soft-purple, #D9CCFF)",
+                    boxShadow: "var(--shadow-sm)",
+                    fontSize: "0.72rem",
+                    fontWeight: 700,
+                    color: "var(--color-slate-muted, #526581)",
+                    width: "fit-content",
+                  }}
+                >
+                  <span style={{ color: "var(--color-sky-blue-deep, #0284C7)", fontWeight: 800 }}>Pusat Kendali:</span>
+                  <span title="Lumina Town: Lentera Penuntun">💡 Lumina</span>
+                  <span style={{ opacity: 0.35 }}>•</span>
+                  <span title="Gate Valley: Gerbang Keamanan">⛩️ Valley</span>
+                  <span style={{ opacity: 0.35 }}>•</span>
+                  <span title="Sprout Garden: Koridor Pengulangan">🌱 Garden</span>
+                  <span style={{ opacity: 0.35 }}>•</span>
+                  <span title="Memory Station: Kotak Memori Kode 5">💾 Memory</span>
+                </div>
+              )}
             </div>
 
-            {/* HUD Kotak Memori Kibo (Tampil jika chapter memory-station) */}
-            {challenge.chapterId === "memory-station" && (
+            {/* HUD Kotak Memori Kibo (Tampil jika chapter memory-station atau kibo-core) */}
+            {(challenge.chapterId === "memory-station" || challenge.chapterId === "kibo-core") && (
               <div
                 id="hud-kibo-memory-box"
                 style={{
@@ -606,16 +651,15 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                   gap: "10px",
                   padding: "6px 14px",
                   borderRadius: "14px",
-                  backgroundColor: "rgba(10, 15, 29, 0.92)",
+                  backgroundColor: "#FFFFFF",
                   border:
                     currentMemoryValue !== null
-                      ? "1.5px solid #00f2fe"
-                      : "1.5px dashed rgba(168, 85, 247, 0.45)",
-                  backdropFilter: "blur(8px)",
+                      ? "1.5px solid var(--color-sky-blue-deep, #0284C7)"
+                      : "1.5px dashed var(--color-soft-purple, #D9CCFF)",
                   boxShadow:
                     currentMemoryValue !== null
-                      ? "0 0 20px rgba(0, 242, 254, 0.4), 0 4px 12px rgba(0, 0, 0, 0.5)"
-                      : "0 4px 12px rgba(0, 0, 0, 0.3)",
+                      ? "0 2px 10px rgba(2, 132, 199, 0.2)"
+                      : "var(--shadow-sm)",
                   transition: "all 300ms ease",
                 }}
               >
@@ -631,7 +675,7 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                       fontSize: "0.68rem",
                       fontWeight: 800,
                       letterSpacing: "0.05em",
-                      color: "#c4b5fd",
+                      color: "var(--color-soft-purple-deep, #6366F1)",
                       display: "flex",
                       alignItems: "center",
                       gap: "4px",
@@ -644,7 +688,7 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                     style={{
                       fontSize: "0.74rem",
                       fontWeight: 700,
-                      color: currentMemoryValue !== null ? "#38bdf8" : "#94a3b8",
+                      color: currentMemoryValue !== null ? "var(--color-sky-blue-deep, #0284C7)" : "var(--color-slate-dim, #7C8BA1)",
                     }}
                   >
                     {currentMemoryValue !== null ? "Tersimpan" : "Kosong"}
@@ -663,17 +707,17 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                     justifyContent: "center",
                     background:
                       currentMemoryValue !== null
-                        ? "linear-gradient(135deg, #0284c7 0%, #7c3aed 100%)"
-                        : "rgba(30, 41, 59, 0.75)",
+                        ? "#EDF8FF"
+                        : "#F8FAFC",
                     border:
                       currentMemoryValue !== null
-                        ? "2px solid #38bdf8"
-                        : "1.5px dashed rgba(148, 163, 184, 0.4)",
+                        ? "2px solid var(--color-sky-blue-deep, #0284C7)"
+                        : "1.5px dashed var(--border-subtle, #DDE7F3)",
                     boxShadow:
                       currentMemoryValue !== null
-                        ? "0 0 14px rgba(0, 242, 254, 0.6)"
+                        ? "0 2px 8px rgba(2, 132, 199, 0.15)"
                         : "none",
-                    color: currentMemoryValue !== null ? "#ffffff" : "#64748b",
+                    color: currentMemoryValue !== null ? "var(--color-sky-blue-deep, #0284C7)" : "var(--color-slate-dim, #7C8BA1)",
                     fontSize: currentMemoryValue !== null ? "1.35rem" : "0.95rem",
                     fontWeight: 900,
                     fontFamily: "monospace",
@@ -699,7 +743,7 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
               zIndex: 3,
             }}
           >
-            {/* Glowing Neon Connecting Beam (Jalur Laser Biru antara Platform) */}
+            {/* Connecting Beam Antara Platform (Friendly Future Tech Trail) */}
             <div
               aria-hidden="true"
               style={{
@@ -709,8 +753,10 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                 right: `${(0.5 / challenge.gridTiles) * 100}%`,
                 height: "4px",
                 background:
-                  "linear-gradient(90deg, #00f2fe 0%, #38bdf8 50%, #00f2fe 100%)",
-                boxShadow: "0 0 16px var(--cyan-core), 0 0 24px var(--cyan-core)",
+                  challenge.chapterId === "kibo-core"
+                    ? "linear-gradient(90deg, #FDE047 0%, #F59E0B 22%, #10B981 50%, #38BDF8 78%, #A855F7 100%)"
+                    : "linear-gradient(90deg, #BFE8FF 0%, #38BDF8 50%, #BFE8FF 100%)",
+                boxShadow: "0 2px 8px rgba(2, 132, 199, 0.25)",
                 borderRadius: "2px",
                 zIndex: 1,
               }}
@@ -726,10 +772,9 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                       left: `${chevronLeft}%`,
                       top: "50%",
                       transform: "translate(-50%, -50%)",
-                      color: "var(--cyan-core)",
+                      color: "var(--color-sky-blue-deep, #0284C7)",
                       fontSize: "14px",
                       fontWeight: 900,
-                      textShadow: "0 0 8px var(--cyan-core)",
                     }}
                   >
                     ››
@@ -759,30 +804,30 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                 }}
               >
                 {/* Floating Pocket Memory Badge di atas Kibo */}
-                {challenge.chapterId === "memory-station" && (
+                {(challenge.chapterId === "memory-station" || challenge.chapterId === "kibo-core") && (
                   <div
                     style={{
                       marginBottom: "4px",
-                      padding: "2px 8px",
+                      padding: "2px 10px",
                       borderRadius: "9999px",
                       backgroundColor:
                         currentMemoryValue !== null
-                          ? "rgba(14, 165, 233, 0.95)"
-                          : "rgba(30, 41, 59, 0.85)",
+                          ? "#EDF8FF"
+                          : "#FFFFFF",
                       border:
                         currentMemoryValue !== null
-                          ? "1px solid #38bdf8"
-                          : "1px dashed rgba(148, 163, 184, 0.5)",
-                      color: "#ffffff",
-                      fontSize: "0.68rem",
+                          ? "1.5px solid var(--color-sky-blue-deep, #0284C7)"
+                          : "1px dashed var(--border-subtle, #DDE7F3)",
+                      color:
+                        currentMemoryValue !== null
+                          ? "var(--color-sky-blue-deep, #0284C7)"
+                          : "var(--color-slate-dim, #7C8BA1)",
+                      fontSize: "0.7rem",
                       fontWeight: 800,
                       display: "flex",
                       alignItems: "center",
                       gap: "4px",
-                      boxShadow:
-                        currentMemoryValue !== null
-                          ? "0 0 10px rgba(56, 189, 248, 0.7)"
-                          : "0 2px 4px rgba(0, 0, 0, 0.4)",
+                      boxShadow: "var(--shadow-sm)",
                       transition: "all 250ms ease",
                     }}
                   >
@@ -822,21 +867,29 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                   : false;
                 const isCurrentKibo = kiboPos === idx;
 
+                const isCompact = challenge.gridTiles >= 6;
                 let label = `PETAK ${idx + 1}`;
                 if (isStart) {
-                  label = "TITIK AWAL";
+                  label = challenge.chapterId === "kibo-core" ? "AWAL" : "TITIK AWAL";
                 } else if (isTarget) {
                   const defaultTargetLabel =
-                    challenge.chapterId === "memory-station"
+                    challenge.chapterId === "kibo-core"
+                      ? "ALTAR INTI"
+                      : challenge.chapterId === "memory-station"
                       ? "STASIUN MEMORI"
                       : challenge.chapterId === "sprout-garden"
                       ? "KEBUN DIGITAL"
                       : challenge.chapterId === "gate-valley"
                       ? "RINTANGAN LEMBAH"
                       : "TIANG LAMPU";
-                  label = targetAtTile?.label || defaultTargetLabel;
+
+                  if (challenge.chapterId === "kibo-core") {
+                    label = targetAtTile?.id === "core-gate" ? "GERBANG" : "ALTAR INTI";
+                  } else {
+                    label = targetAtTile?.label || defaultTargetLabel;
+                  }
                 } else {
-                  label = "JALUR DIGITAL";
+                  label = challenge.chapterId === "kibo-core" ? `PETAK ${idx + 1}` : "JALUR DIGITAL";
                 }
 
                 return (
@@ -854,7 +907,26 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                       label={label}
                       isActive={isCurrentKibo || isTargetActive}
                       hasChevron={!isStart && !isTarget}
+                      isCompact={isCompact}
                     >
+                      {/* Lentera Penuntun Lumina Town di Titik Awal Kibo Core */}
+                      {isStart && challenge.chapterId === "kibo-core" && (
+                        <div
+                          title="Lentera Penuntun Lumina Town (Cahaya Awal Petualangan)"
+                          style={{
+                            position: "relative",
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "flex-end",
+                            height: "100%",
+                            opacity: 0.9,
+                            transform: "scale(0.72) translateY(6px)",
+                            transformOrigin: "bottom center",
+                          }}
+                        >
+                          <StreetLamp isOn={true} />
+                        </div>
+                      )}
                       {isTarget && (
                         <>
                           {targetAtTile?.type === "lamp" && (
@@ -893,6 +965,15 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                               isKiboHere={isCurrentKibo}
                             />
                           )}
+                          {targetAtTile?.type === "core" && (
+                            <KiboCoreChamber
+                              isActive={isTargetActive}
+                              requiredValue={targetAtTile.requiredValue}
+                              currentMemoryValue={currentMemoryValue}
+                              label={targetAtTile.label}
+                              isKiboHere={isCurrentKibo}
+                            />
+                          )}
                         </>
                       )}
                     </DigitalPlatform>
@@ -922,12 +1003,12 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
             style={{
               padding: "24px",
               borderRadius: "24px",
-              border: "1.5px solid rgba(121, 72, 247, 0.35)",
-              backgroundColor: "rgba(10, 15, 29, 0.95)",
+              border: "1.5px solid var(--border-subtle, #DDE7F3)",
+              backgroundColor: "#FFFFFF",
               display: "flex",
               flexDirection: "column",
               gap: "20px",
-              boxShadow: "0 12px 32px rgba(0, 0, 0, 0.4)",
+              boxShadow: "var(--shadow-md)",
             }}
           >
             {/* Header: Susun Kode */}
@@ -937,21 +1018,22 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                   width: "40px",
                   height: "40px",
                   borderRadius: "12px",
-                  background: "linear-gradient(135deg, #7948f7 0%, #00f2fe 100%)",
+                  background: "linear-gradient(135deg, #0284C7 0%, #6366F1 100%)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   fontSize: "1.2rem",
-                  boxShadow: "0 4px 12px rgba(121, 72, 247, 0.4)",
+                  boxShadow: "0 2px 8px rgba(2, 132, 199, 0.2)",
+                  color: "#FFFFFF",
                 }}
               >
                 📋
               </div>
               <div>
-                <h2 style={{ fontSize: "1.25rem", fontWeight: 800, color: "#ffffff", marginBottom: "2px" }}>
+                <h2 style={{ fontSize: "1.25rem", fontWeight: 800, color: "var(--color-deep-slate, #24344D)", marginBottom: "2px" }}>
                   Susun Kode
                 </h2>
-                <p style={{ fontSize: "0.85rem", color: "var(--text-muted)" }}>
+                <p style={{ fontSize: "0.85rem", color: "var(--color-slate-muted, #526581)" }}>
                   Pilih dan atur blok perintah sesuai urutan.
                 </p>
               </div>
@@ -973,8 +1055,8 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                     style={{
                       padding: "28px 16px",
                       borderRadius: "16px",
-                      border: "2px dashed rgba(255, 255, 255, 0.12)",
-                      backgroundColor: "rgba(255, 255, 255, 0.02)",
+                      border: "2px dashed var(--border-subtle, #DDE7F3)",
+                      backgroundColor: "#F8FAFC",
                       textAlign: "center",
                       display: "flex",
                       flexDirection: "column",
@@ -983,10 +1065,10 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                     }}
                   >
                     <span style={{ fontSize: "1.6rem" }}>🧩</span>
-                    <span style={{ fontSize: "0.9rem", fontWeight: 600, color: "var(--text-muted)" }}>
+                    <span style={{ fontSize: "0.9rem", fontWeight: 700, color: "var(--color-slate-muted, #526581)" }}>
                       Belum ada perintah
                     </span>
-                    <span style={{ fontSize: "0.78rem", color: "var(--text-dim)" }}>
+                    <span style={{ fontSize: "0.78rem", color: "var(--color-slate-dim, #7C8BA1)" }}>
                       Pilih blok di samping untuk memasang langkah.
                     </span>
                   </div>
@@ -1023,7 +1105,7 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                           gap: "10px",
                           width: "100%",
                           paddingLeft: isInsideLoop ? "18px" : "0",
-                          borderLeft: isInsideLoop ? "3px solid #10b981" : "3px solid transparent",
+                          borderLeft: isInsideLoop ? "3px solid var(--color-mint-green-deep, #059669)" : "3px solid transparent",
                           transition: "all 150ms ease",
                         }}
                       >
@@ -1034,18 +1116,24 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                             height: "32px",
                             borderRadius: "50%",
                             backgroundColor: isCurrentStep
-                              ? "var(--cyan-core)"
+                              ? "var(--color-sky-blue, #BFE8FF)"
                               : isInsideLoop
-                              ? "rgba(16, 185, 129, 0.25)"
-                              : "rgba(255, 255, 255, 0.1)",
-                            color: isCurrentStep ? "#070a14" : isInsideLoop ? "#6ee7b7" : "#ffffff",
+                              ? "#EEFAF2"
+                              : "#F1F5F9",
+                            border: isCurrentStep
+                              ? "2px solid var(--color-sky-blue-deep, #0284C7)"
+                              : "1px solid var(--border-subtle, #DDE7F3)",
+                            color: isCurrentStep
+                              ? "var(--color-deep-slate, #24344D)"
+                              : isInsideLoop
+                              ? "var(--color-mint-green-deep, #059669)"
+                              : "var(--color-deep-slate, #24344D)",
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
                             fontWeight: 800,
                             fontSize: "0.875rem",
                             flexShrink: 0,
-                            boxShadow: isCurrentStep ? "0 0 12px var(--cyan-core)" : "none",
                             transition: "all 200ms ease",
                           }}
                         >
@@ -1072,34 +1160,18 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                               : isGate
                               ? "linear-gradient(135deg, #d97706 0%, #b45309 100%)"
                               : isSetValue
-                              ? "linear-gradient(135deg, #0284c7 0%, #0369a1 100%)"
-                              : isUseValue
-                              ? "linear-gradient(135deg, #7c3aed 0%, #c026d3 100%)"
-                              : isMove
                               ? "linear-gradient(135deg, #4f46e5 0%, #4338ca 100%)"
+                              : isUseValue
+                              ? "linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)"
+                              : isMove
+                              ? "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)"
                               : "linear-gradient(135deg, #9333ea 0%, #7e22ce 100%)",
                             border: isCurrentStep
-                              ? "2px solid #ffffff"
-                              : isRepeat
-                              ? "1px solid rgba(52, 211, 153, 0.5)"
-                              : isEndLoop
-                              ? "1px solid rgba(16, 185, 129, 0.4)"
-                              : isWater
-                              ? "1px solid rgba(6, 182, 212, 0.5)"
-                              : isBridge
-                              ? "1px solid rgba(56, 189, 248, 0.4)"
-                              : isGate
-                              ? "1px solid rgba(245, 158, 11, 0.4)"
-                              : isSetValue
-                              ? "1px solid rgba(56, 189, 248, 0.6)"
-                              : isUseValue
-                              ? "1px solid rgba(232, 121, 249, 0.6)"
-                              : isMove
-                              ? "1px solid rgba(129, 140, 248, 0.4)"
-                              : "1px solid rgba(192, 132, 252, 0.4)",
+                              ? "2px solid #FFFFFF"
+                              : "1px solid rgba(255, 255, 255, 0.2)",
                             boxShadow: isCurrentStep
-                              ? "0 0 18px var(--cyan-glow), inset 0 0 10px rgba(255, 255, 255, 0.3)"
-                              : "0 4px 12px rgba(0, 0, 0, 0.25)",
+                              ? "0 4px 14px rgba(2, 132, 199, 0.35)"
+                              : "0 2px 6px rgba(36, 52, 77, 0.08)",
                             transform: isCurrentStep ? "scale(1.02)" : "scale(1)",
                             transition: "all 200ms ease",
                           }}
@@ -1148,10 +1220,10 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                 {/* Dashed Box: Tambah Blok */}
                 <div
                   style={{
-                    border: "2px dashed rgba(255, 255, 255, 0.2)",
+                    border: "2px dashed var(--border-subtle, #DDE7F3)",
                     borderRadius: "18px",
                     padding: "16px",
-                    backgroundColor: "rgba(255, 255, 255, 0.03)",
+                    backgroundColor: "#F8FAFC",
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
@@ -1164,23 +1236,25 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                       width: "36px",
                       height: "36px",
                       borderRadius: "50%",
-                      backgroundColor: "rgba(255, 255, 255, 0.1)",
+                      backgroundColor: "#FFFFFF",
+                      border: "1px solid var(--border-subtle, #DDE7F3)",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
                       fontSize: "1.2rem",
-                      fontWeight: 700,
-                      color: "#ffffff",
+                      fontWeight: 800,
+                      color: "var(--color-deep-slate, #24344D)",
+                      boxShadow: "var(--shadow-sm)",
                     }}
                   >
                     +
                   </div>
 
                   <div>
-                    <div style={{ fontWeight: 800, color: "#ffffff", fontSize: "0.95rem" }}>
+                    <div style={{ fontWeight: 800, color: "var(--color-deep-slate, #24344D)", fontSize: "0.95rem" }}>
                       Tambah Blok
                     </div>
-                    <div style={{ fontSize: "0.78rem", color: "var(--text-muted)" }}>
+                    <div style={{ fontSize: "0.78rem", color: "var(--color-slate-dim, #7C8BA1)" }}>
                       Klik tombol untuk menambah perintah:
                     </div>
                   </div>
@@ -1225,31 +1299,15 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                               : isGate
                               ? "linear-gradient(135deg, #d97706 0%, #b45309 100%)"
                               : isSetValue
-                              ? "linear-gradient(135deg, #0284c7 0%, #0369a1 100%)"
-                              : isUseValue
-                              ? "linear-gradient(135deg, #7c3aed 0%, #c026d3 100%)"
-                              : isMove
                               ? "linear-gradient(135deg, #4f46e5 0%, #4338ca 100%)"
-                              : "linear-gradient(135deg, #9333ea 0%, #7e22ce 100%)",
-                            border: isRepeat
-                              ? "1px solid rgba(52, 211, 153, 0.5)"
-                              : isEndLoop
-                              ? "1px solid rgba(16, 185, 129, 0.4)"
-                              : isWater
-                              ? "1px solid rgba(6, 182, 212, 0.5)"
-                              : isBridge
-                              ? "1px solid rgba(56, 189, 248, 0.4)"
-                              : isGate
-                              ? "1px solid rgba(245, 158, 11, 0.4)"
-                              : isSetValue
-                              ? "1px solid rgba(56, 189, 248, 0.6)"
                               : isUseValue
-                              ? "1px solid rgba(232, 121, 249, 0.6)"
+                              ? "linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)"
                               : isMove
-                              ? "1px solid rgba(129, 140, 248, 0.4)"
-                              : "1px solid rgba(192, 132, 252, 0.4)",
+                              ? "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)"
+                              : "linear-gradient(135deg, #9333ea 0%, #7e22ce 100%)",
+                            border: "1px solid rgba(255, 255, 255, 0.2)",
                             color: "#ffffff",
-                            fontWeight: 700,
+                            fontWeight: 800,
                             fontSize: "0.875rem",
                             display: "flex",
                             alignItems: "center",
@@ -1261,6 +1319,7 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                                 : "pointer",
                             opacity:
                               isRunning || blocks.length >= challenge.maxBlocks ? 0.6 : 1,
+                            boxShadow: "0 2px 6px rgba(36, 52, 77, 0.08)",
                             transition: "transform 150ms ease, box-shadow 150ms ease",
                           }}
                         >
@@ -1285,7 +1344,6 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                       borderRadius: "14px",
                       fontWeight: 800,
                       fontSize: "0.95rem",
-                      boxShadow: "0 4px 16px rgba(0, 242, 254, 0.35)",
                       minHeight: "44px",
                     }}
                   >
@@ -1300,9 +1358,9 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                     style={{
                       padding: "10px 18px",
                       borderRadius: "14px",
-                      backgroundColor: "rgba(255, 255, 255, 0.08)",
-                      border: "1px solid rgba(255, 255, 255, 0.2)",
-                      color: "#ffffff",
+                      backgroundColor: "#FFFFFF",
+                      border: "1.5px solid var(--border-subtle, #DDE7F3)",
+                      color: "var(--color-deep-slate, #24344D)",
                       fontWeight: 700,
                       fontSize: "0.9rem",
                       display: "flex",
@@ -1310,6 +1368,7 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                       gap: "6px",
                       cursor: isRunning ? "not-allowed" : "pointer",
                       minHeight: "44px",
+                      boxShadow: "var(--shadow-sm)",
                       transition: "background-color 150ms ease",
                     }}
                   >
@@ -1329,12 +1388,12 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
             style={{
               padding: "24px",
               borderRadius: "24px",
-              border: "1.5px solid rgba(0, 242, 254, 0.35)",
-              backgroundColor: "rgba(10, 15, 29, 0.95)",
+              border: "1.5px solid #DDE7F3",
+              backgroundColor: "#FFFFFF",
               display: "flex",
               flexDirection: "column",
               gap: "18px",
-              boxShadow: "0 12px 32px rgba(0, 0, 0, 0.4)",
+              boxShadow: "0 8px 24px rgba(36, 52, 77, 0.06)",
             }}
           >
             {/* Header / Avatar & Speech Bubble Area */}
@@ -1351,9 +1410,9 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                   position: "relative",
                   padding: "14px 18px",
                   borderRadius: "18px",
-                  backgroundColor: "rgba(21, 29, 56, 0.85)",
-                  border: "1.5px solid rgba(121, 72, 247, 0.4)",
-                  boxShadow: "0 6px 16px rgba(0, 0, 0, 0.3)",
+                  backgroundColor: "#F4F9FF",
+                  border: "1.5px solid #D9CCFF",
+                  boxShadow: "0 4px 14px rgba(36, 52, 77, 0.04)",
                 }}
               >
                 {/* Bubble Header */}
@@ -1362,7 +1421,7 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                     display: "flex",
                     alignItems: "center",
                     gap: "6px",
-                    color: "var(--warm-yellow)",
+                    color: "#92400E",
                     fontWeight: 800,
                     fontSize: "0.85rem",
                     marginBottom: "4px",
@@ -1378,12 +1437,12 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                     fontSize: "0.925rem",
                     color:
                       feedback.type === "success"
-                        ? "#a7f3d0"
+                        ? "#059669"
                         : feedback.type === "error"
-                        ? "#fecdd3"
-                        : "#ffffff",
+                        ? "#E11D48"
+                        : "#24344D",
                     lineHeight: 1.5,
-                    fontWeight: 500,
+                    fontWeight: 600,
                   }}
                 >
                   {feedback.message}
@@ -1399,11 +1458,11 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                 alignItems: "center",
                 flexWrap: "wrap",
                 gap: "10px",
-                borderTop: "1px solid rgba(255, 255, 255, 0.08)",
+                borderTop: "1px solid #E2E8F0",
                 paddingTop: "12px",
               }}
             >
-              <div style={{ fontSize: "0.825rem", color: "var(--text-muted)" }}>
+              <div style={{ fontSize: "0.825rem", color: "#526581", fontWeight: 600 }}>
                 Sahabat Berpikir Kibo (Petunjuk Mandiri)
               </div>
 
@@ -1435,16 +1494,16 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                     <div
                       key={hint.level}
                       style={{
-                        padding: "10px 14px",
-                        borderRadius: "12px",
-                        backgroundColor: "rgba(255, 255, 255, 0.04)",
-                        border: "1px solid rgba(255, 255, 255, 0.08)",
+                        padding: "12px 14px",
+                        borderRadius: "14px",
+                        backgroundColor: "#F8FAFC",
+                        border: "1px solid #E2E8F0",
                       }}
                     >
                       <Badge variant={badgeColor} size="sm">
                         {hint.title}
                       </Badge>
-                      <p style={{ color: "var(--text-main)", fontSize: "0.85rem", marginTop: "4px", lineHeight: 1.4 }}>
+                      <p style={{ color: "#24344D", fontSize: "0.875rem", marginTop: "6px", lineHeight: 1.45, fontWeight: 500 }}>
                         {hint.text}
                       </p>
                     </div>
@@ -1467,8 +1526,8 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
           style={{
             position: "fixed",
             inset: 0,
-            backgroundColor: "rgba(0, 0, 0, 0.8)",
-            backdropFilter: "blur(10px)",
+            backgroundColor: "rgba(36, 52, 77, 0.5)",
+            backdropFilter: "blur(6px)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -1484,9 +1543,9 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
               width: "100%",
               padding: "clamp(24px, 5vw, 36px)",
               borderRadius: "28px",
-              backgroundColor: "rgba(10, 15, 29, 0.98)",
-              border: "2px solid var(--cyan-core)",
-              boxShadow: "0 0 40px var(--cyan-glow)",
+              backgroundColor: "#FFFFFF",
+              border: "2px solid #B9F2D0",
+              boxShadow: "0 20px 50px rgba(36, 52, 77, 0.18)",
               textAlign: "center",
               display: "flex",
               flexDirection: "column",
@@ -1497,20 +1556,31 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
           >
             <KiboAvatar size={140} variant="celebrate" showGlow={true} isCircle={true} />
 
-            <div>
-              <div style={{ fontSize: "2.2rem", marginBottom: "6px" }}>
-                {"⭐".repeat(starsAwarded)}
-              </div>
-              <h2
-                id="victory-modal-title"
-                style={{
-                  fontSize: "clamp(1.5rem, 3.5vw, 2rem)",
-                  fontWeight: 800,
-                  color: "#ffffff",
-                  marginBottom: "8px",
-                }}
-              >
-                {challenge.id === "ch-05"
+            {(() => {
+              const allMissionsFinished = isAllChallengesCompleted({
+                ...progress,
+                completedChallenges: {
+                  ...progress.completedChallenges,
+                  [challenge.id]: {
+                    challengeId: challenge.id,
+                    stars: Math.max(progress.completedChallenges[challenge.id]?.stars ?? 0, starsAwarded),
+                    completedAt: new Date().toISOString(),
+                  },
+                },
+              });
+
+              const totalPlayableCount = Object.keys(CHALLENGES).length;
+              const currentCompletedCount = Object.keys({
+                ...progress.completedChallenges,
+                [challenge.id]: true,
+              }).length;
+              const currentWorldPct = Math.min(
+                100,
+                parseFloat(((currentCompletedCount / totalPlayableCount) * 100).toFixed(1))
+              );
+
+              const victoryTitle =
+                challenge.id === "ch-05"
                   ? "Lumina Town Pulih Sepenuhnya! 🌟"
                   : challenge.id === "ch-08"
                   ? "Gate Valley Pulih Sepenuhnya! ⛩️"
@@ -1518,10 +1588,14 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                   ? "Sprout Garden Pulih Sepenuhnya! 🌱"
                   : challenge.id === "ch-14"
                   ? "Memory Station Pulih Sepenuhnya! 💾"
-                  : "Misi Selesai! Hebat! 🎉"}
-              </h2>
-              <p style={{ color: "var(--text-muted)", fontSize: "0.95rem", lineHeight: 1.6 }}>
-                {challenge.id === "ch-05"
+                  : challenge.id === "ch-15"
+                  ? allMissionsFinished
+                    ? "Kibo World Pulih Sepenuhnya! 🌟🔮✨"
+                    : "Altar Inti Kibo Pulih! 🌟"
+                  : "Misi Selesai! Hebat! 🎉";
+
+              const victoryDescription =
+                challenge.id === "ch-05"
                   ? "Luar biasa! Kamu berhasil menuntaskan seluruh 5 misi di Lumina Town! Seluruh lentera, generator, dan Kristal Cahaya Agung kini bersinar benderang."
                   : challenge.id === "ch-08"
                   ? "Luar biasa! Kamu berhasil menuntaskan seluruh misi di Gate Valley! Seluruh gerbang penjaga dan jembatan energi telah pulih sempurna."
@@ -1529,24 +1603,57 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
                   ? "Luar biasa! Kamu berhasil menuntaskan seluruh misi di Sprout Garden! Seluruh tunas, barisan bunga mawar, dan Air Mancur Megah telah mekar bersemi mempesona!"
                   : challenge.id === "ch-14"
                   ? "Luar biasa! Kamu berhasil menuntaskan seluruh misi di Memory Station! Seluruh terminal data, reaktor plasma, dan Kubah Memori Utama telah aktif dengan kode angka yang presisi!"
-                  : `Kamu berhasil menyelesaikan misi "${challenge.title}" dengan urutan instruksi yang tepat!`}
-              </p>
-            </div>
+                  : challenge.id === "ch-15"
+                  ? allMissionsFinished
+                    ? "Selamat! Kamu berhasil mereaktivasi Altar Inti Kibo dan memulihkan seluruh Kibo World! Seluruh 5 wilayah kini telah terbebas dari System Glitch berkat penguasaan kode agungmu!"
+                    : `Hebat! Altar Inti Kibo berhasil direaktivasi! Tuntaskan seluruh misi di wilayah lain untuk membebaskan Kibo World seutuhnya (Pemulihan Dunia: ${currentWorldPct}%).`
+                  : `Kamu berhasil menyelesaikan misi "${challenge.title}" dengan urutan instruksi yang tepat!`;
 
-            <div
-              style={{
-                width: "100%",
-                padding: "12px",
-                borderRadius: "14px",
-                backgroundColor: "rgba(16, 185, 129, 0.15)",
-                border: "1px solid rgba(16, 185, 129, 0.3)",
-                color: "#a7f3d0",
-                fontSize: "0.875rem",
-                fontWeight: 700,
-              }}
-            >
-              Progres tersimpan: {starsAwarded} Bintang diperoleh! ⭐
-            </div>
+              return (
+                <>
+                  <div>
+                    <div style={{ fontSize: "2.2rem", marginBottom: "6px" }}>
+                      {"⭐".repeat(starsAwarded)}
+                    </div>
+                    <h2
+                      id="victory-modal-title"
+                      style={{
+                        fontSize: "clamp(1.5rem, 3.5vw, 2rem)",
+                        fontWeight: 800,
+                        color: "#24344D",
+                        marginBottom: "8px",
+                      }}
+                    >
+                      {victoryTitle}
+                    </h2>
+                    <p style={{ color: "#526581", fontSize: "0.95rem", lineHeight: 1.6 }}>
+                      {victoryDescription}
+                    </p>
+                  </div>
+
+                  <div
+                    style={{
+                      width: "100%",
+                      padding: "12px",
+                      borderRadius: "14px",
+                      backgroundColor: "#EEFAF2",
+                      border: "1.5px solid #B9F2D0",
+                      color: "#166534",
+                      fontSize: "0.875rem",
+                      fontWeight: 700,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      flexWrap: "wrap",
+                      gap: "6px",
+                    }}
+                  >
+                    <span>Progres tersimpan: {starsAwarded} Bintang diperoleh! ⭐</span>
+                    <span>Dunia Pulih: {currentWorldPct}% 🔋</span>
+                  </div>
+                </>
+              );
+            })()}
 
             <div
               style={{
@@ -1560,14 +1667,13 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
               {nextChallenge && (
                 <Link href={`/challenge/${nextChallenge.id}`} style={{ flex: 1, minWidth: "180px" }}>
                   <Button
-                    variant="cyan"
+                    variant="primary"
                     size="lg"
                     id="btn-victory-next-challenge"
                     style={{
                       width: "100%",
                       borderRadius: "14px",
                       fontWeight: 800,
-                      boxShadow: "0 4px 16px rgba(0, 242, 254, 0.4)",
                     }}
                   >
                     Misi Berikutnya: {nextChallenge.title.split("(")[0].trim()} ▶
@@ -1577,14 +1683,13 @@ export default function ChallengeClient({ challengeId }: ChallengeClientProps) {
 
               <Link href="/adventure" style={{ flex: 1, minWidth: "140px" }}>
                 <Button
-                  variant={nextChallenge ? "outline" : "cyan"}
+                  variant={nextChallenge ? "outline" : "primary"}
                   size="lg"
                   id="btn-victory-back-map"
                   style={{
                     width: "100%",
                     borderRadius: "14px",
                     fontWeight: 700,
-                    boxShadow: nextChallenge ? undefined : "0 4px 16px rgba(0, 242, 254, 0.4)",
                   }}
                 >
                   Kembali ke Peta 🗺️

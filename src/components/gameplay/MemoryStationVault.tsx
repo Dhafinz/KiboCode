@@ -48,19 +48,18 @@ export function MemoryStationVault({
     ? "radial-gradient(circle, rgba(239, 68, 68, 0.5) 0%, rgba(245, 158, 11, 0.3) 50%, transparent 75%)"
     : "radial-gradient(circle, rgba(139, 92, 246, 0.25) 0%, rgba(0, 242, 254, 0.15) 50%, transparent 75%)";
 
-  // Dynamic Badge Text & Color
+  // Dynamic Badge Text & Color - Friendly Future Palette
   let badgeText = "";
-  let badgeBg = "rgba(71, 85, 105, 0.9)";
-  let badgeShadow = "0 0 8px rgba(0, 0, 0, 0.4)";
+  let badgeBg = "#FFFFFF";
+  let badgeColor = "var(--color-deep-slate, #24344D)";
+  let badgeBorder = "1.5px solid var(--border-subtle, #DDE7F3)";
+  let badgeShadow = "0 2px 8px rgba(36, 52, 77, 0.08)";
 
   if (isActive) {
-    badgeBg =
-      type === "reactor"
-        ? "rgba(6, 182, 212, 0.95)"
-        : type === "vault"
-        ? "rgba(245, 158, 11, 0.95)"
-        : "rgba(16, 185, 129, 0.95)";
-    badgeShadow = "0 0 14px " + (type === "reactor" ? "#06b6d4" : type === "vault" ? "#f59e0b" : "#10b981");
+    badgeBg = "var(--color-mint-green, #B9F2D0)";
+    badgeColor = "var(--color-mint-green-deep, #15803D)";
+    badgeBorder = "1.5px solid #86EFAC";
+    badgeShadow = "0 2px 10px rgba(5, 150, 105, 0.2)";
     badgeText =
       type === "reactor"
         ? `⚡ REAKTOR AKTIF (${requiredValue ?? 5})`
@@ -68,12 +67,16 @@ export function MemoryStationVault({
         ? `🌟 KUBAH TERBUKA (${requiredValue ?? 4})`
         : `✓ TERMINAL AKTIF (${requiredValue ?? 3})`;
   } else if (isValueMismatch) {
-    badgeBg = "rgba(239, 68, 68, 0.95)";
-    badgeShadow = "0 0 14px rgba(239, 68, 68, 0.8)";
+    badgeBg = "#FFE4E6";
+    badgeColor = "#9F1239";
+    badgeBorder = "1.5px solid #FECDD3";
+    badgeShadow = "0 2px 8px rgba(225, 29, 72, 0.15)";
     badgeText = `⚠️ SALAH: ${currentMemoryValue} ≠ ${requiredValue}`;
   } else if (isEmptyMemoryWarning) {
-    badgeBg = "rgba(245, 158, 11, 0.95)";
-    badgeShadow = "0 0 12px rgba(245, 158, 11, 0.7)";
+    badgeBg = "#FFF9E6";
+    badgeColor = "#92400E";
+    badgeBorder = "1.5px solid #FFE49A";
+    badgeShadow = "0 2px 8px rgba(217, 119, 6, 0.15)";
     badgeText = `📭 BUTUH DATA: ${requiredValue}`;
   } else {
     badgeText =
@@ -129,7 +132,8 @@ export function MemoryStationVault({
           padding: "3px 9px",
           borderRadius: "9999px",
           backgroundColor: badgeBg,
-          color: "#ffffff",
+          color: badgeColor,
+          border: badgeBorder,
           fontSize: "0.68rem",
           fontWeight: 800,
           letterSpacing: "0.02em",

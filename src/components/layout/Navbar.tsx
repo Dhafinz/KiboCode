@@ -37,10 +37,11 @@ export function Navbar() {
         top: 0,
         zIndex: 50,
         width: "100%",
-        borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
-        backgroundColor: "rgba(7, 10, 20, 0.85)",
-        backdropFilter: "blur(14px)",
-        WebkitBackdropFilter: "blur(14px)",
+        borderBottom: "1px solid var(--border-subtle, #DDE7F3)",
+        backgroundColor: "rgba(255, 255, 255, 0.94)",
+        backdropFilter: "blur(12px)",
+        WebkitBackdropFilter: "blur(12px)",
+        boxShadow: "0 2px 10px rgba(36, 52, 77, 0.04)",
       }}
     >
       <div
@@ -64,7 +65,7 @@ export function Navbar() {
             gap: "10px",
             fontWeight: 800,
             fontSize: "1.35rem",
-            color: "#ffffff",
+            color: "var(--color-deep-slate, #24344D)",
             letterSpacing: "-0.01em",
           }}
         >
@@ -73,13 +74,13 @@ export function Navbar() {
               width: "16px",
               height: "16px",
               borderRadius: "50%",
-              backgroundColor: "var(--cyan-core)",
-              boxShadow: "0 0 12px var(--cyan-core)",
+              backgroundColor: "var(--color-sky-blue-deep, #0284C7)",
+              boxShadow: "0 2px 8px rgba(2, 132, 199, 0.35)",
               display: "inline-block",
             }}
           />
           <span>
-            Kibo<span style={{ color: "var(--cyan-core)" }}>Code</span>
+            Kibo<span style={{ color: "var(--color-soft-purple-deep, #6366F1)" }}>Code</span>
           </span>
         </Link>
 
@@ -97,8 +98,8 @@ export function Navbar() {
             href="/"
             style={{
               fontSize: "0.95rem",
-              fontWeight: 600,
-              color: "var(--text-main)",
+              fontWeight: 700,
+              color: "var(--color-deep-slate, #24344D)",
               transition: "color 150ms ease",
             }}
           >
@@ -108,8 +109,8 @@ export function Navbar() {
             href="/#cara-belajar"
             style={{
               fontSize: "0.95rem",
-              fontWeight: 500,
-              color: "var(--text-muted)",
+              fontWeight: 600,
+              color: "var(--color-slate-muted, #526581)",
               transition: "color 150ms ease",
             }}
           >
@@ -119,8 +120,8 @@ export function Navbar() {
             href="/adventure"
             style={{
               fontSize: "0.95rem",
-              fontWeight: 500,
-              color: "var(--text-muted)",
+              fontWeight: 600,
+              color: "var(--color-slate-muted, #526581)",
               transition: "color 150ms ease",
             }}
           >
@@ -130,8 +131,8 @@ export function Navbar() {
             href="/#kibo-mentor"
             style={{
               fontSize: "0.95rem",
-              fontWeight: 500,
-              color: "var(--text-muted)",
+              fontWeight: 600,
+              color: "var(--color-slate-muted, #526581)",
               transition: "color 150ms ease",
             }}
           >
@@ -142,7 +143,7 @@ export function Navbar() {
         {/* Desktop CTA Action */}
         <div style={{ display: "none", alignItems: "center", gap: "12px" }} className="desktop-cta">
           <Link href="/adventure">
-            <Button variant="cyan" size="sm" style={{ fontWeight: 700, borderRadius: "9999px" }}>
+            <Button variant="cyan" size="sm" style={{ fontWeight: 800, borderRadius: "9999px" }}>
               Mulai Petualangan 🚀
             </Button>
           </Link>
@@ -163,10 +164,11 @@ export function Navbar() {
             width: "44px",
             height: "44px",
             borderRadius: "12px",
-            background: "rgba(255, 255, 255, 0.08)",
-            border: "1px solid rgba(255, 255, 255, 0.12)",
-            color: "#ffffff",
+            background: "#FFFFFF",
+            border: "1px solid var(--border-subtle, #DDE7F3)",
+            color: "var(--color-deep-slate, #24344D)",
             fontSize: "1.25rem",
+            boxShadow: "var(--shadow-sm)",
           }}
         >
           {mobileMenuOpen ? "✕" : "☰"}
@@ -178,12 +180,13 @@ export function Navbar() {
         <div
           id="nav-mobile-menu"
           style={{
-            backgroundColor: "rgba(10, 15, 29, 0.98)",
-            borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+            backgroundColor: "#FFFFFF",
+            borderBottom: "1px solid var(--border-subtle, #DDE7F3)",
+            boxShadow: "var(--shadow-lg)",
             padding: "20px 24px",
             display: "flex",
             flexDirection: "column",
-            gap: "16px",
+            gap: "14px",
           }}
         >
           <Link
@@ -191,8 +194,8 @@ export function Navbar() {
             onClick={closeMobileMenu}
             style={{
               fontSize: "1.05rem",
-              fontWeight: 600,
-              color: "#ffffff",
+              fontWeight: 700,
+              color: "var(--color-deep-slate, #24344D)",
               padding: "8px 0",
             }}
           >
@@ -203,8 +206,8 @@ export function Navbar() {
             onClick={closeMobileMenu}
             style={{
               fontSize: "1.05rem",
-              fontWeight: 500,
-              color: "var(--text-muted)",
+              fontWeight: 600,
+              color: "var(--color-slate-muted, #526581)",
               padding: "8px 0",
             }}
           >
@@ -215,8 +218,8 @@ export function Navbar() {
             onClick={closeMobileMenu}
             style={{
               fontSize: "1.05rem",
-              fontWeight: 500,
-              color: "var(--text-muted)",
+              fontWeight: 600,
+              color: "var(--color-slate-muted, #526581)",
               padding: "8px 0",
             }}
           >
@@ -227,8 +230,8 @@ export function Navbar() {
             onClick={closeMobileMenu}
             style={{
               fontSize: "1.05rem",
-              fontWeight: 500,
-              color: "var(--text-muted)",
+              fontWeight: 600,
+              color: "var(--color-slate-muted, #526581)",
               padding: "8px 0",
             }}
           >
@@ -236,7 +239,7 @@ export function Navbar() {
           </Link>
           <div style={{ paddingTop: "8px" }}>
             <Link href="/adventure" onClick={closeMobileMenu}>
-              <Button variant="cyan" size="md" style={{ width: "100%", borderRadius: "12px" }}>
+              <Button variant="cyan" size="md" style={{ width: "100%", borderRadius: "12px", fontWeight: 800 }}>
                 Mulai Petualangan 🚀
               </Button>
             </Link>

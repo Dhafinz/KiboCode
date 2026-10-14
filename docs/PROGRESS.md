@@ -28,11 +28,11 @@ Priority:
 
 ## Phase 1 — Core Navigation
 
-- [x] P0 Home / Landing (Verified)
-- [x] P0 Adventure / World Map (Verified: `/adventure` with 5 regions, 4 playable chapters, Memory Station dynamic unlocking, lock states, restoration badges, and inter-chapter progression)
-- [ ] P0 Progress page (Integrated into Adventure World Map header)
+- [x] P0 Home / Landing (Verified: Beranda reaktif terhubung ke data progres pemain riil `usePlayerProgress`, badge status bab dinamis, dan copywriting ramah anak: "15 Tantangan Coding", "Bagaimana Cara Belajar di KiboCode?", "Pilih dan susun blok kode visual")
+- [x] P0 Adventure / World Map (Verified: `/adventure` dengan 5 wilayah lengkap, 5 bab playable termasuk Kibo Core, pembukaan kunci dinamis, status restorasi, dan navigasi lintas-bab berurutan)
+- [ ] P0 Progress page (Integrated into Adventure World Map header & Homepage Hero status)
 - [ ] P0 How-to-play page
-- [x] P0 Responsive navigation (Verified: Navbar desktop + mobile drawer, cross-chapter navigation ch-11 -> ch-12 -> ch-13 -> ch-14)
+- [x] P0 Responsive navigation (Verified: Navbar desktop + mobile drawer, navigasi berurutan ch-11 -> ch-12 -> ch-13 -> ch-14 -> ch-15)
 
 ## Phase 2 — Kibo
 
@@ -50,13 +50,13 @@ Priority:
 - [x] P0 Block library (Verified: Child-friendly set MOVE, ACTIVATE, IF_GATE, IF_BRIDGE, WATER, REPEAT_2, REPEAT_3, END_LOOP, SET_VALUE_2..5, USE_VALUE)
 - [x] P0 Variable state & simulation (Verified: runtime memoryValue tracking, empty memory validation, value discrimination, value updating, and per-step memory logging)
 - [x] P0 Variable visual & HUD (Verified: "Kotak Memori Kibo" HUD with responsive reactive status, floating memory chip above Kibo, and isometric 2.5D MemoryStationVault for terminal, reactor, and vault targets)
-- [ ] P0 Drag/drop (Deferred to later iteration; click-to-add implemented)
+- [ ] P0 Drag/drop (Deferred to later iteration; click-to-add / select-and-arrange implemented)
 - [ ] P0 Snap behavior (Deferred to visual puzzle iteration)
 - [ ] P0 Nested blocks (Deferred to Condition/Loop chapters)
 - [x] P0 Remove/reset blocks (Verified: single remove ✕, clear all 🗑️, reset stage ↺)
 - [x] P0 Program execution (Verified: pure deterministic engine `runSimulation` parameterized for arbitrary gridTiles and targets without hardcoding)
-- [x] P0 Execution visualization (Verified: dynamic linear interpolation track, laser conduit chevrons, StreetLamp lighting states, and MemoryStationVault reactive states)
-- [x] P0 Success/failure validation (Verified: dynamic targets matching, chapter-aware & target-specific feedback without Lumina Town lamp hardcoding, premature activation check, overstep check, and dynamic optimalBlocks star rating)
+- [x] P0 Execution visualization (Verified: dynamic linear interpolation track, laser conduit chevrons, StreetLamp lighting states, MemoryStationVault reactive states, dan KiboCoreChamber grand altar)
+- [x] P0 Success/failure validation (Verified: dynamic targets matching, chapter-aware & target-specific feedback, premature activation check, overstep check, dan penilaian bintang adaptif untuk ch-15 mendukung loop hingga 10 blok meraih 3 bintang)
 - [x] P0 Route & Progress validation (Verified: Server-side `notFound()` for invalid challenge IDs, fake progress record prevention in `storage.ts`)
 - [ ] P1 Undo/redo if feasible
 
@@ -86,19 +86,16 @@ Priority:
 - [x] P0 Challenge 13 (Verified: "Kirimkan Nilai Data (Use the Data)" konsep penyaluran nilai memori SET_VALUE_5 + USE_VALUE, target Reaktor Memori dengan requiredValue: 5, blok ACTIVATE yang tidak relevan dieliminasi, optimal 6 blok: `SET_VALUE_5 -> MOVE x4 -> USE_VALUE` di `/challenge/ch-13`)
 - [x] P0 Challenge 14 (Verified: "Sinkronisasi Dua Nilai (Data Delivery & Update)" konsep pembaruan nilai variabel berurutan dengan Konsol Alpha [nilai 2] & Kubah Memori Utama [nilai 4], optimal 9 blok di `/challenge/ch-14`)
 
-### Kibo Core (Problem Solving)
-- [ ] P0 Challenge 21
-- [ ] P0 Challenge 22
-- [ ] P0 Challenge 23
-- [ ] P0 Challenge 24
-- [ ] P0 Challenge 25
+### Kibo Core (Problem Solving — Finale Challenge Complete)
+- [x] P0 Challenge 15 (Verified: "Inti Kibo (The Kibo Core)" grand finale menggabungkan urutan, kondisi gerbang `IF_GATE`, pengulangan koridor transmisi `REPEAT_3`, dan penyaluran nilai `SET_VALUE_5` + `USE_VALUE` ke Altar Inti di `/challenge/ch-15`. Evaluasi bintang adaptif mendukung compound loop 8 blok maupun sequential loop ganda 10 blok untuk 3 bintang penuh. 100% lulus pengujian otomatis `tests/kibo-core.test.ts`)
 
 ## Phase 5 — Progress
 
-- [x] P0 Challenge completion tracking (Verified: client-side `localStorage` with untrusted-data validation)
-- [x] P0 Star tracking (Verified: 3 stars for optimal run, persistent across page reloads)
-- [x] P0 Replay (Verified: replay maintains best stars)
-- [x] P0 World restoration progress (Verified: dynamic percentage calculation based on completed missions)
+- [x] P0 Challenge completion tracking (Verified: client-side `localStorage` dengan validasi data untrusted, dihitung ulang secara ketat dari penyelesaian 15 tantangan riil)
+- [x] P0 Star tracking (Verified: 3 bintang untuk solusi optimal, persisten lintas reload, dihitung murni dari nilai tertinggi per tantangan tanpa duplikasi)
+- [x] P0 Replay (Verified: replay mempertahankan bintang tertinggi pemain)
+- [x] P0 World restoration progress (Verified: persentase pemulihan dunia dihitung akurat dari total 15 tantangan yang benar-benar selesai; tantangan yang baru terbuka tidak dihitung)
+- [x] P0 Full restoration condition & victory guard (Verified: fungsi guard `isAllChallengesCompleted` memastikan dialog kemenangan penuh "Kibo World Pulih Sepenuhnya!" hanya tampil jika seluruh 15 tantangan selesai; penyelesaian parsial menampilkan status altar pemulihan yang jujur)
 - [ ] P0 Learning progress (Expanded concept breakdown in future phases)
 - [ ] P1 Achievements
 
@@ -120,7 +117,8 @@ Priority:
 - [x] P0 Performance audit (Verified: Turbopack partial prerendering, statically generated routes)
 - [x] P0 Basic SEO
 - [x] P0 Console/runtime error audit (0 ESLint errors, 0 type errors, clean build)
-- [ ] P0 Full 15-challenge playthrough (Deferred until remaining challenges built)
+- [x] P0 Visual Redesign: Friendly Future (Verified: Bright child-friendly aesthetic with Cloud White #F4F9FF, Sky Blue #BFE8FF, Mint Green #B9F2D0, Warm Yellow #FFE49A, Soft Purple #D9CCFF, Deep Slate #24344D, and crisp white cards. Contrast ratio >8:1, 0 ESLint warnings, 100% tests pass, clean Next.js 16 build).
+- [x] P0 Full 15-challenge playthrough (Verified: Seluruh 15 tantangan ch-01 s/d ch-15 dapat dimainkan hingga selesai dan tervalidasi via automated test suite 100% pass)
 - [ ] P0 Deployment test
 - [ ] P0 Final regression test
 - [x] P1 Additional micro-interactions

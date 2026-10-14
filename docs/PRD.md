@@ -85,8 +85,7 @@ Five areas form the main adventure:
 
 MVP target:
 - 5 chapters
-- 3 challenges per chapter
-- 15 challenges total
+- 15 challenges total (didistribusikan dalam format 5–3–3–3–1: Lumina Town 5 tantangan, Gate Valley 3 tantangan, Sprout Garden 3 tantangan, Memory Station 3 tantangan, dan Kibo Core 1 tantangan grand finale)
 
 ## 8. Kibo
 
@@ -133,8 +132,8 @@ Long-term goal:
 The MVP uses a custom block coding engine.
 
 Interaction:
-- drag and drop,
-- snap blocks together,
+- click-to-add / select-and-arrange (anak memilih dan menyusun blok kode visual ke dalam antrean langkah secara intuitif, sangat ramah bagi perangkat layar sentuh/tablet anak SD; interaksi drag-and-drop ditangguhkan untuk iterasi berikutnya),
+- block sequencing, removal (✕), and clear/reset (↺/🗑️),
 - run program,
 - see visual execution.
 
@@ -230,11 +229,11 @@ No coins, shop, lootbox, gacha, inventory, or leaderboard.
 ## 13. MVP Pages
 
 Required:
-- `/` — Home / Landing
-- `/adventure` — World Map
-- challenge pages
-- `/progress` — Learning and world progress
-- `/how-to-play` — Instructions/About
+- `/` — Home / Landing (menampilkan progres petualangan dinamis dan ringkasan bintang)
+- `/adventure` — World Map (peta 5 bab dengan progres pemulihan dunia terintegrasi)
+- `/challenge/[challengeId]` — Arena permainan & coding untuk 15 tantangan
+- Progress tracking — Terintegrasi langsung pada header `/adventure` dan kartu status beranda (halaman `/progress` terpisah dikonsolidasikan demi kesederhanaan navigasi anak SD)
+- `/how-to-play` — Panduan alur belajar & cara bermain
 
 Not required for MVP:
 - login,

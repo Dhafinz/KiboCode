@@ -126,3 +126,13 @@ Kibo Core → Problem Solving
 **Decision:** Bahasa Indonesia for UI/explanations, English for coding block keywords.
 
 **Reason:** Keeps the learning experience accessible while preserving recognizable programming terminology.
+
+## D-021 — Distribusi 15 Tantangan MVP dan Interaksi Blok
+
+**Decision:**
+1. Total 15 tantangan MVP dialokasikan dengan susunan 5–3–3–3–1 (Lumina Town: 5 tantangan, Gate Valley: 3 tantangan, Sprout Garden: 3 tantangan, Memory Station: 3 tantangan, dan Kibo Core: 1 tantangan grand finale terintegrasi).
+2. Interaksi penyusunan blok menggunakan mekanisme pilih dan susun (*click-to-add/select-and-arrange*), sementara *drag-and-drop* ditangguhkan.
+3. Evaluasi bintang optimal pada Kibo Core (ch-15) mengakomodasi solusi berbasis loop hingga 10 blok (baik *compound loop* 8 blok maupun *sequential loop* ganda 10 blok) untuk meraih 3 bintang penuh.
+
+**Reason:**
+Komposisi 5 tantangan pada Lumina Town memberikan pengenalan bertahap yang kokoh bagi anak SD sebelum mempelajari percabangan (*condition*), sedangkan *ch-15* menjadi klimaks tunggal yang memadukan keempat konsep sebelumnya. Mekanisme *click-to-add* meminimalkan kesalahan gestur pada layar sentuh, dan evaluasi bintang yang adaptif menghargai penalaran loop alami siswa tanpa penalti yang keliru.
