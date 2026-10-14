@@ -134,11 +134,16 @@ Kibo should not pretend to have capabilities that the product does not provide.
 
 ## 10. Implementation Rule
 
-AI output must be treated as untrusted external content:
-- validate inputs,
-- handle provider errors,
-- provide fallback messaging,
-- never expose API keys,
-- avoid rendering unsafe raw HTML.
+### A. Implementasi Aktif MVP (Client-Side Deterministic Hints)
+- Pada rilis MVP KiboCode, AI Mentor Kibo bekerja secara **deterministik di sisi klien**.
+- Seluruh 15 tantangan memiliki kurikulum petunjuk bertingkat 4 level (`hints: [{ level: 1..4, title, text }]` pada `src/data/challenges.ts`) yang terhubung langsung dengan kondisi dan tujuan masing-masing level.
+- Umpan balik kegagalan langkah (`failureReason`) dihasilkan secara dinamis dan kontekstual oleh mesin simulasi (`src/features/blocks/engine.ts`) sesuai kesalahan spesifik anak (misalnya gerbang tertutup, jembatan terputus, memori kosong, atau nilai data tidak cocok).
+- Pendekatan ini menjamin keandalan 100%, bebas latensi jaringan, tidak memerlukan API key eksternal, dan aman dari halusinasi model saat kompetisi berlangsung.
 
-The AI system must not be able to alter the challenge definition or product rules.
+### B. Rencana Integrasi Server-Side LLM (Masa Depan / Deferred)
+Jika integrasi API LLM eksternal (`/api/kibo`) diaktifkan di kemudian hari:
+- Output AI harus selalu divalidasi dan diperlakukan sebagai konten eksternal yang tidak dipercaya (*untrusted*).
+- API keys penyedia AI harus selalu berada di server-side, tidak pernah diekspos ke browser.
+- Sediakan pesan fallback jika penyedia AI mengalami timeout atau kegagalan kuota.
+- Hindari rendering HTML mentah tanpa sanitasi.
+- Model AI tidak boleh diizinkan mengubah aturan atau definisi tantangan yang telah ditetapkan.

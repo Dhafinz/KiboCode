@@ -6,40 +6,36 @@ This document defines the visual direction and design constraints.
 
 The AI coding agent may design individual UI components, but must follow this visual direction.
 
-## 2. Overall Visual Identity
+## 2. Overall Visual Identity: Friendly Future
 
-Kibo World should feel like:
+Kibo World dirancang dengan arah visual **Friendly Future** yang cerah, ramah anak, dan nyaman bagi siswa SD:
 
 - cute,
-- modern,
-- digital adventure,
+- modern digital adventure,
 - playful,
-- clean,
+- clean & bright (latar terang yang ramah mata anak),
 - friendly,
 - imaginative.
 
-It should NOT feel like:
-- a corporate dashboard,
-- a generic SaaS website,
-- heavy cyberpunk,
-- neon overload,
-- overly babyish children's software.
+Kibo World TIDAK boleh terasa seperti:
+- dashboard korporat / generic SaaS,
+- dark-mode cyberpunk yang berat atau melelahkan mata anak,
+- neon overload / glow berlebihan,
+- software balita yang kekanak-kanakan secara berlebih.
 
-## 3. Color Direction
+## 3. Color Direction (Palet Friendly Future)
 
-Use a consistent palette based on these roles:
+Sesuai token desain aktif pada `src/app/globals.css`:
 
-- **Kibo Purple** — primary brand color
-- **Cyan** — Kibo Core, interactive highlights, technology accents
-- **Deep Navy** — dark backgrounds / digital world atmosphere
-- **Soft Lavender** — surfaces and secondary areas
-- **Warm Yellow** — stars, achievements, important rewards
-- **Green** — success/restored states
-- **Soft Coral** — error/warning states
+- **Cloud White (`#F4F9FF`)** — Latar belakang utama aplikasi yang bersih, cerah, dan menenangkan.
+- **Sky Blue (`#BFE8FF`, deep: `#0284C7`)** — Warna interaktif utama, aksen teknologi bersahabat, dan tombol aksi.
+- **Mint Green (`#B9F2D0`, deep: `#059669`)** — Indikator keberhasilan, petak pulih, dan ornamen alam.
+- **Warm Yellow (`#FFE49A`, deep: `#D97706`)** — Bintang reward prestasi, pill status bintang, dan pencapaian.
+- **Soft Purple (`#D9CCFF`, deep: `#6366F1`)** — Identitas warna Kibo, aksen brand, dan konsep memori.
+- **Deep Slate (`#24344D`)** — Warna tipografi utama dengan rasio kontras tinggi (>8:1) di atas permukaan terang.
+- **Pure White Surface (`#FFFFFF`)** — Latar kartu, modal, dan platform dengan border lembut (`#DDE7F3`) dan bayangan halus.
 
-The agent may select exact HEX shades and component combinations.
-
-Do not use every accent color everywhere. Color should communicate meaning.
+*(Catatan historis: Palet prototipe awal yang didominasi Deep Navy gelap dan glow neon berlebih telah ditinggalkan dan dialihkan sepenuhnya ke Friendly Future demi kenyamanan membaca anak SD).*
 
 ## 4. Typography
 

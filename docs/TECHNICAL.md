@@ -6,63 +6,51 @@ Build a reliable, responsive Next.js web application for the Kibo coding-learnin
 
 Keep architecture simple enough for the competition deadline and robust enough for the 15-challenge MVP.
 
-## 2. Recommended Stack
+## 2. Technology Stack
 
-- Next.js 16+ / App Router
-- React 19+
-- TypeScript
-- Prisma ORM
-- SQLite for initial MVP/development
-- PostgreSQL/Supabase as production option if persistent cloud storage is required
-- Server-side API route for AI requests
+- **Framework**: Next.js 16 (App Router)
+- **UI Library**: React 19
+- **Language**: TypeScript 5
+- **Styling**: Vanilla CSS (CSS Variables / Design Tokens tema *Friendly Future*)
+- **Active Progress Storage**: Browser `localStorage` (`kibocode_player_progress_v1`) via React `useSyncExternalStore`
+- **Database Layer (Foundation/Unintegrated)**: Prisma ORM 6 dengan SQLite lokal (`prisma/dev.db`) sebagai skema arsitektur cadangan/masa depan
+- **AI Mentorship Engine**: Client-side Deterministic Contextual Progressive Hints (4 tingkat) & failure feedback
 
-Use free/open-source or competition-compatible dependencies where practical.
-
-## 3. High-Level Architecture
+## 3. High-Level Architecture (Active MVP)
 
 ```text
-Browser
-  ↓
-Next.js UI
-  ├── Home
-  ├── Adventure / World Map
-  ├── Challenge UI
-  └── Progress
-       ↓
-Custom Block Coding Engine
-       ↓
-Challenge Logic / Validation
-       ↓
-Progress Storage
+Browser Client (Next.js 16 / React 19)
+  ├── Home (/) [termasuk seksi /#cara-belajar & kartu progres]
+  ├── Adventure (/adventure) [termasuk header status pemulihan 5 bab & total bintang]
+  └── Challenge UI (/challenge/[challengeId])
+        ↓
+  Custom Block Coding Engine (runSimulation di engine.ts)
+        ├── Deterministic Unrolling (Loop REPEAT_2 / REPEAT_3 / END_LOOP)
+        ├── State Simulation (Position, Obstacles IF_GATE / IF_BRIDGE, Variables SET/USE)
+        └── Star & Objective Evaluation (1–3 ⭐)
+        ↓
+  AI Mentor Kibo (Client-Side Contextual Hints & Engine Feedback)
+        ↓
+  Progress Storage (localStorage: kibocode_player_progress_v1)
 
-Challenge failure / Ask Kibo
-       ↓
-/api/kibo
-       ↓
-AI Provider
+Server Endpoints Aktif:
+  └── /api/health (status dan kesehatan aplikasi)
+
+Rencana Pengembangan Masa Depan (Deferred):
+  └── /api/kibo (Server-side AI LLM Proxy) → External AI Provider
+  └── Prisma ORM → Cloud PostgreSQL / Supabase
 ```
 
-## 4. AI API Security
+## 4. AI Mentorship Architecture & Future Server-Side Security
 
-AI API keys must remain server-side.
+Dalam implementasi MVP saat ini:
+- AI Mentor Kibo bekerja secara **deterministik di sisi klien** menggunakan kurikulum petunjuk kontekstual 4 level yang terstruktur pada data setiap tantangan (`src/data/challenges.ts`) serta pesan kesalahan spesifik rintangan dari `engine.ts`.
+- Tidak ada panggilan API eksternal dan tidak ada API key yang diekspos di sisi browser.
 
-The browser must never contain a private provider API key.
-
-Expected flow:
-
-```text
-Client
-  ↓
-POST /api/kibo
-  ↓
-Server validates/sanitizes context
-  ↓
-AI Provider
-  ↓
-Kibo response
-  ↓
-Client
-```
+Arsitektur Masa Depan (Jika Server-Side LLM diaktifkan):
+Jika di masa depan Kibo AI dihubungkan ke penyedia LLM eksternal:
+- Endpoint proxy server-side `POST /api/kibo` harus digunakan agar private API key tidak pernah terekspos ke browser.
+- Server wajib memvalidasi dan membersihkan payload konteks tantangan sebelum diteruskan ke penyedia AI.
 
 ## 5. AI Context
 
@@ -127,59 +115,55 @@ type Challenge = {
 
 Keep challenge content separate from UI code whenever practical.
 
-## 8. Progress Model
+## 8. Progress Model & Storage Implementation
 
-Progress should support:
-- completed challenges,
-- best stars,
-- attempts,
-- concepts learned,
-- achievements,
-- world restoration state.
+Model data progres pemain (`src/features/progress/storage.ts`):
+```ts
+export interface ChallengeProgressRecord {
+  challengeId: string;
+  stars: number; // 1, 2, 3
+  completedAt: string; // ISO string
+}
 
-For MVP, local browser persistence is acceptable if it keeps the system simpler.
-
-If cloud persistence is required:
-```text
-Next.js
-  ↓
-Prisma
-  ↓
-PostgreSQL / Supabase
+export interface PlayerProgressData {
+  playerId: string;
+  currentChapterId: ChapterId;
+  currentChallengeId: string;
+  completedChallenges: Record<string, ChallengeProgressRecord>;
+  totalStars: number;
+  worldRestoredPct: number;
+  updatedAt: string;
+}
 ```
 
-Do not introduce authentication unless a real product requirement appears.
+Implementasi aktif pada rilis MVP:
+- Disimpan di `localStorage` klien dengan key `kibocode_player_progress_v1`.
+- Dibaca dan disinkronkan ke komponen UI menggunakan hook `useSyncExternalStore` (bebas re-render berlebih, SSR-safe dengan in-memory cache fallback).
+- Nilai `worldRestoredPct` dihitung ulang secara ketat dari jumlah 15 tantangan yang benar-benar selesai (`(completed / 15) * 100%`).
+- Fungsi guard `isAllChallengesCompleted()` memastikan dialog kemenangan utuh Kibo World hanya aktif jika seluruh 15 misi tuntas.
 
-## 9. Database Strategy
+## 9. Database Strategy & Prisma Status
 
-Development:
-`SQLite`
+- **Status MVP Saat Ini**: Basis data belum terhubung ke alur aktif permainan. Progres pemain 100% berjalan di `localStorage` peramban.
+- **Fondasi Skema**: Berkas `prisma/schema.prisma` dan database SQLite lokal (`prisma/dev.db`) disediakan sebagai fondasi arsitektur database. Model `PlayerProgress` telah didefinisikan sebagai cetak biru untuk ekspansi masa depan.
+- **Opsi Produksi / Cloud Sync (Masa Depan)**: Jika integrasi akun cloud diwajibkan di kemudian hari, layer Prisma dapat dialihkan ke Supabase / PostgreSQL tanpa merombak logika inti permainan.
 
-Production option:
-`PostgreSQL`
+## 10. Routing (Struktur Rute Aktual)
 
-Use Prisma to reduce database coupling.
+Sesuai struktur fisik direktori `src/app`:
 
-Do not switch database technology without documenting the decision in `DECISIONS.md`.
+### Rute Halaman Aplikasi:
+- `/` — Beranda / Landing Page (dilengkapi kartu progres dinamis dan seksi panduan `/#cara-belajar`)
+- `/adventure` — Peta Petualangan Dunia Kibo (peta 5 bab dengan pemulihan dinamis dan total bintang)
+- `/challenge/[challengeId]` — Arena permainan & coding untuk 15 tantangan (`ch-01` s/d `ch-15`)
 
-## 10. Routing
+### Rute API Server:
+- `/api/health` — Endpoint verifikasi kesiapan sistem dan status aplikasi (aktif)
 
-Suggested routes:
-
-```text
-/
- /adventure
- /challenge/[challengeId]
- /progress
- /how-to-play
-```
-
-API:
-```text
-/api/kibo
-```
-
-Exact routing may be adjusted if the implementation remains aligned with the PRD.
+### Status Halaman yang Dikonsolidasi:
+- **Panduan Cara Bermain (`how-to-play`)**: Dikonsolidasikan langsung ke seksi Beranda `/#cara-belajar`.
+- **Pemantauan Progres (`progress`)**: Dikonsolidasikan langsung ke kartu Hero Beranda dan header Peta Petualangan `/adventure`.
+- **API AI Server (`/api/kibo`)**: Ditangguhkan (MVP menggunakan kurikulum petunjuk kontekstual deterministik di sisi klien).
 
 ## 11. Performance
 

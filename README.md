@@ -13,8 +13,10 @@ Proyek ini dibangun menggunakan stack modern yang ringan, stabil, dan terfokus u
 - **Framework Web**: [Next.js](https://nextjs.org/) 16 (App Router)
 - **UI Library**: [React](https://react.dev/) 19
 - **Bahasa**: [TypeScript](https://www.typescriptlang.org/) 5
-- **Styling**: Vanilla CSS dengan custom design tokens, tema petualangan digital *deep navy*, aksen neon cyan/purple, dan efek *glassmorphism* (Font: Plus Jakarta Sans)
-- **Database & ORM**: [Prisma ORM](https://www.prisma.io/) 6 dengan [SQLite](https://sqlite.org/) lokal (`prisma/dev.db`)
+- **Styling**: Vanilla CSS dengan custom design tokens tema **Friendly Future** yang cerah dan ramah anak (Cloud White `#F4F9FF`, Sky Blue `#BFE8FF`, Mint Green `#B9F2D0`, Warm Yellow `#FFE49A`, Soft Purple `#D9CCFF`, Deep Slate `#24344D`; Font: Plus Jakarta Sans)
+- **Penyimpanan Progres Aktif**: Browser `localStorage` (`kibocode_player_progress_v1`) via hook reaktif `useSyncExternalStore` (bebas latensi dan tanpa beban login)
+- **Fondasi Database**: [Prisma ORM](https://www.prisma.io/) 6 dengan [SQLite](https://sqlite.org/) lokal (`prisma/dev.db`) disiapkan sebagai fondasi skema arsitektur masa depan jika cloud sync diwajibkan (belum terhubung ke alur permainan aktif)
+- **AI Mentorship**: Deterministic Contextual Progressive Hints (4 tingkat petunjuk bertahap langsung di sisi klien)
 
 ---
 
@@ -38,7 +40,7 @@ Salin berkas template environment:
 cp .env.example .env
 ```
 
-Pastikan variabel `DATABASE_URL` mengarah ke database SQLite lokal:
+Variabel `DATABASE_URL` mengarah ke database SQLite lokal fondasi:
 
 ```env
 DATABASE_URL="file:./dev.db"
@@ -52,15 +54,15 @@ npm run dev
 
 Buka [http://localhost:3000](http://localhost:3000) di browser untuk melihat aplikasi.
 
-### 5. Memeriksa Database (Prisma Studio)
+### 5. Memeriksa Database Fondasi (Prisma Studio)
 
-Untuk menginspeksi tabel database lokal (seperti model `PlayerProgress`) secara visual di antarmuka web:
+Untuk menginspeksi skema database fondasi lokal (model `PlayerProgress`) di antarmuka web:
 
 ```bash
 npx prisma studio
 ```
 
-Prisma Studio akan terbuka di [http://localhost:5555](http://localhost:5555).
+*(Catatan: Progres pemain aktif saat ini disimpan langsung di `localStorage` browser Anda, sedangkan tabel Prisma SQLite merupakan skema fondasi yang disiapkan untuk ekspansi persistensi cloud).*
 
 ### 6. Perintah Pemeriksaan Kualitas & Build
 
@@ -68,6 +70,7 @@ Sesuai script yang terdaftar di `package.json`:
 
 - **Typecheck**: `npm run typecheck` — Memeriksa tipe data TypeScript (`tsc --noEmit`).
 - **Linting**: `npm run lint` — Memeriksa standar kode menggunakan ESLint.
+- **Automated Tests**: `npm test` — Menjalankan 5 test suite otomatis (Lumina Town, Gate Valley, Sprout Garden, Memory Station, Kibo Core).
 - **Production Build**: `npm run build` — Melakukan kompilasi bundle produksi Next.js.
 - **Production Run**: `npm run start` — Menjalankan server aplikasi bundle hasil build.
 
@@ -77,11 +80,11 @@ Sesuai script yang terdaftar di `package.json`:
 
 Seluruh dokumentasi produk dan arsitektur aktif tersentralisasi di dalam folder `docs/`:
 
-1. **[`docs/PRD.md`](docs/PRD.md)** — *Product Requirements Document*: Visi produk, target pengguna siswa SD kelas 1–6, 5 wilayah Kibo World, alur inti bermain, prinsip edukasi, dan batasan ruang lingkup MVP.
-2. **[`docs/DESIGN.md`](docs/DESIGN.md)** — *Design Specification*: Panduan visual Kibo World, palet warna (Kibo Purple, Cyan Core, Deep Navy, Warm Yellow), tipografi, ekspresi karakter, serta pedoman UI tantangan dan blok kode.
-3. **[`docs/TECHNICAL.md`](docs/TECHNICAL.md)** — *Technical Specification*: Arsitektur aplikasi Next.js, model data tantangan, integrasi database SQLite & Prisma, alur API server-side untuk AI Kibo, serta standar aksesibilitas dan performa.
-4. **[`docs/AI_RULES.md`](docs/AI_RULES.md)** — *AI Behavior Rules*: Pedoman dan batasan Kibo AI sebagai mentor ramah anak; mencakup sistem petunjuk bertingkat 4 level (*Thinking*, *Direction*, *Concept*, *Guided Solution*) dan kesadaran kesalahan kontekstual.
-5. **[`docs/CONTENT.md`](docs/CONTENT.md)** — *Learning Content Specification*: Kurikulum 5 bab pembelajaran (Lumina Town, Gate Valley, Sprout Garden, Memory Station, Kibo Core) dengan total 15 level tantangan logika pemrograman.
+1. **[`docs/PRD.md`](docs/PRD.md)** — *Product Requirements Document*: Visi produk, target pengguna siswa SD kelas 1–6, 5 wilayah Kibo World, alur inti bermain, konsolidasi rute, dan batasan ruang lingkup MVP.
+2. **[`docs/DESIGN.md`](docs/DESIGN.md)** — *Design Specification*: Panduan visual Kibo World dengan palet **Friendly Future**, tipografi, ekspresi karakter, serta pedoman UI tantangan dan blok kode.
+3. **[`docs/TECHNICAL.md`](docs/TECHNICAL.md)** — *Technical Specification*: Arsitektur aplikasi Next.js, model data tantangan, penyimpanan `localStorage`, fondasi Prisma/SQLite, alur rute aktif, serta standar aksesibilitas dan performa.
+4. **[`docs/AI_RULES.md`](docs/AI_RULES.md)** — *AI Behavior Rules*: Pedoman Kibo AI sebagai mentor ramah anak; sistem petunjuk kontekstual bertingkat 4 level (*Thinking*, *Direction*, *Concept*, *Guided Solution*) deterministik di sisi klien.
+5. **[`docs/CONTENT.md`](docs/CONTENT.md)** — *Learning Content Specification*: Kurikulum 5 bab pembelajaran (Lumina Town, Gate Valley, Sprout Garden, Memory Station, Kibo Core) dengan total 15 level tantangan logika pemrograman (format 5–3–3–3–1).
 6. **[`docs/PROGRESS.md`](docs/PROGRESS.md)** — *Project Progress Tracking*: **Sumber kebenaran status progres pengerjaan terbaru** (Phase 0 Foundation hingga Phase 7 Polish).
 7. **[`docs/DECISIONS.md`](docs/DECISIONS.md)** — *Product Decisions Log*: Daftar keputusan strategis produk dan arsitektur yang telah disetujui dan dikunci oleh Product Manager (PM).
 8. **[`MASTER_PROMPT.md`](MASTER_PROMPT.md)** — *Master AI Agent Rules*: Pedoman operasional kerja, batasan kewenangan, dan protokol verifikasi untuk AI Coding Agent.

@@ -177,6 +177,8 @@ AI hint progression:
 3. Concept — relevant coding concept/block.
 4. Guided Solution — clearer guidance after sufficient struggle.
 
+Dalam rilis MVP, sistem AI Mentor Kibo bekerja secara deterministik di sisi klien menggunakan kurikulum petunjuk kontekstual 4 tingkat yang telah terstruktur pada data setiap tantangan, serta deteksi kegagalan simulasi berbasis engine (menghindari latensi jaringan dan risiko error eksternal saat lomba). Panggilan API server-side AI ditangguhkan untuk iterasi berikutnya.
+
 Kibo should understand the mistake and respond to the actual challenge state.
 
 AI must not:
@@ -228,12 +230,15 @@ No coins, shop, lootbox, gacha, inventory, or leaderboard.
 
 ## 13. MVP Pages
 
-Required:
-- `/` — Home / Landing (menampilkan progres petualangan dinamis dan ringkasan bintang)
-- `/adventure` — World Map (peta 5 bab dengan progres pemulihan dunia terintegrasi)
-- `/challenge/[challengeId]` — Arena permainan & coding untuk 15 tantangan
-- Progress tracking — Terintegrasi langsung pada header `/adventure` dan kartu status beranda (halaman `/progress` terpisah dikonsolidasikan demi kesederhanaan navigasi anak SD)
-- `/how-to-play` — Panduan alur belajar & cara bermain
+Rute Aktif (sesuai struktur fisik `src/app`):
+- `/` — Home / Landing (menampilkan status progres petualangan dinamis, ringkasan bintang, kurikulum 5 bab, dan seksi panduan cara belajar di `/#cara-belajar`)
+- `/adventure` — World Map (peta 5 bab dengan pemulihan dunia terintegrasi, pemantauan bintang, dan alur pembukaan prasyarat berurutan)
+- `/challenge/[challengeId]` — Arena permainan & coding interaktif untuk seluruh 15 tantangan
+- `/api/health` — Endpoint verifikasi status kesehatan dan kesiapan aplikasi
+
+Halaman yang Dikonsolidasikan (tidak memerlukan rute URL mandiri):
+- **Panduan Cara Bermain (`how-to-play`)**: Dikonsolidasikan langsung ke dalam seksi interaktif Beranda `/#cara-belajar` untuk mempermudah akses anak tanpa berpindah halaman.
+- **Pemantauan Progres (`progress`)**: Dikonsolidasikan langsung ke kartu Hero Beranda dan header Peta Petualangan `/adventure` agar progres selalu terlihat secara alami.
 
 Not required for MVP:
 - login,
@@ -252,7 +257,7 @@ Not required for MVP:
 - complex account system,
 - social features.
 
-Progress may initially be stored locally in the browser if persistent cloud storage is not necessary.
+Progres pemain disimpan secara aktif pada browser melalui `localStorage` (`kibocode_player_progress_v1`). Database server-side disiapkan sebagai opsi masa depan.
 
 ## 14. Product Principles
 

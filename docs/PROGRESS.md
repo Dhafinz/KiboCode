@@ -30,8 +30,8 @@ Priority:
 
 - [x] P0 Home / Landing (Verified: Beranda reaktif terhubung ke data progres pemain riil `usePlayerProgress`, badge status bab dinamis, dan copywriting ramah anak: "15 Tantangan Coding", "Bagaimana Cara Belajar di KiboCode?", "Pilih dan susun blok kode visual")
 - [x] P0 Adventure / World Map (Verified: `/adventure` dengan 5 wilayah lengkap, 5 bab playable termasuk Kibo Core, pembukaan kunci dinamis, status restorasi, dan navigasi lintas-bab berurutan)
-- [ ] P0 Progress page (Integrated into Adventure World Map header & Homepage Hero status)
-- [ ] P0 How-to-play page
+- [x] P0 Progress tracking integration (Verified: Dikonsolidasikan langsung ke header Peta Petualangan `/adventure` dan kartu status Hero Beranda, tidak memerlukan rute `/progress` mandiri)
+- [x] P0 How-to-play guide integration (Verified: Dikonsolidasikan langsung ke dalam seksi interaktif Beranda `/#cara-belajar`, tidak memerlukan rute `/how-to-play` mandiri)
 - [x] P0 Responsive navigation (Verified: Navbar desktop + mobile drawer, navigasi berurutan ch-11 -> ch-12 -> ch-13 -> ch-14 -> ch-15)
 
 ## Phase 2 — Kibo
@@ -119,8 +119,8 @@ Priority:
 - [x] P0 Console/runtime error audit (0 ESLint errors, 0 type errors, clean build)
 - [x] P0 Visual Redesign: Friendly Future (Verified: Bright child-friendly aesthetic with Cloud White #F4F9FF, Sky Blue #BFE8FF, Mint Green #B9F2D0, Warm Yellow #FFE49A, Soft Purple #D9CCFF, Deep Slate #24344D, and crisp white cards. Contrast ratio >8:1, 0 ESLint warnings, 100% tests pass, clean Next.js 16 build).
 - [x] P0 Full 15-challenge playthrough (Verified: Seluruh 15 tantangan ch-01 s/d ch-15 dapat dimainkan hingga selesai dan tervalidasi via automated test suite 100% pass)
-- [ ] P0 Deployment test
-- [ ] P0 Final regression test
+- [ ] P0 Deployment test (Pending: Menunggu proses hosting/deployment ke server lomba atau domain publik)
+- [ ] P0 Final regression test (Pending: Menunggu validasi pengujian manual akhir pada perangkat fisik layar sentuh/tablet siswa SD)
 - [x] P1 Additional micro-interactions
 
 ## Deferred / Out of Scope

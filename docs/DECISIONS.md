@@ -39,9 +39,9 @@ Kibo Core → Problem Solving
 
 ## D-006 — Fifteen challenges
 
-**Decision:** 5 chapters × 3 challenges = 15 challenges.
+**Decision:** Total 15 tantangan MVP didistribusikan dalam susunan 5–3–3–3–1 (Lumina Town: 5, Gate Valley: 3, Sprout Garden: 3, Memory Station: 3, Kibo Core: 1 grand finale). *(Catatan historis: Pada inisiasi awal dirancang format 5 bab × 3 tantangan, kemudian disempurnakan pada D-021 agar Lumina Town memberikan fondasi urutan yang lebih kokoh bagi siswa SD dan Kibo Core menjadi klimaks terintegrasi).*
 
-**Reason:** A smaller polished MVP is preferable to a large unfinished game.
+**Reason:** Format 5–3–3–3–1 memberikan transisi kurva kesulitan bertahap yang ideal bagi anak sekolah dasar sekaligus menghadirkan tantangan akhir yang utuh dan berbobot tanpa mengurangi total target 15 tantangan MVP.
 
 ## D-007 — Block coding
 
@@ -75,15 +75,15 @@ Kibo Core → Problem Solving
 
 ## D-012 — Progress storage
 
-**Decision:** Local browser progress is acceptable for MVP. Cloud PostgreSQL is an option if persistent cloud storage is actually required.
+**Decision:** Seluruh progres pemain MVP disimpan secara aktif pada browser `localStorage` (`kibocode_player_progress_v1`) via hook reaktif `useSyncExternalStore`. Persistensi cloud (PostgreSQL/Supabase) disiapkan sebagai opsi masa depan jika kompetisi mewajibkan akun cloud.
 
-**Reason:** Keeps initial architecture simple.
+**Reason:** Memberikan performa instan tanpa latensi jaringan, bebas error sesi, SSR-safe, dan tidak membebani siswa SD dengan keharusan login.
 
-## D-013 — SQLite first
+## D-013 — SQLite & Prisma as Architecture Foundation
 
-**Decision:** SQLite for development/MVP, with Prisma as ORM.
+**Decision:** Dependensi Prisma ORM dan basis data SQLite lokal (`prisma/dev.db`) disediakan sebagai fondasi arsitektur database masa depan, namun belum dihubungkan ke alur aktif permainan MVP.
 
-**Reason:** Simple setup and enough for the initial product. PostgreSQL can be used later without changing the application architecture substantially.
+**Reason:** Menjaga kesiapan teknis jika fitur cloud sync atau leaderboard diimplementasikan di kemudian hari, tanpa menambah kompleksitas koneksi jaringan pada fase awal.
 
 ## D-014 — Supabase/PostgreSQL production option
 
